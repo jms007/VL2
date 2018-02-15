@@ -68,7 +68,7 @@ public class VL2
 
     public void VL2Init(String args[])
     {
-        System.out.println("Enter VL2Init mod #5");
+        System.out.println("Enter VL2Init");
         
 //        {   // Display Logo only on initial call
 //            try
