@@ -43,6 +43,7 @@ public class VL2
     implements ActionListener
 {
     // Global variables
+	static final String ONEDRIVE="C:\\Users\\jms\\OneDrive\\ACCOUNTING\\";
     static String entityName=null;
     static String entityLongName=null;
     //static String entityDir=null;
@@ -68,7 +69,7 @@ public class VL2
 
     public void VL2Init(String args[])
     {
-        System.out.println("Enter VL2Init #10");
+        System.out.println("Enter VL2Init ONEDRIVE=" + ONEDRIVE);
         
 //        {   // Display Logo only on initial call
 //            try
@@ -109,33 +110,33 @@ public class VL2
         // accountingRoot is:
         //     a top-level folder named 'ACCOUNTING' on some disk
         //     which contains a file named 'accounting.properties'
-        // There should be only ONE such instance on the system.
-        String accountingRoot = null;
-        String trial;
-        for (int i=0; i<Strings.ALPHA_UPPER.length(); ++i)
-        {
-            String disk = Strings.ALPHA_UPPER.substring( i, i+1 );
-            if ( new File( disk + ":\\ACCOUNTING" ).exists() )
-            {
-                trial = disk + ":\\ACCOUNTING\\";
-                if (new File( trial + "accounting.properties").exists())
-                    if (accountingRoot != null)
-                    {
-                        System.out.println("multiple accounting roots:");
-                        System.out.println("    " + accountingRoot + "and " + trial);
-                        System.exit(102);
-                    }
-                    else
-                    {
-                        accountingRoot = trial;
-                        System.out.println("accountingRoot="+accountingRoot);
-                        try { aprops = new XProperties(trial+"accounting.properties"); }
-                        catch (IOException iox)
-                        { 
-                            System.out.println("unable to open " + trial + "accounting.properties");
-                            System.exit(101); // Cannot open accounting.properties
-                        }
-                    }
+        // We expect this to be on ONEDRIVE
+        String accountingRoot = ONEDRIVE;
+//        String trial;
+//        for (int i=0; i<Strings.ALPHA_UPPER.length(); ++i)
+//        {
+//            String disk = Strings.ALPHA_UPPER.substring( i, i+1 );
+//            if ( new File( disk + ":\\ACCOUNTING" ).exists() )
+//            {
+//                trial = disk + ":\\ACCOUNTING\\";
+//                if (new File( trial + "accounting.properties").exists())
+//                    if (accountingRoot != null)
+//                    {
+//                        System.out.println("multiple accounting roots:");
+//                        System.out.println("    " + accountingRoot + "and " + trial);
+//                        System.exit(102);
+//                    }
+//                    else
+//                    {
+//                        accountingRoot = trial;
+//                        System.out.println("accountingRoot="+accountingRoot);
+//                        try { aprops = new XProperties(trial+"accounting.properties"); }
+//                        catch (IOException iox)
+//                        { 
+//                            System.out.println("unable to open " + trial + "accounting.properties");
+//                            System.exit(101); // Cannot open accounting.properties
+//                        }
+//                    }
 //                else if (secondaryAccountingRoot != null)
 //                {
 //                    System.out.println("multiple secondary accounting roots");
@@ -150,8 +151,8 @@ public class VL2
 //                if ((primaryAccountingRoot != null) && (secondaryAccountingRoot != null))
 //                    break;
 //            }
-            }
-        }
+//            }
+//        }
         try { aprops = new XProperties(accountingRoot + "accounting.properties"); }
         catch (IOException iox)
             {
