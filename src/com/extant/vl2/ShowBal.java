@@ -39,12 +39,12 @@ import java.io.IOException;
 //import java.util.Vector;
 //import java.util.StringTokenizer;
 import javax.swing.JRadioButton;
-import javax.swing.JTree;
+//import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import javax.swing.event.*;
-import javax.swing.tree.DefaultTreeModel;
+//import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
-
+import java.awt.event.KeyEvent;
 
 /**
  *
@@ -54,13 +54,13 @@ public class ShowBal
     extends javax.swing.JFrame
     implements TreeSelectionListener
 {
-    public ShowBal( Chart chart, ChartTree tree, String glFileName )
+    public ShowBal( Chart chart, ChartTree tree, XProperties props )
     {
         logger = VL2.logger;
         // For debugging
         //logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
         this.chart = chart;
-        this.glFileName = glFileName;
+        glFileName = props.getString("GLFile");
         initComponents();
         setup();
     }
@@ -160,7 +160,7 @@ public class ShowBal
 
     private void txtEffDateKeyTyped(java.awt.event.KeyEvent evt)//GEN-FIRST:event_txtEffDateKeyTyped
     {//GEN-HEADEREND:event_txtEffDateKeyTyped
-        if ( evt.getKeyChar() == evt.VK_ENTER ) btnComputeActionPerformed( null );
+        if ( evt.getKeyChar() == KeyEvent.VK_ENTER ) btnComputeActionPerformed( null );
     }//GEN-LAST:event_txtEffDateKeyTyped
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCloseActionPerformed
