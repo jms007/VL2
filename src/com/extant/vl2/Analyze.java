@@ -13,15 +13,20 @@ import com.extant.utilities.LogFile;
 import java.io.IOException;
 import java.util.Vector;
 import javax.swing.JRadioButton;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 /**
  *
  * @author  jms
  */
 public class Analyze
-extends javax.swing.JDialog
+	extends javax.swing.JDialog
+	implements TreeSelectionListener
 {
-    public Analyze(javax.swing.JFrame parent, boolean modal, Chart chart, String glFilename )
+    public Analyze(javax.swing.JFrame parent, boolean modal, Chart chart, ChartTree tree, String glFilename )
     {
         super(parent, modal);
         initComponents();
@@ -243,6 +248,23 @@ extends javax.swing.JDialog
 //        }
 //        else comboAccounts.setSelectedIndex( -1 );
     }//GEN-LAST:event_comboAccountsKeyTyped
+
+    private void TreeSelectionListener(TreeSelectionEvent e)
+    {
+    	logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+        TreePath selectedPath = e.getNewLeadSelectionPath();
+        DefaultMutableTreeNode selectedNode =
+            ((DefaultMutableTreeNode)selectedPath.getLastPathComponent());
+        logger.logDebug("ShowBal: selectedNode="+selectedNode.toString());
+        String nodeString = selectedNode.toString();
+        if (nodeString.contains("[]")) return;  //This is not an account node
+        String[] split = nodeString.split("\\[*\\]");
+        String selectedAccount = split[0];
+        logger.logDebug("selectedAccount="+selectedAccount);
+        String selectedAccountNo = selectedAccount.substring(1);
+        logger.logDebug("selectedAccountNo="+selectedAccountNo);
+        comboAccounts.setSelectedItem(selectedAccountNo);
+    }
 
     /** Closes the dialog */
     private void closeDialog(java.awt.event.WindowEvent evt)
