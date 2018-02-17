@@ -232,7 +232,7 @@ public class ShowBal
             }
             cutoffDate = new Julian( txtEffDate.getText() );
         }
-        else cutoffDate = null;
+        else cutoffDate = new Julian();
         statusBar.setText( "" );
         lblAnswer1.setText( "" );
         lblAnswer2.setText( "" );
