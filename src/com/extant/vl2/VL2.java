@@ -589,7 +589,7 @@ public class VL2
             else if (command.equals("Account Balance"))
                 new ShowBal(VL2.chart, chartTree, props);
             else if (command.equals("Analyze"))
-                new Analyze(this, true, VL2.chart, props.getString("GLFile"));
+                new Analyze(this, false, VL2.chart, chartTree, props.getString("GLFile"));
             else if (command.equals("Validate"))
                 ;
             else if (command.equals("Search"))
@@ -619,6 +619,7 @@ public class VL2
             logger.logDebug("Entity: "+ props.getString("EntityLongName"));
             try
             {   
+            	String outFile=workDir + "Stmt.txt";
                 StatementTXT statement = new StatementTXT
                     ( props
                     , VL2.chart
@@ -626,7 +627,7 @@ public class VL2
                     , new Julian(props.getString("EarliestDate"))
                     , new Julian(props.getString("LatestDate"))
                     , 0
-                    , workDir+"Stmt.txt"
+                    , outFile
                     , VL2.logger
                     );
                 statement.makeStatement();
