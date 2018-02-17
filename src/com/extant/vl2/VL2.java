@@ -48,7 +48,7 @@ public class VL2
     static String entityLongName=null;
     //static String entityDir=null;
     //static String entityRemoteDir=null;
-    //static String entityPropsFilename=null;
+    static String entityPropsFilename=null;
     static String yy=null;
     static String workDir;
     static com.extant.utilities.XProperties props;
@@ -112,6 +112,7 @@ public class VL2
         //     which contains a file named 'accounting.properties'
         // We expect this to be on ONEDRIVE
         String accountingRoot = ONEDRIVE;
+/*****        
 //        String trial;
 //        for (int i=0; i<Strings.ALPHA_UPPER.length(); ++i)
 //        {
@@ -153,6 +154,8 @@ public class VL2
 //            }
 //            }
 //        }
+ *****/
+
         try { aprops = new XProperties(accountingRoot + "accounting.properties"); }
         catch (IOException iox)
             {
@@ -165,6 +168,9 @@ public class VL2
         logger = new LogFile(logFilename, true);
         logger.log("Log File " + logFilename + " opened");
         logger.log("***** STARTING VL2 " + new Julian().toString("") + " *****");
+        
+        // For Debugging
+        //logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
         MsgBox msgBox = new MsgBox
             ( VL2MenuFrame
@@ -174,21 +180,16 @@ public class VL2
             , new String[] {"OK", "Cancel"}
             );
         if (msgBox.getCommand().equals("Cancel"))
-        {
-            System.out.println("User Cancel (Enter Entity Short Name)");
-            System.exit(0);
-        }
+        	logger.logFatal("User Cancel (Enter Entity Name)");
         entityName = msgBox.getResponse().toUpperCase();
         String entityRoot;
         entityRoot = accountingRoot + entityName + "\\";
-        //aprops.setProperty("EntityRoot", entityRoot);
-        //System.out.println("aprops("+entityName+")="+aprops.getProperty(entityName));
         
         // Set properties file name for this entity
-        String propertiesFile = entityRoot + entityName + ".properties";
-        try { props = new XProperties( propertiesFile ); }
-        catch (IOException iox) { System.out.println("Could not open " + propertiesFile); }
-        cashAcctNo = props.getString("CashAcctNo");
+        entityPropsFilename = entityRoot + entityName + ".properties";
+        try { props = new XProperties( entityPropsFilename ); }
+        catch (IOException iox)
+        {  	logger.logFatal("Could not open " + entityPropsFilename); }
 
         msgBox = new MsgBox
             ( VL2MenuFrame
@@ -198,36 +199,35 @@ public class VL2
             , new String[] {"OK", "Cancel"}
             );
         if (msgBox.getCommand().equals("Cancel"))
-        {
-            System.out.println("User Cancel (Enter year)");
-            System.exit(0);
-        }
+        	logger.logFatal("User Cancel (Enter year)");
         yy = msgBox.getResponse();
         
-        // Check that logger is functional
-        if (logger == null)
-        {
-            System.out.println("VL2:214 logger is null");
-            System.exit(11);
-        }
-        //else System.out.println("VL2:210 logger is NOT null");
-        
-        // Get entity props
-        String entityPropertiesFile = entityRoot + entityName + ".properties";
+/*****
+        // Get entity props & initialize
+
         logger.logDebug("entityPropertiesFile="+entityPropertiesFile);
         try { props = new XProperties(entityPropertiesFile); }
         catch (IOException iox)
         { logger.logFatal("Cannot open entity XProperties File (" + 
                 entityPropertiesFile + ") " + iox.getMessage()); }
         props.setProperty("PropertiesFile", entityPropertiesFile);
-
+*****/
         // Find working directory & entity files for the selected entity
+        cashAcctNo = props.getString("CashAcctNo");
+        if (cashAcctNo == null) logger.logFatal("cashAcctNo is null!");
+        if (cashAcctNo.length() < 4)
+        	logger.logFatal("Invalid CashAcctNo: " + cashAcctNo);
         workDir = entityRoot + "GL" + yy + "\\";
         if (!new File( workDir ).exists())
             logger.logFatal("Unable to find workDir: " + workDir);
         props.setProperty("WorkDir", workDir);
         props.setProperty("yy", yy);
-        props.setProperty("WorkDir", workDir);
+        props.setProperty("GLFile", workDir + "GL0010.DAT");
+        props.setProperty("CustomerList", workDir + "CUSTOMER.LST");
+        props.setProperty("VendorList", workDir + "VENDOR.LST");
+        props.setProperty("ContactsList", workDir + "CONTACTS.LST");
+        props.setProperty("ChartXML", workDir + "CHART.XML");
+        props.setProperty("GSNFile", workDir + "gsnNVFile.txt");
 
         // Make a progress report
         //logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
@@ -237,12 +237,12 @@ public class VL2
         logger.logDebug("accounting.props="+accountingRoot + "accounting.properties");
         logger.logDebug("entityName="+entityName);
         logger.logDebug("EntityLongName="+props.getString("VL.EntityLongName"));
-        logger.logDebug("entityPropertiesFile="+entityPropertiesFile);
+        logger.logDebug("entityPropsFilename="+entityPropsFilename);
         logger.logDebug("entityRoot="+entityRoot);
         logger.logDebug("WorkDir="+props.getString("WorkDir"));
-        logger.logDebug("CashAcctNo="+props.getString("VL.CashAcctNo"));
-        
+        //logger.logDebug("CashAcctNo="+props.getString("VL.CashAcctNo"));
         logger.logDebug("test retrieving from props: EntityLongName=" + props.getProperty("EntityLongName"));
+        
         VL2MenuFrame.setTitle(props.getString("EntityLongName"));
 
         // Set Initial GSN
@@ -254,7 +254,7 @@ public class VL2
         logger.logDebug("entityName=" + entityName);
         logger.logDebug("year=" + yy);
         logger.logDebug("workDir=" + workDir);
-        logger.logDebug("propertiesFile=" + propertiesFile);
+        logger.logDebug("entityPropsFilename=" + entityPropsFilename);
 
         try
         {
@@ -268,15 +268,22 @@ public class VL2
                 logger.logFatal( "Unable to find " + chartFilename );
             chart = new Chart();
             chart.init( chartFilename, logger );  // throws IOException & VLException
-            chartTree = new ChartTree(props, chart, logger);
+            //chartTree = new ChartTree(props, chart, logger);
         }
-        catch (IOException|VLException|ParserConfigurationException|SAXException x)
-        {   logger.logFatal("VL2 error checking or displaying chart: " + x.getMessage()); }
+        catch (IOException iox)
+        {   logger.logFatal("IO error checking chart: " + iox.getMessage()); }
+        catch (VLException vlx)
+        { logger.logFatal("VL Error checking chart: "+ vlx.getMessage()); }
+//            catch (ParserConfigurationException pcx)
+//        {	logger.logFatal("ParserConfigurationError: " + pcx.getMessage()); }
+//          catch (SAXException sax)
+//      {	logger.logFatal("SAX Exception: " + sax.getMessage()); }
         
         // Build ChartTree (initially invisible, location & size not specified)
         try { chartTree = new ChartTree(props, chart, logger); }
         catch (ParserConfigurationException|SAXException|IOException|VLException x)
         { logger.logFatal("ChartTree build: "+ x.getMessage()); }
+        
         logger.logInfo("Chart initialized without error");
             
 //            //Create a tree that allows one node selection at a time.
@@ -328,7 +335,7 @@ public class VL2
 
             if (glCheck.getNEntries() > 0)
             {
-                // Properties file has been updated with dates by GLCheck
+                // Properties file dates have been updated by GLCheck
                 //logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
                 //logger.logDebug("(before update) EarliestDate="+props.getString("EarliestDate"));
                 //logger.logDebug("(before update) LatestDate="+props.getString("LatestDate"));
@@ -357,8 +364,8 @@ public class VL2
     public void VL2Start(String[] args)
     {
         logger.logInfo("Enter VL2Start");
-        //if (VL2MenuFrame == null) logger.logDebug("Entering VL2Start: VL2MenuFrame is null");
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        //if (VL2MenuFrame == null) logger.logDebug("Entering VL2Start: VL2MenuFrame is null!");
+//        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 //        int screenWidth = (int)screenSize.getWidth();
 //        int screenHeight = (int)screenSize.getHeight();
 //        int xCenter = screenWidth/2;
@@ -492,7 +499,7 @@ public class VL2
             {
                 try
                 {
-                    Four11 four11 = new Four11("E:");
+                    Four11 four11 = new Four11("C:\\Users\\jms\\OneDrive\\ACCOUNTING");
                     four11.showTree();
                 }
                 catch (UtilitiesException ux)
@@ -580,7 +587,7 @@ public class VL2
 
         // Audit
             else if (command.equals("Account Balance"))
-                new ShowBal(VL2.chart, chartTree, props.getString("GLFile"));
+                new ShowBal(VL2.chart, chartTree, props);
             else if (command.equals("Analyze"))
                 new Analyze(this, true, VL2.chart, props.getString("GLFile"));
             else if (command.equals("Validate"))
