@@ -200,18 +200,17 @@ public class ShowBal
     @Override
     public void valueChanged(TreeSelectionEvent e)
     {
-        //Console.println("ShowBal: valueChanged");
         TreePath selectedPath = e.getNewLeadSelectionPath();
         DefaultMutableTreeNode selectedNode =
             ((DefaultMutableTreeNode)selectedPath.getLastPathComponent());
-        Console.println("ShowBal: selectedNode="+selectedNode.toString());
+        logger.logDebug("ShowBal: selectedNode="+selectedNode.toString());
         String nodeString = selectedNode.toString();
         if (nodeString.contains("[]")) return;  //This is not an account node
         String[] split = nodeString.split("\\[*\\]");
         String selectedAccount = split[0];
-        Console.println("selectedAccount="+selectedAccount);
+        logger.logDebug("selectedAccount="+selectedAccount);
         String selectedAccountNo = selectedAccount.substring(1);
-        Console.println("selectedAccountNo="+selectedAccountNo);
+        logger.logDebug("selectedAccountNo="+selectedAccountNo);
         txtAccountNo.setText(selectedAccountNo);
     }
 
