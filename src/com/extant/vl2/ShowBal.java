@@ -247,7 +247,7 @@ public class ShowBal
             {
                 image = glFile.readLine( UsefulFile.ALL_WHITE );
                 glEntry = new GLEntry( image );
-                include = chart.match( acctEntry, glEntry, cutoffDate );
+                include = Chart.match( acctEntry, glEntry, cutoffDate );
                 if ( include )
                 {
                     found = true;
@@ -289,7 +289,6 @@ public class ShowBal
     LogFile logger;
     Chart chart;
     String glFileName;
-    //StringBuffer comboAcctBuffer;
     AccountFinder accountFinder;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -305,5 +304,15 @@ public class ShowBal
     private javax.swing.JTextField txtAccountNo;
     private javax.swing.JTextField txtEffDate;
     // End of variables declaration//GEN-END:variables
+    
+    /***** How to implement account selection from chart
+     * In VL2:
+     *     add chartTree to the parameters
+     * In user class:
+     *     add ChartTree tree in the parameters
+     *     add implements [javax.swing.event.]TreeSelectionListener
+     *     tree.addTreeSelectionListener(this) in the initialization code
+     *     add method valueChanged(TreeSelectionEvent evt) to process the event
+     *****/     
 }
 

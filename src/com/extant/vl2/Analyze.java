@@ -18,6 +18,9 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import static com.extant.vl2.ChartTree.tree;
+
+
 /**
  *
  * @author  jms
@@ -249,22 +252,9 @@ public class Analyze
 //        else comboAccounts.setSelectedIndex( -1 );
     }//GEN-LAST:event_comboAccountsKeyTyped
 
-    private void TreeSelectionListener(TreeSelectionEvent e)
-    {
-    	logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-        TreePath selectedPath = e.getNewLeadSelectionPath();
-        DefaultMutableTreeNode selectedNode =
-            ((DefaultMutableTreeNode)selectedPath.getLastPathComponent());
-        logger.logDebug("ShowBal: selectedNode="+selectedNode.toString());
-        String nodeString = selectedNode.toString();
-        if (nodeString.contains("[]")) return;  //This is not an account node
-        String[] split = nodeString.split("\\[*\\]");
-        String selectedAccount = split[0];
-        logger.logDebug("selectedAccount="+selectedAccount);
-        String selectedAccountNo = selectedAccount.substring(1);
-        logger.logDebug("selectedAccountNo="+selectedAccountNo);
-        comboAccounts.setSelectedItem(selectedAccountNo);
-    }
+//    public void TreeSelectionListener(TreeSelectionEvent e)
+//    {
+//    }
 
     /** Closes the dialog */
     private void closeDialog(java.awt.event.WindowEvent evt)
@@ -278,6 +268,7 @@ public class Analyze
         manageDateButtons(null);
         manageSortButtons(null);
         setVisible(true);
+        tree.addTreeSelectionListener(this);
     }
 
     private void analyze( Account acctEntry, Julian startDate, Julian endDate )
@@ -447,5 +438,22 @@ public class Analyze
     private javax.swing.JTextField txtEndDate;
     private javax.swing.JTextField txtStartDate;
     // End of variables declaration//GEN-END:variables
+	@Override
+	public void valueChanged(TreeSelectionEvent e)
+	{
+    	logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+        TreePath selectedPath = e.getNewLeadSelectionPath();
+        DefaultMutableTreeNode selectedNode =
+            ((DefaultMutableTreeNode)selectedPath.getLastPathComponent());
+        logger.logDebug("ShowBal: selectedNode="+selectedNode.toString());
+        String nodeString = selectedNode.toString();
+        if (nodeString.contains("[]")) return;  //This is not an account node
+        String[] split = nodeString.split("\\[*\\]");
+        String selectedAccount = split[0];
+        logger.logDebug("selectedAccount="+selectedAccount);
+        String selectedAccountNo = selectedAccount.substring(1);
+        logger.logDebug("selectedAccountNo="+selectedAccountNo);
+        comboAccounts.setSelectedItem(selectedAccountNo);
+	}
 }
 
