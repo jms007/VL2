@@ -14,7 +14,7 @@ public class GSNMan
 {
     private static String GSNfilename = "gsnNVFile.txt";
     private static String GSN;
-    static XProperties props;
+    XProperties props;
     LogFile logger;
 
     String init(XProperties props, LogFile logger)
