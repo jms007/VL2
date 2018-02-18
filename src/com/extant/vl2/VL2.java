@@ -2,7 +2,7 @@ package com.extant.vl2;
 import com.extant.utilities.MsgBox;
 import com.extant.utilities.XProperties;
 import com.extant.utilities.Four11;
-import com.extant.utilities.Strings;
+//import com.extant.utilities.Strings;
 import com.extant.utilities.Julian;
 //import com.extant.utilities.MyPanel;
 import com.extant.utilities.LogFile;
@@ -10,23 +10,22 @@ import com.extant.utilities.ViewFile;
 import com.extant.utilities.UtilitiesException;
 import com.extant.utilities.DisplayTree;
 import com.extant.utilities.TreeClimber;
-import org.w3c.dom.Document;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JTree;
+import org.w3c.dom.Document;
 import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JTree;
 import java.awt.Container;
-//import java.io.FileInputStream;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 //import java.net.*;
@@ -41,12 +40,18 @@ public class VL2
     extends JFrame
     implements ActionListener
 {
+	private static String getAccountingDataDirectory()
+	{
+		String userName = System.getProperty("user.name");
+		String pattern = "C:\\Users\\%s\\OneDrive\\ACCOUNTING\\";
+		return String.format(pattern, userName);
+	}
+
     // Global variables
-	static final String ONEDRIVE="C:\\Users\\jms\\OneDrive\\ACCOUNTING\\";
+	static final String ACCOUNTING_DIR = getAccountingDataDirectory();
     static String entityName=null;
     static String entityLongName=null;
     //static String entityDir=null;
-    //static String entityRemoteDir=null;
     static String entityPropsFilename=null;
     static String yy=null;
     static String workDir;
@@ -68,7 +73,7 @@ public class VL2
 
     public void VL2Init(String args[])
     {
-        System.out.println("Enter VL2Init ONEDRIVE=" + ONEDRIVE);
+        System.out.println("Enter VL2Init ACCCOUNTING_DIR =" + ACCOUNTING_DIR);
         
 //        {   // Display Logo only on initial call
 //            try
@@ -89,10 +94,10 @@ public class VL2
 //                logoPanel.setVisible(true);
 //            }
 //            catch (Exception x)
-//            {   System.out.println( "cannot display logo: " + x.getMessage() ); }
+//            {   System.out.println( "cannot display logo: " + x.getMessage()); }
 //            System.out.println( "finished with logo" );
 //        }
-//
+
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         VL2MenuFrame.setLocation(
             (((int)screenSize.getWidth()  - 550)/2),
@@ -106,11 +111,7 @@ public class VL2
         }
         
         // Locate the accountingRoot & accounting.properties file
-        // accountingRoot is:
-        //     a top-level folder named 'ACCOUNTING' on some disk
-        //     which contains a file named 'accounting.properties'
-        // We expect this to be on ONEDRIVE
-        String accountingRoot = ONEDRIVE;
+        String accountingRoot = ACCOUNTING_DIR;
 /*****        
 //        String trial;
 //        for (int i=0; i<Strings.ALPHA_UPPER.length(); ++i)
@@ -317,7 +318,8 @@ public class VL2
             
             logger.logInfo("Chart tree initialization & display complete.");
 
-            // Check gl file
+            // Check GL file
+            
             glFilename = workDir + "GL0010.DAT";
             logger.logDebug("Checking GL File " + glFilename);
             if ( !new File( glFilename ).exists() )
@@ -356,7 +358,7 @@ public class VL2
 //                catch (IOException iox)
 //                {   logger.logFatal( "VL2: error found in GL File" + iox.getMessage()); }
                 
-                logger.logInfo("All Checks Complete - No Errors Detected.");
+                logger.logInfo("ALL CHECKS COMPLETE - NO ERRORS FOUND.");
             }
     }
 
@@ -590,7 +592,7 @@ public class VL2
             else if (command.equals("Analyze"))
                 new Analyze(this, false, VL2.chart, chartTree, props.getString("GLFile"));
             else if (command.equals("Validate"))
-                ;
+                logger.logInfo("The validate command is not implemented.");
             else if (command.equals("Search"))
                 new Search(props);
 
