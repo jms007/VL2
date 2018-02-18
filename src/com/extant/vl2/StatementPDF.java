@@ -33,7 +33,6 @@ extends AbstractStatement
     public StatementPDF
         ( XProperties props
         , Chart chart
-        , String glFilename
         , Julian begin
         , Julian end
         , int reportLevel
@@ -44,7 +43,7 @@ extends AbstractStatement
     {
         makingChart = false;
         makingStatement = true;
-        setup( props, chart, makingStatement, begin, end, reportLevel, outfileName, logger );
+        setup( props, chart, begin, end, reportLevel, outfileName, logger );
     }
 
     // Use this constructor to make a chart listing
@@ -53,7 +52,6 @@ extends AbstractStatement
     public StatementPDF
         ( XProperties props
         , Chart chart
-        , String glFilename
         , String outFilename
         , LogFile logger
         )

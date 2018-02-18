@@ -48,7 +48,7 @@ public class VL2
 	}
 
     // Global variables
-	static final String ACCOUNTING_DIR = getAccountingDataDirectory();
+	static String ACCOUNTING_DIR;
     static String entityName=null;
     static String entityLongName=null;
     //static String entityDir=null;
@@ -60,7 +60,7 @@ public class VL2
     static Chart chart=null;
     static ChartTree chartTree=null;
     static JTree chartJTree=null;
-    static String glFilename=null;
+    //static String glFilename=null;
     static GLCheck glCheck=null;
     static Julian EarliestDate;
     static Julian LatestDate;
@@ -73,7 +73,7 @@ public class VL2
 
     public void VL2Init(String args[])
     {
-        System.out.println("Enter VL2Init ACCCOUNTING_DIR =" + ACCOUNTING_DIR);
+        System.out.println("Enter VL2Init");
         
 //        {   // Display Logo only on initial call
 //            try
@@ -111,7 +111,8 @@ public class VL2
         }
         
         // Locate the accountingRoot & accounting.properties file
-        String accountingRoot = ACCOUNTING_DIR;
+        String accountingRoot = getAccountingDataDirectory();
+        System.out.println("accountingRoot="+accountingRoot);
 /*****        
 //        String trial;
 //        for (int i=0; i<Strings.ALPHA_UPPER.length(); ++i)
@@ -182,8 +183,7 @@ public class VL2
         if (msgBox.getCommand().equals("Cancel"))
         	logger.logFatal("User Cancel (Enter Entity Name)");
         entityName = msgBox.getResponse().toUpperCase();
-        String entityRoot;
-        entityRoot = accountingRoot + entityName + "\\";
+        String entityRoot = accountingRoot + entityName + "\\";
         
         // Set properties file name for this entity
         entityPropsFilename = entityRoot + entityName + ".properties";
@@ -201,6 +201,9 @@ public class VL2
         if (msgBox.getCommand().equals("Cancel"))
         	logger.logFatal("User Cancel (Enter year)");
         yy = msgBox.getResponse();
+        workDir = entityRoot + "GL" + yy + "\\" ;
+        props.setProperty("WorkDir", workDir);
+        logger.logInfo("workDir=" + workDir);
         
 /*****
         // Get entity props & initialize
@@ -211,16 +214,17 @@ public class VL2
         { logger.logFatal("Cannot open entity XProperties File (" + 
                 entityPropertiesFile + ") " + iox.getMessage()); }
         props.setProperty("PropertiesFile", entityPropertiesFile);
+        props.setProperty("WorkDir",  entityRoot + "GL" + yy);
+
 *****/
         // Find working directory & entity files for the selected entity
         cashAcctNo = props.getString("CashAcctNo");
         if (cashAcctNo == null) logger.logFatal("cashAcctNo is null!");
         if (cashAcctNo.length() < 4)
         	logger.logFatal("Invalid CashAcctNo: " + cashAcctNo);
-        workDir = entityRoot + "GL" + yy + "\\";
+        
         if (!new File( workDir ).exists())
             logger.logFatal("Unable to find workDir: " + workDir);
-        props.setProperty("WorkDir", workDir);
         props.setProperty("yy", yy);
         props.setProperty("GLFile", workDir + "GL0010.DAT");
         props.setProperty("CustomerList", workDir + "CUSTOMER.LST");
@@ -262,7 +266,7 @@ public class VL2
             //logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
             
             // Check Chart, Build & Display Chart Tree
-            chartFilename = workDir + "CHART.XML";
+            chartFilename = workDir + props.getString("ChartFile");
             logger.logDebug("Checking Chart file: " + chartFilename);
             if ( !new File( chartFilename ).exists() )
                 logger.logFatal( "Unable to find " + chartFilename );
@@ -320,19 +324,19 @@ public class VL2
 
             // Check GL file
             
-            glFilename = workDir + "GL0010.DAT";
-            logger.logDebug("Checking GL File " + glFilename);
-            if ( !new File( glFilename ).exists() )
-                logger.logFatal( "Unable to find " + glFilename );
+            String GLFile = props.getString("GLFile");
+            logger.logDebug("Checking GLFile " + GLFile);
+            if ( !new File( GLFile ).exists() )
+                logger.logFatal( "Unable to find " + GLFile );
             glCheck = new GLCheck();
-            glCheck.glCheck(glFilename, chart, "token", props, logger);
+            glCheck.glCheck(GLFile, chart, "token", props, logger);
             if ( glCheck.getNErrors() > 0 )
             {
                 System.out.println( "GL File Error Report:" );
                 System.out.print( glCheck.getReport() );
-                logger.logFatal("Error(s) in " + glFilename);
+                logger.logFatal("Error(s) in " + GLFile);
             }
-            else logger.logInfo( "No errors found in " + glFilename );
+            else logger.logInfo( "No errors found in " + GLFile );
 
             if (glCheck.getNEntries() > 0)
             {
@@ -670,7 +674,6 @@ public class VL2
                 StatementPDF statement = new StatementPDF
                        ( props
                        , VL2.chart
-                       , props.getString("GLFile")
                        , new Julian(props.getString("EarliestDate"))
                        , new Julian(props.getString("LatestDate"))
                        , 0             // report level
@@ -724,11 +727,11 @@ public class VL2
             try
             {
                 // For debugging:
-                logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+                //logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
                 String outFilename = workDir + "Chart.pdf";
                 StatementPDF statementPDF = new StatementPDF
-                    (props, VL2.chart, glFilename, outFilename, logger);
+                    (props, VL2.chart, outFilename, logger);
             }
             catch (VLException vlx)
             {

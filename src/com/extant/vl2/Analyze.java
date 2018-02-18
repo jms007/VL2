@@ -408,7 +408,7 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 	// End of variables declaration//GEN-END:variables
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
-		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		TreePath selectedPath = e.getNewLeadSelectionPath();
 		DefaultMutableTreeNode selectedNode = ((DefaultMutableTreeNode) selectedPath.getLastPathComponent());
 		logger.logDebug("ShowBal: selectedNode=" + selectedNode.toString());

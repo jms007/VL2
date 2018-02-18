@@ -58,7 +58,7 @@ public class PrintChart
         int reportLevel = chart.getMaxLevel();
         Julian begin = new Julian( "1/1/20" + new Julian().toString( "yy" ) );
         Julian end = new Julian();
-        statement = new StatementPDF( props, chart, glFilename, begin, end, reportLevel, outfileName, logger );
+        statement = new StatementPDF( props, chart, outfileName, logger );
         stmtTable = statement.initialize( reportLevel, outfileName );
         statement.levelTotals = new long[10];
         for (int i=0; i<statement.levelTotals.length; ++i)
