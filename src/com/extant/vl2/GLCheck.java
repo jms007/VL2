@@ -192,7 +192,7 @@ public class GLCheck {
 
 	private void reportInfo(String msg)
 	{
-		report += msg + "\n";
+		report += "[" + lineNo + "] " + msg + "\n";
 	}
 
 	private void reportError(String msg)

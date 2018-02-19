@@ -98,27 +98,6 @@ public class VL2 extends JFrame implements ActionListener {
 			System.exit(106);
 		}
 
-		// Locate the accountingRoot & accounting.properties file
-		/*****
-		 * // String trial; // for (int i=0; i<Strings.ALPHA_UPPER.length(); ++i) // {
-		 * // String disk = Strings.ALPHA_UPPER.substring( i, i+1 ); // if ( new File(
-		 * disk + ":\\ACCOUNTING" ).exists() ) // { // trial = disk + ":\\ACCOUNTING\\";
-		 * // if (new File( trial + "accounting.properties").exists()) // if
-		 * (accountingRoot != null) // { // System.out.println("multiple accounting
-		 * roots:"); // System.out.println(" " + accountingRoot + "and " + trial); //
-		 * System.exit(102); // } // else // { // accountingRoot = trial; //
-		 * System.out.println("accountingRoot="+accountingRoot); // try { aprops = new
-		 * XProperties(trial+"accounting.properties"); } // catch (IOException iox) // {
-		 * // System.out.println("unable to open " + trial + "accounting.properties");
-		 * // System.exit(101); // Cannot open accounting.properties // } // } // else
-		 * if (secondaryAccountingRoot != null) // { // System.out.println("multiple
-		 * secondary accounting roots"); // System.exit(104); // } // else // { //
-		 * secondaryAccountingRoot = trial; //
-		 * System.out.println("secondaryAccountingRoot="+trial); // } // // if
-		 * ((primaryAccountingRoot != null) && (secondaryAccountingRoot != null)) //
-		 * break; // } // } // }
-		 *****/
-
 		String logFilename = VL2Config.getAccountingDataDirectory() + "VL2.log";
 		logger = new LogFile(logFilename, true);
 		logger.log("Log File " + logFilename + " opened");
@@ -139,17 +118,6 @@ public class VL2 extends JFrame implements ActionListener {
 
 		vl2Config = new VL2Config(entityName, yy);
 
-		/*****
-		 * // Get entity props & initialize
-		 * 
-		 * logger.logDebug("entityPropertiesFile="+entityPropertiesFile); try { props =
-		 * new XProperties(entityPropertiesFile); } catch (IOException iox) {
-		 * logger.logFatal("Cannot open entity XProperties File (" +
-		 * entityPropertiesFile + ") " + iox.getMessage()); }
-		 * props.setProperty("PropertiesFile", entityPropertiesFile);
-		 * props.setProperty("WorkDir", entityRoot + "GL" + yy);
-		 * 
-		 *****/
 		// Make a progress report
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		if (logger.getLogLevel() >= LogFile.DEBUG_LOG_LEVEL)
@@ -198,26 +166,6 @@ public class VL2 extends JFrame implements ActionListener {
 
 		logger.logInfo("Chart initialized without error");
 
-		// //Create a tree that allows one node selection at a time.
-		// chartTree.getSelectionModel().setSelectionMode
-		// (TreeSelectionModel.SINGLE_TREE_SELECTION);
-		//
-		// // Add implements TreeSelectionListener
-		// // Listen for a change of selected node
-		// // (This listener must be in each of the classes that use the
-		// // ChartTree to select an account, instead of a comboBox.)
-		// // It DOES NOT belong here in VL2!
-		// chartTree.addTreeSelectionListener(this);
-		//
-		// chartTree.addTreeSelectionListener(new TreeSelectionListener()
-		// {
-		// public void valueChanged(TreeSelectionEvent e)
-		// {
-		// DefaultMutableTreeNode node =
-		// (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-		// }
-		// )
-
 		// Point is (x,y)
 		// Dimension is (width, height)
 		Point location = this.getLocation();
@@ -231,7 +179,6 @@ public class VL2 extends JFrame implements ActionListener {
 		logger.logInfo("Chart tree initialization & display complete.");
 
 		// Check GL file
-
 		String GLFile = vl2Config.getGLFile();
 		logger.logDebug("Checking GLFile " + GLFile);
 		if (!new File(GLFile).exists())
@@ -241,34 +188,11 @@ public class VL2 extends JFrame implements ActionListener {
 		if (glCheck.getNErrors() > 0) {
 			System.out.println("GL File Error Report:");
 			System.out.print(glCheck.getReport());
-			logger.logFatal("Error(s) in " + GLFile);
+			// logger.logFatal("Error(s) in " + GLFile);
 		} else
 			logger.logInfo("No errors found in " + GLFile);
 
 		if (glCheck.getNEntries() > 0) {
-			// Properties file dates have been updated by GLCheck
-			// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-			// logger.logDebug("(before update)
-			// EarliestDate="+props.getString("EarliestDate"));
-			// logger.logDebug("(before update) LatestDate="+props.getString("LatestDate"));
-			// props.setProperty("EarliestDate", glCheck.earliestDate.toString("yymmdd"));
-			// props.setProperty("LatestDate", glCheck.latestDate.toString("yymmdd"));
-			// logger.logDebug("(after update)
-			// EarliestDate="+props.getString("EarliestDate"));
-			// logger.logDebug("(after update) LatestDate="+props.getString("LatestDate"));
-			// try
-			// {
-			// String tempFilename = props.getString("EntityRoot"+"propsCopy.txt")cd g:
-			// cdg;
-			// props.store(tempFilename, "for reload");
-			// String propsFilename = props.getString("PropertiesFile");
-			// logger.logDebug("propsFilename="+propsFilename);
-			// FileInputStream fis = new FileInputStream(new File(tempFilename));
-			// props.load(fis);
-			// fis.close();
-			// }
-			// catch (IOException iox)
-			// { logger.logFatal( "VL2: error found in GL File" + iox.getMessage()); }
 
 			logger.logInfo("ALL CHECKS COMPLETE - NO ERRORS FOUND.");
 		}
@@ -289,17 +213,10 @@ public class VL2 extends JFrame implements ActionListener {
 		JMenuBar greenMenuBar = new JMenuBar();
 
 		JMenu muFile = new JMenu("File");
-		// JMenuItem muChangeDir = new JMenuItem("Change Dir");
-		// muChangeDir.addActionListener(this);
-		// muFile.add(muChangeDir);
 
 		JMenuItem muViewDir = new JMenuItem("Directory Tree");
 		muViewDir.addActionListener(this);
 		muFile.add(muViewDir);
-
-		// JMenuItem muViewChart = new JMenuItem("Chart Tree");
-		// muViewChart.addActionListener(this);
-		// muFile.add(muViewChart);
 
 		JMenuItem muPrintCheck = new JMenuItem("Print Check");
 		muPrintCheck.addActionListener(this);

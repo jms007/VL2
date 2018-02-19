@@ -1,6 +1,6 @@
 package com.extant.vl2;
 
-import com.extant.utilities.XProperties;
+//import com.extant.utilities.XProperties;
 import com.extant.utilities.UsefulFile;
 import com.extant.utilities.Strings;
 import com.extant.utilities.Julian;
