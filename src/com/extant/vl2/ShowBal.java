@@ -51,19 +51,21 @@ import java.awt.event.KeyEvent;
  * @author jms
  */
 public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener {
-	public ShowBal(Chart chart, ChartTree tree, XProperties props) {
+	public ShowBal(Chart chart, ChartTree tree, VL2FileMan vl2FileMan)
+	{
 		logger = VL2.logger;
 		// For debugging
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		this.chart = chart;
-		glFileName = props.getString("GLFile");
+		glFileName = vl2FileMan.getGLFile();
 		initComponents();
 		setup();
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="Generated
 	// Code">//GEN-BEGIN:initComponents
-	private void initComponents() {
+	private void initComponents()
+	{
 
 		jLabel1 = new javax.swing.JLabel();
 		rbAllTrans = new javax.swing.JRadioButton();
@@ -79,7 +81,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 
 		setTitle("Compute Account Balance");
 		addWindowListener(new java.awt.event.WindowAdapter() {
-			public void windowClosing(java.awt.event.WindowEvent evt) {
+			public void windowClosing(java.awt.event.WindowEvent evt)
+			{
 				exitForm(evt);
 			}
 		});
@@ -92,7 +95,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		rbAllTrans.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbAllTrans.setText("Include All Transactions");
 		rbAllTrans.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				rbAllTransActionPerformed(evt);
 			}
 		});
@@ -101,14 +105,16 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		rbCutoffDate.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbCutoffDate.setText("Specify Cutoff Date ...");
 		rbCutoffDate.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				rbCutoffDateActionPerformed(evt);
 			}
 		});
 		getContentPane().add(rbCutoffDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 90, -1, -1));
 
 		txtEffDate.addKeyListener(new java.awt.event.KeyAdapter() {
-			public void keyTyped(java.awt.event.KeyEvent evt) {
+			public void keyTyped(java.awt.event.KeyEvent evt)
+			{
 				txtEffDateKeyTyped(evt);
 			}
 		});
@@ -126,7 +132,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		btnCompute.setMnemonic('B');
 		btnCompute.setText("Show Balance");
 		btnCompute.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				btnComputeActionPerformed(evt);
 			}
 		});
@@ -136,7 +143,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		btnClose.setMnemonic('C');
 		btnClose.setText("Close");
 		btnClose.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				btnCloseActionPerformed(evt);
 			}
 		});
@@ -186,11 +194,13 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 	}// GEN-LAST:event_rbAllTransActionPerformed
 
 	/** Exit the Application */
-	private void exitForm(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_exitForm
+	private void exitForm(java.awt.event.WindowEvent evt)
+	{// GEN-FIRST:event_exitForm
 		this.setVisible(false);
 	}// GEN-LAST:event_exitForm
 
-	void setup() {
+	void setup()
+	{
 		tree.addTreeSelectionListener(this);
 		manageButtons(null);
 		// accountFinder = new AccountFinder( chart, logger, comboAccounts );
@@ -198,7 +208,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 	}
 
 	@Override
-	public void valueChanged(TreeSelectionEvent e) {
+	public void valueChanged(TreeSelectionEvent e)
+	{
 		TreePath selectedPath = e.getNewLeadSelectionPath();
 		DefaultMutableTreeNode selectedNode = ((DefaultMutableTreeNode) selectedPath.getLastPathComponent());
 		logger.logDebug("ShowBal: selectedNode=" + selectedNode.toString());
@@ -213,7 +224,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		txtAccountNo.setText(selectedAccountNo);
 	}
 
-	void compute() throws VLException {
+	void compute() throws VLException
+	{
 		UsefulFile glFile;
 		String image;
 		GLEntry glEntry;
@@ -261,7 +273,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		}
 	}
 
-	void manageButtons(java.awt.event.ActionEvent evt) {
+	void manageButtons(java.awt.event.ActionEvent evt)
+	{
 		JRadioButton button = rbAllTrans;
 		if (evt == null)
 			button = rbAllTrans;

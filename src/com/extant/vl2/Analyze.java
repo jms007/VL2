@@ -27,21 +27,28 @@ import javax.swing.JTextField;
  * @author jms
  */
 public class Analyze extends javax.swing.JDialog implements TreeSelectionListener {
-	public Analyze(javax.swing.JFrame parent, boolean modal, Chart chart, ChartTree tree, String glFilename) {
+
+	VL2FileMan vl2FileMan;
+
+	public Analyze(javax.swing.JFrame parent, boolean modal, Chart chart, ChartTree tree, VL2FileMan vl2FileMan)
+	{
 		super(parent, modal);
 		initComponents();
 		this.parent = parent;
+		this.vl2FileMan = vl2FileMan;
 		setup();
 	}
 
 	@Override
-	public void setVisible(boolean bln) {
+	public void setVisible(boolean bln)
+	{
 		super.setVisible(bln); // To change body of generated methods, choose Tools | Templates.
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="Generated
 	// Code">//GEN-BEGIN:initComponents
-	private void initComponents() {
+	private void initComponents()
+	{
 
 		comboAccounts = new JTextField();
 		jLabel1 = new javax.swing.JLabel();
@@ -63,7 +70,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 
 		setTitle("Analyze Account");
 		addWindowListener(new java.awt.event.WindowAdapter() {
-			public void windowClosing(java.awt.event.WindowEvent evt) {
+			public void windowClosing(java.awt.event.WindowEvent evt)
+			{
 				closeDialog(evt);
 			}
 		});
@@ -80,7 +88,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		btnAnalyze.setText("Analyze");
 		btnAnalyze.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 		btnAnalyze.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				btnAnalyzeActionPerformed(evt);
 			}
 		});
@@ -90,7 +99,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		btnAnalyzeCancel.setText("Cancel");
 		btnAnalyzeCancel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 		btnAnalyzeCancel.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				btnAnalyzeCancelActionPerformed(evt);
 			}
 		});
@@ -116,7 +126,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		rbAllTrans.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbAllTrans.setText("Include All Transactions");
 		rbAllTrans.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				manageDateButtons(evt);
 			}
 		});
@@ -125,7 +136,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		rbDates.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbDates.setText("Specify  Dates");
 		rbDates.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				manageDateButtons(evt);
 			}
 		});
@@ -146,7 +158,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		rbSortByDescr.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbSortByDescr.setText("Description");
 		rbSortByDescr.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				manageSortButtons(evt);
 			}
 		});
@@ -155,7 +168,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		rbSortByDate.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbSortByDate.setText("Date");
 		rbSortByDate.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				manageSortButtons(evt);
 			}
 		});
@@ -164,7 +178,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		rbSortByAmount.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbSortByAmount.setText("Amount");
 		rbSortByAmount.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			public void actionPerformed(java.awt.event.ActionEvent evt)
+			{
 				manageSortButtons(evt);
 			}
 		});
@@ -253,11 +268,13 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 	// }
 
 	/** Closes the dialog */
-	private void closeDialog(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_closeDialog
+	private void closeDialog(java.awt.event.WindowEvent evt)
+	{// GEN-FIRST:event_closeDialog
 		dispose();
 	}// GEN-LAST:event_closeDialog
 
-	private void setup() {
+	private void setup()
+	{
 		// accountFinder = new AccountFinder( VL2.chart, logger, comboAccounts );
 		manageDateButtons(null);
 		manageSortButtons(null);
@@ -265,7 +282,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		tree.addTreeSelectionListener(this);
 	}
 
-	private void analyze(Account acctEntry, Julian startDate, Julian endDate) {
+	private void analyze(Account acctEntry, Julian startDate, Julian endDate)
+	{
 		String acctNo = acctEntry.getAccountNo();
 		StringBuffer results = new StringBuffer();
 		GLEntry glEntry;
@@ -273,7 +291,7 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		String dateFormat = "mm-dd-yyyy";
 		int dateSpace = dateFormat.length() + 1;
 		try {
-			UsefulFile glFile = new UsefulFile(VL2.glFilename, "r");
+			UsefulFile glFile = new UsefulFile(vl2FileMan.getGLFile(), "r");
 			while (!glFile.EOF()) {
 				glEntry = new GLEntry(glFile.readLine(UsefulFile.ALL_WHITE));
 				if (chart.match(acctNo, glEntry, startDate, endDate))
@@ -367,7 +385,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		}
 	}
 
-	void showText(String title, String text) {
+	void showText(String title, String text)
+	{
 		TextDialog textDialog = new TextDialog(parent, true);
 		textDialog.setText(text);
 		textDialog.setVisible(true);
@@ -407,7 +426,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 
 	// End of variables declaration//GEN-END:variables
 	@Override
-	public void valueChanged(TreeSelectionEvent e) {
+	public void valueChanged(TreeSelectionEvent e)
+	{
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		TreePath selectedPath = e.getNewLeadSelectionPath();
 		DefaultMutableTreeNode selectedNode = ((DefaultMutableTreeNode) selectedPath.getLastPathComponent());

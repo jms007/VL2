@@ -40,12 +40,8 @@ public class VL2
     extends JFrame
     implements ActionListener
 {
-	private static String getAccountingDataDirectory()
-	{
-		String userName = System.getProperty("user.name");
-		String pattern = "C:\\Users\\%s\\OneDrive\\ACCOUNTING\\";
-		return String.format(pattern, userName);
-	}
+	
+	private static VL2FileMan vl2FileMan;
 
     // Global variables
 	static String ACCOUNTING_DIR;
@@ -55,7 +51,6 @@ public class VL2
     static String entityPropsFilename=null;
     static String yy=null;
     static String workDir;
-    static com.extant.utilities.XProperties props;
     static String chartFilename=null;
     static Chart chart=null;
     static ChartTree chartTree=null;
@@ -71,7 +66,7 @@ public class VL2
 
     JFrame VL2MenuFrame = this;
 
-    public void VL2Init(String args[])
+    public void VL2Init(String args[]) throws IOException
     {
         System.out.println("Enter VL2Init");
         
@@ -111,9 +106,7 @@ public class VL2
         }
         
         // Locate the accountingRoot & accounting.properties file
-        String accountingRoot = getAccountingDataDirectory();
-        System.out.println("accountingRoot="+accountingRoot);
-/*****        
+ /*****        
 //        String trial;
 //        for (int i=0; i<Strings.ALPHA_UPPER.length(); ++i)
 //        {
@@ -157,15 +150,7 @@ public class VL2
 //        }
  *****/
 
-        try { aprops = new XProperties(accountingRoot + "accounting.properties"); }
-        catch (IOException iox)
-            {
-                System.out.println("Error opening " + accountingRoot+"accounting.properties: "+ iox.getMessage());
-                System.exit(105);
-            }
-
-        // Initialize LogFile (to append)
-        String logFilename = accountingRoot + "VL2.log";
+        String logFilename = VL2FileMan.getAccountingDataDirectory() + "VL2.log";
         logger = new LogFile(logFilename, true);
         logger.log("Log File " + logFilename + " opened");
         logger.log("***** STARTING VL2 " + new Julian().toString("") + " *****");
@@ -183,15 +168,7 @@ public class VL2
         if (msgBox.getCommand().equals("Cancel"))
         	logger.logFatal("User Cancel (Enter Entity Name)");
         entityName = msgBox.getResponse().toUpperCase();
-        String entityRoot = accountingRoot + entityName + "\\";
-        
-        // Set properties file name for this entity
-        entityPropsFilename = entityRoot + entityName + ".properties";
-        try { props = new XProperties( entityPropsFilename ); }
-        catch (IOException iox)
-        {  	logger.logFatal("Could not open " + entityPropsFilename); }
-
-        msgBox = new MsgBox
+         msgBox = new MsgBox
             ( VL2MenuFrame
             , "Year"
             , "Enter the year (yy)"
@@ -201,9 +178,8 @@ public class VL2
         if (msgBox.getCommand().equals("Cancel"))
         	logger.logFatal("User Cancel (Enter year)");
         yy = msgBox.getResponse();
-        workDir = entityRoot + "GL" + yy + "\\" ;
-        props.setProperty("WorkDir", workDir);
-        logger.logInfo("workDir=" + workDir);
+        
+        vl2FileMan = new VL2FileMan(entityName, yy);
         
 /*****
         // Get entity props & initialize
@@ -217,40 +193,14 @@ public class VL2
         props.setProperty("WorkDir",  entityRoot + "GL" + yy);
 
 *****/
-        // Find working directory & entity files for the selected entity
-        cashAcctNo = props.getString("CashAcctNo");
-        if (cashAcctNo == null) logger.logFatal("cashAcctNo is null!");
-        if (cashAcctNo.length() < 4)
-        	logger.logFatal("Invalid CashAcctNo: " + cashAcctNo);
-        
-        if (!new File( workDir ).exists())
-            logger.logFatal("Unable to find workDir: " + workDir);
-        props.setProperty("yy", yy);
-        props.setProperty("GLFile", workDir + "GL0010.DAT");
-        props.setProperty("CustomerList", workDir + "CUSTOMER.LST");
-        props.setProperty("VendorList", workDir + "VENDOR.LST");
-        props.setProperty("ContactsList", workDir + "CONTACTS.LST");
-        props.setProperty("ChartXML", workDir + "CHART.XML");
-        props.setProperty("GSNFile", workDir + "gsnNVFile.txt");
-
         // Make a progress report
         //logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
         if (logger.getLogLevel() >= LogFile.DEBUG_LOG_LEVEL) 
             logger.whereAreWe(new Error());
-        logger.logDebug("Reporting:");
-        logger.logDebug("accounting.props="+accountingRoot + "accounting.properties");
-        logger.logDebug("entityName="+entityName);
-        logger.logDebug("EntityLongName="+props.getString("VL.EntityLongName"));
-        logger.logDebug("entityPropsFilename="+entityPropsFilename);
-        logger.logDebug("entityRoot="+entityRoot);
-        logger.logDebug("WorkDir="+props.getString("WorkDir"));
-        //logger.logDebug("CashAcctNo="+props.getString("VL.CashAcctNo"));
-        logger.logDebug("test retrieving from props: EntityLongName=" + props.getProperty("EntityLongName"));
-        
-        VL2MenuFrame.setTitle(props.getString("EntityLongName"));
+        VL2MenuFrame.setTitle(vl2FileMan.getEntityLongName());
 
         // Set Initial GSN
-        new GSNMan().init(props, logger);
+        new GSNMan().init(vl2FileMan, logger);
         logger.logInfo("GSN Initial Value: " + GSNMan.getGSN());
         
         // Report
@@ -266,7 +216,7 @@ public class VL2
             //logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
             
             // Check Chart, Build & Display Chart Tree
-            chartFilename = workDir + props.getString("ChartFile");
+            chartFilename = vl2FileMan.getChartFile();
             logger.logDebug("Checking Chart file: " + chartFilename);
             if ( !new File( chartFilename ).exists() )
                 logger.logFatal( "Unable to find " + chartFilename );
@@ -284,7 +234,7 @@ public class VL2
 //      {	logger.logFatal("SAX Exception: " + sax.getMessage()); }
         
         // Build ChartTree (initially invisible, location & size not specified)
-        try { chartTree = new ChartTree(props, chart, logger); }
+        try { chartTree = new ChartTree(vl2FileMan, chart, logger); }
         catch (ParserConfigurationException|SAXException|IOException|VLException x)
         { logger.logFatal("ChartTree build: "+ x.getMessage()); }
         
@@ -324,12 +274,12 @@ public class VL2
 
             // Check GL file
             
-            String GLFile = props.getString("GLFile");
+            String GLFile = vl2FileMan.getGLFile();
             logger.logDebug("Checking GLFile " + GLFile);
             if ( !new File( GLFile ).exists() )
                 logger.logFatal( "Unable to find " + GLFile );
             glCheck = new GLCheck();
-            glCheck.glCheck(GLFile, chart, "token", props, logger);
+            glCheck.glCheck(GLFile, chart, "token", vl2FileMan, logger);
             if ( glCheck.getNErrors() > 0 )
             {
                 System.out.println( "GL File Error Report:" );
@@ -504,7 +454,7 @@ public class VL2
             {
                 try
                 {
-                    Four11 four11 = new Four11("C:\\Users\\jms\\OneDrive\\ACCOUNTING");
+                    Four11 four11 = new Four11(VL2FileMan.getAccountingDataDirectory());
                     four11.showTree();
                 }
                 catch (UtilitiesException ux)
@@ -516,7 +466,7 @@ public class VL2
             else if (command.equals("Print Check"))
             {
                 CheckPrinter2 cp2 = new CheckPrinter2();
-                cp2.CheckPrinter2();
+                cp2.CheckPrinter2(vl2FileMan);
                 cp2.setSize(800,600);
                 cp2.setLocation(600,200);
                 cp2.pack();
@@ -532,7 +482,7 @@ public class VL2
         // Tools
             else if (command.equals("Options"))
             {
-                listProps(props);
+//                listProps(props);
             }
             
             else if (command.equals("Edit Vendor List"))
@@ -540,20 +490,20 @@ public class VL2
                 Container contentPane;
                 contentPane = this.getContentPane();
                 contentPane.setPreferredSize(new Dimension(600, 450));
-                contentPane = new ListMan4(props, workDir+"VENDOR.LST");
+                contentPane = new ListMan4(vl2FileMan, ListType.VENDOR);
                 VL2MenuFrame.pack();
                 contentPane.setVisible(true);
             }
             else if (command.equals("Edit Customer List"))
             {
                 Container contentPane;
-                contentPane = new ListMan4(props, workDir+"CUSTOMER.LST", false);
+                contentPane = new ListMan4(vl2FileMan,ListType.CUSTOMER, false);
                 contentPane.setPreferredSize(new Dimension(500, 450));
                 VL2MenuFrame.pack();
                 contentPane.setVisible(true);
             }
             else if (command.equals("List Properties"))
-                listProps(props);
+            	vl2FileMan.listAllProperties();
 
             else if (command.equals("Climb Chart Tree"))
             {
@@ -573,7 +523,7 @@ public class VL2
             else if (command.equals("Receipts") || command.equals("Disbursements"))
             {
                 JPanel contentPanel=null;
-                try { contentPanel = new EnterTransactionPanel(chart, logger, command, props); }
+                try { contentPanel = new EnterTransactionPanel(chart, logger, command, vl2FileMan); }
                 catch (IOException iox) { logger.logFatal(iox.getMessage()); }
                 contentPanel.setPreferredSize(new Dimension(500, 450));
                 VL2MenuFrame.setContentPane(contentPanel);
@@ -583,7 +533,7 @@ public class VL2
             else if (command.equals("Journal Entries"))
             {
                 JPanel contentPanel;
-                contentPanel = new EnterJournalTransaction(chart, props, logger);
+                contentPanel = new EnterJournalTransaction(chart, vl2FileMan, logger);
                 contentPanel.setPreferredSize(new Dimension(500, 450));
                 VL2MenuFrame.setContentPane(contentPanel);
                 VL2MenuFrame.pack();
@@ -592,13 +542,13 @@ public class VL2
 
         // Audit
             else if (command.equals("Account Balance"))
-                new ShowBal(VL2.chart, chartTree, props);
+                new ShowBal(VL2.chart, chartTree, vl2FileMan);
             else if (command.equals("Analyze"))
-                new Analyze(this, false, VL2.chart, chartTree, props.getString("GLFile"));
+                new Analyze(this, false, VL2.chart, chartTree, vl2FileMan);
             else if (command.equals("Validate"))
                 logger.logInfo("The validate command is not implemented.");
             else if (command.equals("Search"))
-                new Search(props);
+                new Search(vl2FileMan);
 
         // Reports
             else if (command.equals("Text Statement"))
@@ -606,9 +556,9 @@ public class VL2
             else if (command.equals("PDF Statement"))
                 startPDFStmt();
             else if (command.equals("Transaction Summary"))
-                startTranReport(TranReport.SUMMARY, props, logger);
+                startTranReport(TranReport.SUMMARY, vl2FileMan, logger);
             else if (command.equals("Transaction Details"))
-                startTranReport(TranReport.DETAIL, props, logger);
+                startTranReport(TranReport.DETAIL, vl2FileMan, logger);
             else if (command.equals("Print Chart"))
                 startPrintChart();
 
@@ -620,17 +570,17 @@ public class VL2
         {
             //logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
             logger.logDebug("Starting StatementTXT");
-            logger.logDebug("GLFile="+props.getString("GLFile"));
-            logger.logDebug("Entity: "+ props.getString("EntityLongName"));
+            logger.logDebug("GLFile="+vl2FileMan.getGLFile());
+            logger.logDebug("Entity: "+ vl2FileMan.getEntityLongName());
             try
             {   
             	String outFile=workDir + "Stmt.txt";
                 StatementTXT statement = new StatementTXT
-                    ( props
+                    ( vl2FileMan
                     , VL2.chart
-                    , props.getString("GLFile")
-                    , new Julian(props.getString("EarliestDate"))
-                    , new Julian(props.getString("LatestDate"))
+                    , vl2FileMan.getGLFile()
+                    , new Julian(vl2FileMan.getEarliestDate())
+                    , new Julian(vl2FileMan.getLatestDate())
                     , 0
                     , outFile
                     , VL2.logger
@@ -669,13 +619,13 @@ public class VL2
             {
                 logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
                 logger.logDebug("Starting PDFStmt");
-                logger.logDebug("GLFile="+props.getString("GLFile"));
+                logger.logDebug("GLFile="+vl2FileMan.getGLFile());
                 String outFilename = workDir+"StmtPDF.pdf";
                 StatementPDF statement = new StatementPDF
-                       ( props
+                       ( vl2FileMan
                        , VL2.chart
-                       , new Julian(props.getString("EarliestDate"))
-                       , new Julian(props.getString("LatestDate"))
+                       , new Julian(vl2FileMan.getEarliestDate())
+                       , new Julian(vl2FileMan.getLatestDate())
                        , 0             // report level
                        , outFilename   // outfile name
                        , VL2.logger
@@ -691,7 +641,7 @@ public class VL2
             {   logger.log("Cannot initialize ViewFile: " + ux.getMessage()); }
         }
 
-        private void startTranReport(int reportType, XProperties props, LogFile logger)
+        private void startTranReport(int reportType, VL2FileMan vl2FileMan, LogFile logger)
         {
             String outFilename = null;
             try
@@ -699,7 +649,7 @@ public class VL2
                 logger.logDebug("TranReport.DETAIL="+TranReport.DETAIL);
                 if (reportType == TranReport.DETAIL) outFilename = workDir+"DetailTranReport.txt";
                 else if (reportType == TranReport.SUMMARY) outFilename = workDir+"SummaryTranReport.txt";
-                TranReport tranReport = new TranReport(reportType, chart, props, logger);
+                TranReport tranReport = new TranReport(reportType, chart, vl2FileMan, logger);
             }
             catch (IOException iox)
                 { logger.log("@startTranReport: " + iox.getMessage()); }
@@ -730,8 +680,7 @@ public class VL2
                 //logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
                 String outFilename = workDir + "Chart.pdf";
-                StatementPDF statementPDF = new StatementPDF
-                    (props, VL2.chart, outFilename, logger);
+                StatementPDF statementPDF = new StatementPDF(vl2FileMan, VL2.chart, outFilename, logger);
             }
             catch (VLException vlx)
             {
@@ -739,7 +688,7 @@ public class VL2
             }
         }
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws IOException
     {
         VL2 vl2 = new VL2();
         vl2.VL2Init(args);
