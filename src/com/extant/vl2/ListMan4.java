@@ -36,12 +36,12 @@ import com.extant.utilities.UsefulFile;
  * @author jms
  */
 public class ListMan4 extends javax.swing.JFrame {
-	public ListMan4(VL2FileMan props, ListType listType)
+	public ListMan4(VL2Config props, ListType listType)
 	{
 		this(props, listType, false);
 	}
 
-	public ListMan4(VL2FileMan vl2FileMan, ListType listType, boolean selectEntry)
+	public ListMan4(VL2Config vl2Config, ListType listType, boolean selectEntry)
 	{
 		try {
 			logger = VL2.logger;
@@ -50,9 +50,10 @@ public class ListMan4 extends javax.swing.JFrame {
 			// logger.setLogLevel( LogFile.DEBUG_LOG_LEVEL );
 			initComponents();
 			selectEntry = true;
-			this.vl2FileMan = vl2FileMan;
+			this.vl2FileMan = vl2Config;
 			this.selectEntry = selectEntry;
-			this.setTitle(vl2FileMan.getEntityName() + listType + " List");
+			this.checkPrinter2 = new CheckPrinter2(vl2Config);
+			this.setTitle(vl2Config.getEntityName() + listType + " List");
 			Dimension windowSize = new Dimension(450, 500);
 			setSize(windowSize);
 			java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
@@ -592,7 +593,7 @@ public class ListMan4 extends javax.swing.JFrame {
 	 *****/
 
 	LogFile logger;
-	VL2FileMan vl2FileMan;
+	VL2Config vl2FileMan;
 	String fileName;
 	// RemoteFileMan remoteFileMan;
 	String delim = "|"; // Default

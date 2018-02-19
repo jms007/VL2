@@ -42,7 +42,7 @@ public class CheckPrinter2 extends JFrame implements Printable {
 	int y;
 	Hashtable<String, Point> points = new Hashtable<String, Point>();
 
-	public void CheckPrinter2(VL2FileMan vl2FileMan)
+	public CheckPrinter2(VL2Config vl2Config)
 	{
 		initComponents();
 		// Frame size and location are set in VL2
@@ -55,7 +55,7 @@ public class CheckPrinter2 extends JFrame implements Printable {
 		btnApprove.setEnabled(false);
 		resetForm();
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		this.vl2FileMan = vl2FileMan;
+		this.vl2FileMan = vl2Config;
 	}
 
 	public void resetForm()
@@ -307,12 +307,12 @@ public class CheckPrinter2 extends JFrame implements Printable {
 	// txtPayee3.setText(payeeData[3]);
 	// }
 
-	public static void main(String args[])
-	{
-		CheckPrinter2 checkPrinter2 = new CheckPrinter2();
-		checkPrinter2.setVisible(true);
-	}
-
+	// public static void main(String args[])
+	// {
+	// CheckPrinter2 checkPrinter2 = new CheckPrinter2();
+	// checkPrinter2.setVisible(true);
+	// }
+	//
 	// private String abort(int error)
 	// {
 	// String report = "";
@@ -328,7 +328,7 @@ public class CheckPrinter2 extends JFrame implements Printable {
 	// return report;
 	// }
 
-	VL2FileMan vl2FileMan;
+	VL2Config vl2FileMan;
 	String[] payeeData = new String[4];
 	// String[] stubs;
 	// ArrayList <JTextField> txtStubs = new ArrayList <JTextField>();

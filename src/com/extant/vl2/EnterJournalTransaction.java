@@ -24,17 +24,17 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 	/**
 	 * Creates new form EnterJournalTransaction
 	 */
-	public EnterJournalTransaction(Chart chart, VL2FileMan vl2FileMan, LogFile logger)
+	public EnterJournalTransaction(Chart chart, VL2Config vl2Config, LogFile logger)
 	{
 		initComponents();
 		// For testing:
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-		this.vl2FileMan = vl2FileMan;
+		this.vl2Config = vl2Config;
 		// GSNMan gsnMan = new GSNMan();
 		txtDate.setInputVerifier(new DateVerifier());
 		txtDebitAmount.setInputVerifier(new AmountVerifier());
 		txtCreditAmount.setInputVerifier(new AmountVerifier());
-		lblEntityName.setText(vl2FileMan.getEntityLongName());
+		lblEntityName.setText(vl2Config.getEntityLongName());
 		debitAccountFinder = new AccountFinder(chart, logger, comboDebitAccount);
 		creditAccountFinder = new AccountFinder(chart, logger, comboCreditAccount);
 		imbalanceAmount = 0;
@@ -237,7 +237,7 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 	{// GEN-FIRST:event_PostActionPerformed
 		// logger.logDebug("Enter PostActionPerformed");
 		try {
-			UsefulFile GLFile = new UsefulFile(vl2FileMan.getGLFile(), "w+");
+			UsefulFile GLFile = new UsefulFile(vl2Config.getGLFile(), "w+");
 			// Change status to "F" and append the unposted entries to GL file
 			for (int i = 0; i < unpostedEntries.size(); ++i) {
 				GLEntry glEntry = unpostedEntries.get(i);
@@ -256,7 +256,7 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 
 		// No problems detected, increment GSN and clear unpostedEntries
 		unpostedEntries.clear();
-		new GSNMan().incrementGSN();
+		new GSNMan(vl2Config, logger).incrementGSN();
 		clearForm();
 	}// GEN-LAST:event_PostActionPerformed
 
@@ -349,7 +349,7 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 	}
 
 	// Local Variables
-	VL2FileMan vl2FileMan;
+	VL2Config vl2Config;
 	LogFile logger;
 	Julian transDate;
 	String drcr;

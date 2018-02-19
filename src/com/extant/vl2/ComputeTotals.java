@@ -17,7 +17,7 @@ import com.extant.utilities.Strings;
  * @author jms
  */
 public class ComputeTotals extends AbstractStatement {
-	public ComputeTotals(VL2FileMan vl2FileMan, Chart chart, Julian begin, Julian end, int reportLevel,
+	public ComputeTotals(VL2Config vl2FileMan, Chart chart, Julian begin, Julian end, int reportLevel,
 			String outfileName, LogFile logger) throws IOException, VLException
 	{
 		setup(vl2FileMan, chart, false, begin, end, reportLevel, outfileName, logger);

@@ -20,7 +20,7 @@ import java.io.IOException;
 
 public class GLCheck {
 	public int glCheck(String glFilename, Chart chart, String fileType // "fixed" or "token"
-			, VL2FileMan props, LogFile loggerParm)
+			, VL2Config props, LogFile loggerParm)
 	{
 		if (loggerParm == null) {
 			System.out.println("entering glCheck: loggerparm is null; creating new LogFile");
@@ -232,7 +232,7 @@ public class GLCheck {
 	}
 
 	// Global variables
-	VL2FileMan vl2FileMan;
+	VL2Config vl2FileMan;
 	GLEntry glEntry;
 	Chart chart;
 	int lineNo;

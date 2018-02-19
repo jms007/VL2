@@ -30,7 +30,7 @@ public class StatementPDF extends AbstractStatement {
 	}
 
 	// Use this constructor to make a statement
-	public StatementPDF(VL2FileMan vl2FileMan, Chart chart, Julian begin, Julian end, int reportLevel,
+	public StatementPDF(VL2Config vl2FileMan, Chart chart, Julian begin, Julian end, int reportLevel,
 			String outfileName, LogFile logger) throws VLException
 	{
 		makingChart = false;
@@ -41,7 +41,7 @@ public class StatementPDF extends AbstractStatement {
 	// Use this constructor to make a chart listing
 	// (props, VL2.chart, glFilename, outFilename, logger);
 
-	public StatementPDF(VL2FileMan vl2FileMan, Chart chart, String outFilename, LogFile logger) throws VLException
+	public StatementPDF(VL2Config vl2FileMan, Chart chart, String outFilename, LogFile logger) throws VLException
 	{
 		makingChart = true;
 		makingStatement = false;

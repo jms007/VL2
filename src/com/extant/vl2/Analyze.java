@@ -28,9 +28,9 @@ import javax.swing.JTextField;
  */
 public class Analyze extends javax.swing.JDialog implements TreeSelectionListener {
 
-	VL2FileMan vl2FileMan;
+	VL2Config vl2FileMan;
 
-	public Analyze(javax.swing.JFrame parent, boolean modal, Chart chart, ChartTree tree, VL2FileMan vl2FileMan)
+	public Analyze(javax.swing.JFrame parent, boolean modal, Chart chart, ChartTree tree, VL2Config vl2FileMan)
 	{
 		super(parent, modal);
 		initComponents();

@@ -70,7 +70,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 	ChartTreeNode selectedNode = null;
 	EventListenerList listenerList = new EventListenerList();
 
-	ChartTree(VL2FileMan vl2FileMan, Chart chart, LogFile logger)
+	ChartTree(VL2Config vl2Config, Chart chart, LogFile logger)
 			throws ParserConfigurationException, SAXException, IOException, VLException
 	{
 		this.logger = logger;

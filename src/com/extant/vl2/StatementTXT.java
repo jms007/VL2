@@ -22,7 +22,7 @@ import java.io.*;
  * @author jms
  */
 public class StatementTXT extends AbstractStatement {
-	public StatementTXT(VL2FileMan vl2FileMan, Chart chart, String glFilename, Julian earliestDate, Julian latestDate,
+	public StatementTXT(VL2Config vl2FileMan, Chart chart, String glFilename, Julian earliestDate, Julian latestDate,
 			int reportLevel, String outfileName, LogFile logger) throws VLException
 	{
 		setup(vl2FileMan, chart, true, earliestDate, latestDate, reportLevel, outfileName, logger);

@@ -19,7 +19,7 @@ import com.extant.utilities.XProperties;
 //GSNFile=gsnNVFile.txt
 //CashAcctNo=0010
 
-public class VL2FileMan {
+public class VL2Config {
 
 	public static String getAccountingDataDirectory()
 	{
@@ -37,7 +37,7 @@ public class VL2FileMan {
 	private String earliestDate;
 	private String latestDate;
 
-	public VL2FileMan(String entityName, String currentYear) throws IOException
+	public VL2Config(String entityName, String currentYear) throws IOException
 	{
 		this.accountingDataDir = getAccountingDataDirectory();
 		this.entityName = entityName;

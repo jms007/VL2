@@ -13,24 +13,42 @@ import com.extant.utilities.UsefulFile;
 public class GSNMan {
 
 	private static String GSN;
-	VL2FileMan vl2FileMan;
+	VL2Config vl2Config;
 	LogFile logger;
 
-	String init(VL2FileMan vl2FileMan, LogFile logger)
+	public GSNMan(VL2Config vl2Config, LogFile logger)
 	{
 		try {
-			this.vl2FileMan = vl2FileMan;
-			UsefulFile GSNFile = new UsefulFile(vl2FileMan.getGSNFile());
+			this.vl2Config = vl2Config;
+			UsefulFile GSNFile = new UsefulFile(vl2Config.getGSNFile());
 			String image = GSNFile.readLine();
-			String[] temp;
-			temp = image.split("\\|");
-			GSN = temp[0];
+			if (GSN == null) {
+				String[] temp;
+				temp = image.split("\\|");
+				GSN = temp[0];
+			}
 			GSNFile.close();
 		} catch (IOException iox) {
 			logger.logFatal("Unable to initialize GSN: " + iox.getMessage());
 		}
-		return GSN;
+
 	}
+
+	// String init(VL2Config vl2Config, LogFile logger)
+	// {
+	// try {
+	// this.vl2Config = vl2Config;
+	// UsefulFile GSNFile = new UsefulFile(vl2Config.getGSNFile());
+	// String image = GSNFile.readLine();
+	// String[] temp;
+	// temp = image.split("\\|");
+	// GSN = temp[0];
+	// GSNFile.close();
+	// } catch (IOException iox) {
+	// logger.logFatal("Unable to initialize GSN: " + iox.getMessage());
+	// }
+	// return GSN;
+	// }
 
 	public static String getGSN()
 	{
@@ -56,7 +74,8 @@ public class GSNMan {
 	private void updateNV() throws IOException
 	{
 		try {
-			UsefulFile GSNFile = new UsefulFile(vl2FileMan.getGSNFile(), "w");
+			UsefulFile GSNFile = new UsefulFile(vl2Config.getGSNFile(), "w");
+
 			GSNFile.println(GSN + "|" + new Julian().toString("mm/dd/yyyy hh:mm:ss"));
 			GSNFile.close();
 		} catch (IOException iox) {

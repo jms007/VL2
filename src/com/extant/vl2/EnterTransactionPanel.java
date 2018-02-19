@@ -223,7 +223,7 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 	{// GEN-FIRST:event_PostActionPerformed
 		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		logger.logDebug("Enter PostActionPerformed");
-		logger.logDebug("GLFilename=" + vl2FileMan.getGLFile());
+		logger.logDebug("GLFilename=" + vl2Config.getGLFile());
 
 		try { /***** See VL2\Test Data\Notes.txt *****/
 
@@ -264,7 +264,7 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 			}
 
 			// No problems detected, increment GSN and clear unpostedEntries
-			new GSNMan().incrementGSN();
+			new GSNMan(vl2Config, logger).incrementGSN();
 			unpostedEntries.clear();
 			imbalanceAmount = 0;
 			clearForm();
@@ -319,24 +319,23 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		manageButtons(); // To eliminate losing focus requirement to get "Enter" button enabled
 	}// GEN-LAST:event_txtDescrKeyTyped
 
-	public EnterTransactionPanel(Chart chart, LogFile logger, String transType, VL2FileMan vl2FileMan)
-			throws IOException
+	public EnterTransactionPanel(Chart chart, LogFile logger, String transType, VL2Config vl2Config) throws IOException
 	{
 		initComponents();
 		this.logger = logger;
 		this.transType = transType;
-		this.vl2FileMan = vl2FileMan;
-		String entityLongName = vl2FileMan.getEntityLongName();
+		this.vl2Config = vl2Config;
+		String entityLongName = vl2Config.getEntityLongName();
 		// this.setTitle(entityLongName);
 		lblCoName.setText(entityLongName);
-		cashAcctNo = vl2FileMan.getCashAcctNo();
+		cashAcctNo = vl2Config.getCashAcctNo();
 		logger.logDebug("CashAcctNo=" + cashAcctNo);
 		lblCashAcctDescr.setText("Cash Account No: " + cashAcctNo);
 		lblTransType.setText("Cash " + transType);
 
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-		logger.logDebug("EntityLongName=" + vl2FileMan.getEntityLongName());
-		logger.logDebug("CashAcctNo=" + vl2FileMan.getCashAcctNo());
+		logger.logDebug("EntityLongName=" + vl2Config.getEntityLongName());
+		logger.logDebug("CashAcctNo=" + vl2Config.getCashAcctNo());
 
 		this.setVisible(true);
 		txtDate.setInputVerifier(new DateVerifier());
@@ -344,7 +343,7 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		accountFinder = new AccountFinder(chart, logger, comboAccount);
 		imbalanceAmount = 0L;
 		clearForm();
-		String GLFilename = vl2FileMan.getGLFile();
+		String GLFilename = vl2Config.getGLFile();
 		logger.logDebug("GLFilename=" + GLFilename);
 		GLFile = new UsefulFile(GLFilename, "rw+");
 		txtDate.requestFocus();
@@ -427,7 +426,7 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 
 	// Local Variables
 	LogFile logger;
-	VL2FileMan vl2FileMan;
+	VL2Config vl2Config;
 	String transType;
 	Julian transDate;
 	String drcr;

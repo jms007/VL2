@@ -51,7 +51,7 @@ import java.awt.event.KeyEvent;
  * @author jms
  */
 public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener {
-	public ShowBal(Chart chart, ChartTree tree, VL2FileMan vl2FileMan)
+	public ShowBal(Chart chart, ChartTree tree, VL2Config vl2FileMan)
 	{
 		logger = VL2.logger;
 		// For debugging

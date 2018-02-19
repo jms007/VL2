@@ -29,7 +29,7 @@ import com.lowagie.text.DocumentException;
  */
 public class PrintChart {
 	// Local variables
-	VL2FileMan vl2FileMan;
+	VL2Config vl2Config;
 	String workDir;
 	String glFilename;
 	Chart chart;
@@ -40,7 +40,7 @@ public class PrintChart {
 	boolean showacctSave;
 	StmtTable stmtTable;
 
-	public void printPDF(VL2FileMan vl2FileMan, Chart chart, String outfileName, LogFile logger) throws VLException
+	public void printPDF(VL2Config vl2Config, Chart chart, String outfileName, LogFile logger) throws VLException
 	{
 		this.logger = logger;
 		if (logger == null)
@@ -48,10 +48,10 @@ public class PrintChart {
 		// For debugging:
 		// logger.setLogAll(true);
 
-		this.vl2FileMan = vl2FileMan;
+		this.vl2Config = vl2Config;
 		this.chart = chart;
-		workDir = vl2FileMan.getWorkingDirectory();
-		glFilename = vl2FileMan.getGLFile();
+		workDir = vl2Config.getWorkingDirectory();
+		glFilename = vl2Config.getGLFile();
 		if (outfileName.contains(File.separator))
 			this.outfileName = outfileName;
 		else
@@ -60,7 +60,7 @@ public class PrintChart {
 		int reportLevel = chart.getMaxLevel();
 		Julian begin = new Julian("1/1/20" + new Julian().toString("yy"));
 		Julian end = new Julian();
-		statement = new StatementPDF(vl2FileMan, chart, outfileName, logger);
+		statement = new StatementPDF(vl2Config, chart, outfileName, logger);
 		stmtTable = statement.initialize(reportLevel, outfileName);
 		statement.levelTotals = new long[10];
 		for (int i = 0; i < statement.levelTotals.length; ++i)

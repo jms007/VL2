@@ -24,7 +24,7 @@ import java.util.Enumeration;
  * @author jms
  */
 public class TranReport extends JDialog {
-	public TranReport(int reportType, Chart chart, VL2FileMan vl2FileMan, LogFile logger)
+	public TranReport(int reportType, Chart chart, VL2Config vl2FileMan, LogFile logger)
 			throws IOException, VLException
 	{
 		this.chart = chart;
@@ -106,7 +106,7 @@ public class TranReport extends JDialog {
 		logger.logDebug("Transaction report is in " + outFilename);
 	}
 
-	private void printTitle(UsefulFile outfile, int reportType, String sDate, String eDate, VL2FileMan vl2FileMan)
+	private void printTitle(UsefulFile outfile, int reportType, String sDate, String eDate, VL2Config vl2FileMan)
 	{
 		int reportWidth;
 		if (reportType == DETAIL)
@@ -267,7 +267,7 @@ public class TranReport extends JDialog {
 
 	public static final int DETAIL = 1;
 	public static final int SUMMARY = 2;
-	public VL2FileMan vl2FileMan;
+	public VL2Config vl2FileMan;
 	LogFile logger;
 	String workDir;
 	String glFileName;

@@ -20,7 +20,7 @@ public abstract class AbstractStatement {
 	{
 	}
 
-	public void setup(VL2FileMan vl2FileMan, Chart chart, boolean showAmounts, Julian begin, Julian end,
+	public void setup(VL2Config vl2FileMan, Chart chart, boolean showAmounts, Julian begin, Julian end,
 			int reportLevel, String outfileName // specify "" if output is not needed
 			, LogFile logger) throws VLException
 	{
@@ -190,7 +190,7 @@ public abstract class AbstractStatement {
 	abstract void printAmountLine(ChartElement element, Account account) throws VLException;
 	// abstract void close() throws VLException;
 
-	VL2FileMan vl2FileMan;
+	VL2Config vl2FileMan;
 	Chart chart;
 	LogFile logger;
 	String workDir;

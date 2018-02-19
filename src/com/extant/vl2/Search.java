@@ -21,7 +21,7 @@ import javax.swing.JRadioButton;
  * @author jms
  */
 public class Search extends javax.swing.JFrame {
-	public Search(VL2FileMan vl2FileMan)
+	public Search(VL2Config vl2FileMan)
 	{
 		initComponents();
 		lineBreak = System.lineSeparator();
@@ -293,7 +293,7 @@ public class Search extends javax.swing.JFrame {
 	int nEntries;
 	long total;
 	// StringBuffer comboAcctBuffer;
-	VL2FileMan vl2FileMan;
+	VL2Config vl2FileMan;
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
 	private javax.swing.JButton btnClose;
