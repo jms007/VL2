@@ -4,7 +4,7 @@ import com.extant.utilities.XProperties;
 import com.extant.utilities.Four11;
 //import com.extant.utilities.Strings;
 import com.extant.utilities.Julian;
-//import com.extant.utilities.MyPanel;
+import com.extant.utilities.MyPanel;
 import com.extant.utilities.LogFile;
 import com.extant.utilities.ViewFile;
 import com.extant.utilities.UtilitiesException;
@@ -28,9 +28,9 @@ import java.awt.event.ActionListener;
 import java.awt.Container;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
-//import java.net.*;
-//import java.awt.Image;
-//import java.awt.MediaTracker;
+import java.net.*;
+import java.awt.Image;
+import java.awt.MediaTracker;
 
 /**
  *
@@ -47,7 +47,6 @@ public class VL2
 	static String ACCOUNTING_DIR;
     static String entityName=null;
     static String entityLongName=null;
-    //static String entityDir=null;
     static String entityPropsFilename=null;
     static String yy=null;
     static String workDir;
@@ -55,7 +54,6 @@ public class VL2
     static Chart chart=null;
     static ChartTree chartTree=null;
     static JTree chartJTree=null;
-    //static String glFilename=null;
     static GLCheck glCheck=null;
     static Julian EarliestDate;
     static Julian LatestDate;
@@ -70,28 +68,28 @@ public class VL2
     {
         System.out.println("Enter VL2Init");
         
-//        {   // Display Logo only on initial call
-//            try
-//            {
-//                Image logo=null;
-//                System.out.println("Logo section ...");
-//                Toolkit toolkit = Toolkit.getDefaultToolkit();
-//                URL logoSrc = new URL("http://extantinvestments.com/img/Extant4Small.jpg");
-//                logo = toolkit.getImage( logoSrc );
-//                if ( logo == null ) throw new Exception( "logo image is null" );
-//                MediaTracker mediaTracker = new MediaTracker( this );
-//                if ( mediaTracker == null ) throw new Exception( "mediaTracker is null!");
-//                mediaTracker.addImage( toolkit.getImage(logoSrc), 1);
-//                mediaTracker.waitForID( 0, 10000 );
-//                MyPanel logoPanel = new MyPanel( logo, MyPanel.CENTER );
-//                Container contentPane = getContentPane();
-//                contentPane.add( logoPanel, 0 );
-//                logoPanel.setVisible(true);
-//            }
-//            catch (Exception x)
-//            {   System.out.println( "cannot display logo: " + x.getMessage()); }
-//            System.out.println( "finished with logo" );
-//        }
+        {   // Display Logo only on initial call
+            try
+            {
+                Image logo=null;
+                System.out.println("Logo section ...");
+                Toolkit toolkit = Toolkit.getDefaultToolkit();
+                URL logoSrc = new URL("http://extantinvestments.com/img/Extant4Small.jpg");
+                logo = toolkit.getImage( logoSrc );
+                if ( logo == null ) throw new Exception( "logo image is null" );
+                MediaTracker mediaTracker = new MediaTracker( this );
+                if ( mediaTracker == null ) throw new Exception( "mediaTracker is null!");
+                mediaTracker.addImage( toolkit.getImage(logoSrc), 1);
+                mediaTracker.waitForID( 0, 10000 );
+                MyPanel logoPanel = new MyPanel( logo, MyPanel.CENTER );
+                Container contentPane = getContentPane();
+                contentPane.add( logoPanel, 0 );
+                logoPanel.setVisible(true);
+            }
+            catch (Exception x)
+            {   System.out.println( "cannot display logo: " + x.getMessage()); }
+            System.out.println( "finished with logo" );
+        }
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         VL2MenuFrame.setLocation(
@@ -562,7 +560,6 @@ public class VL2
             else if (command.equals("Print Chart"))
                 startPrintChart();
 
-
             else System.out.println("This command (" + command + ") is not implemented");
         }
 
@@ -574,7 +571,7 @@ public class VL2
             logger.logDebug("Entity: "+ vl2FileMan.getEntityLongName());
             try
             {   
-            	String outFile=workDir + "Stmt.txt";
+            	String outFile = workDir + "Stmt.txt";
                 StatementTXT statement = new StatementTXT
                     ( vl2FileMan
                     , VL2.chart
