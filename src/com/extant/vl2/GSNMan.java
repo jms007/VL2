@@ -65,7 +65,7 @@ public class GSNMan {
 			updateNV();
 		} catch (IOException iox) {
 			System.out.println("GSNMan.incrementGSN: " + iox.getMessage());
-			System.exit(10);
+			System.exit(200);
 		}
 		System.out.println("GSN after increment=" + GSN);
 		return GSN;
@@ -73,15 +73,10 @@ public class GSNMan {
 
 	private void updateNV() throws IOException
 	{
-		try {
-			UsefulFile GSNFile = new UsefulFile(vl2Config.getGSNFile(), "w");
+		UsefulFile GSNFile = new UsefulFile(vl2Config.getGSNFile(), "w");
 
-			GSNFile.println(GSN + "|" + new Julian().toString("mm/dd/yyyy hh:mm:ss"));
-			GSNFile.close();
-		} catch (IOException iox) {
-			System.out.println("GSNMan.updateNV: " + iox.getMessage());
-			System.exit(10);
-		}
+		GSNFile.println(GSN + "|" + new Julian().toString("mm/dd/yyyy hh:mm:ss"));
+		GSNFile.close();
 	}
 
 	// For testing: *****
