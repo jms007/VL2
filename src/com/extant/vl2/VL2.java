@@ -62,6 +62,13 @@ public class VL2 extends JFrame implements ActionListener {
 
 	JFrame VL2MenuFrame = this;
 
+	/**
+	 * Main Method for application VL2.
+	 * 
+	 * @param args
+	 *            Currently not used
+	 * @throws IOException
+	 */
 	public void VL2Init(String args[]) throws IOException
 	{
 		System.out.println("Enter VL2Init");
