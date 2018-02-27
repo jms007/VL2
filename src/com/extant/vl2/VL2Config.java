@@ -19,8 +19,8 @@ import com.extant.utilities.XProperties;
 //GSNFile=gsnNVFile.txt
 //CashAcctNo=0010
 
-public class VL2Config {
-
+public class VL2Config
+{
 	public static String getAccountingDataDirectory()
 	{
 		String userName = System.getProperty("user.name");
