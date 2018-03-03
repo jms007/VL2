@@ -15,20 +15,22 @@ import com.extant.utilities.Strings;
  *
  * @author jms
  */
-public abstract class AbstractStatement {
+public abstract class AbstractStatement
+{
 	public AbstractStatement()
 	{
 	}
 
-	public void setup(VL2Config vl2FileMan, Chart chart, boolean showAmounts, Julian begin, Julian end,
-			int reportLevel, String outfileName // specify "" if output is not needed
+	public void setup(VL2Config vl2Config, Chart chart, boolean showAmounts, Julian begin, Julian end, int reportLevel,
+			String outfileName // specify "" if output is not needed
 			, LogFile logger) throws VLException
 	{
-		try {
-			this.vl2FileMan = vl2FileMan;
+		try
+		{
+			this.vl2Config = vl2Config;
 			this.chart = chart;
 			this.showAmounts = showAmounts;
-			this.glFilename = vl2FileMan.getGLFile();
+			this.glFilename = vl2Config.getGLFile();
 			if (reportLevel <= 0 || reportLevel > chart.getMaxLevel())
 				this.reportLevel = chart.getMaxLevel();
 			else
@@ -45,7 +47,8 @@ public abstract class AbstractStatement {
 			// !! You cannot feed nulls to extractBalances() for begin & end
 			if (reportLevel <= 0)
 				reportLevel = chart.getMaxLevel();
-			if (showAmounts) {
+			if (showAmounts)
+			{
 				logger.logDebug("   calling VLUtil.extractBalances(" + glFilename + ",<chart>,"
 						+ begin.toString("yymmdd") + "," + end.toString("yymmdd") + ")");
 				VLUtil.extractBalances(glFilename, chart, begin, end, logger);
@@ -57,7 +60,8 @@ public abstract class AbstractStatement {
 
 			// Overwrite confirmation is obtained in ReportOptions under VL
 			// !! BUT ReportOptions does not run if executing stand-alone
-			if (outfileName.length() > 0) {
+			if (outfileName.length() > 0)
+			{
 				File f = new File(outfileName);
 				if (f.exists())
 					f.delete();
@@ -67,7 +71,8 @@ public abstract class AbstractStatement {
 			initialize(reportLevel, outfileName);
 			logger.logDebug("   back from initialize()");
 			makeStatement();
-		} catch (IOException iox) {
+		} catch (IOException iox)
+		{
 			throw new VLException(VLException.IOX, iox.getMessage());
 		}
 	}
@@ -75,7 +80,8 @@ public abstract class AbstractStatement {
 	public String makeStatement() throws VLException
 	{
 		Enumeration chartElements = chart.chartElements();
-		while (chartElements.hasMoreElements()) {
+		while (chartElements.hasMoreElements())
+		{
 			ChartElement element = (ChartElement) chartElements.nextElement();
 			processChartElement(element);
 		}
@@ -85,15 +91,18 @@ public abstract class AbstractStatement {
 
 	void processChartElement(ChartElement element) throws VLException
 	{
-		try {
+		try
+		{
 			String elementName = element.name;
-			if (elementName.equals("chart") || elementName.equals("section") || elementName.equals("group")) {
+			if (elementName.equals("chart") || elementName.equals("section") || elementName.equals("group"))
+			{
 				if (element.getLevel() <= reportLevel)
 					cPrint(element, null, elementName.equals("group")); // only group titles are conditionally printed
 			}
 
-			else if (elementName.equals("account") && showAmounts) { // Print ending balance in this account & add to
-																		// level total
+			else if (elementName.equals("account") && showAmounts)
+			{ // Print ending balance in this account & add to
+				// level total
 				int accountIndex = element.getAccountIndex(); // !!Mystery VLException from this line
 				Account account;
 				account = chart.getAccount(accountIndex);
@@ -102,20 +111,23 @@ public abstract class AbstractStatement {
 					printNetWorth(element, account, showAmounts);
 				if (account.getEndBal() != 0L && element.getLevel() <= reportLevel)
 					cPrint(element, account, false);
-			} else if (elementName.equals("total") && showAmounts) {
+			} else if (elementName.equals("total") && showAmounts)
+			{
 				element.setTotal(levelTotals[element.getLevel()]);
 				Account account = new Account("", element.getLevelString(), element.getAttribute("type"),
 						element.getAttribute("title"));
 				account.zeroBalances();
 				account.addToBeginBal(levelTotals[element.getLevel()]);
-				if (account.getEndBal() != 0L && element.getLevel() <= reportLevel) {
+				if (account.getEndBal() != 0L && element.getLevel() <= reportLevel)
+				{
 					cPrint(element, account, false);
 				}
 				if (element.getLevel() > 0)
 					levelTotals[element.getLevel() - 1] += levelTotals[element.getLevel()];
 				levelTotals[element.getLevel()] = 0L;
 			}
-		} catch (VLException vlx) {
+		} catch (VLException vlx)
+		{
 			logger.logFatal("Mystery Exception@AbstractStatement: ProcessChartElement: " + vlx.getMessage());
 		}
 	}
@@ -151,11 +163,14 @@ public abstract class AbstractStatement {
 
 	public void cPrint(ChartElement element, Account account, boolean conditional) throws VLException
 	{
-		if (conditional) {
-			for (int i = 0; i < cPrintBuffer.size(); ++i) {
+		if (conditional)
+		{
+			for (int i = 0; i < cPrintBuffer.size(); ++i)
+			{
 				int cPrintLevel = ((ChartElement) cPrintBuffer.elementAt(i)).getLevel();
 				String cPrintImage = ((ChartElement) cPrintBuffer.elementAt(i)).getAttribute("title");
-				if (cPrintLevel >= element.getLevel()) {
+				if (cPrintLevel >= element.getLevel())
+				{
 					logger.logDebug("Removing '" + cPrintImage + "'");
 					cPrintBuffer.removeElementAt(i);
 					--i;
@@ -163,13 +178,16 @@ public abstract class AbstractStatement {
 			}
 			cPrintBuffer.addElement(element);
 			logger.logDebug("Adding '" + element.getAttribute("title") + "' to cPrintBuffer");
-		} else {
-			for (int i = 0; i < cPrintBuffer.size(); ++i) {
+		} else
+		{
+			for (int i = 0; i < cPrintBuffer.size(); ++i)
+			{
 				int cPrintLevel = ((ChartElement) cPrintBuffer.elementAt(i)).getLevel();
 				String cPrintImage = ((ChartElement) cPrintBuffer.elementAt(i)).getAttribute("title");
 				logger.logDebug("level=" + element.getLevel() + " Checking [" + cPrintLevel + "] " + cPrintImage
 						+ "(print=" + (element.getLevel() > cPrintLevel) + ")");
-				if (element.getLevel() > cPrintLevel) {
+				if (element.getLevel() > cPrintLevel)
+				{
 					printTextLine((ChartElement) cPrintBuffer.elementAt(i));
 				}
 				cPrintBuffer.removeElementAt(i);
@@ -190,7 +208,7 @@ public abstract class AbstractStatement {
 	abstract void printAmountLine(ChartElement element, Account account) throws VLException;
 	// abstract void close() throws VLException;
 
-	VL2Config vl2FileMan;
+	VL2Config vl2Config;
 	Chart chart;
 	LogFile logger;
 	String workDir;
