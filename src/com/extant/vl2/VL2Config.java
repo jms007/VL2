@@ -43,13 +43,27 @@ public class VL2Config
 		this.entityName = entityName;
 		this.currentYear = currentYear;
 		String propFile = accountingDataDir + entityName + "\\" + entityName + ".properties";
-		VL2.logger.log("Properties:45" + "Reading properties file: " + propFile);
+		VL2.logger.logDebug("Properties:46" + "Reading properties file: " + propFile);
 		props = new XProperties(propFile);
 	}
 
 	public void listAllProperties()
 	{
-		// TODO
+		System.out.println("AccountingDataDirectory=" + getAccountingDataDirectory());
+		System.out.println("EntityName=" + getEntityName());
+		System.out.println("EntityLongName=" + getEntityLongName());
+		System.out.println("currentYear=" + getCurrentYear());
+		System.out.println("ChartFile=" + getChartFile());
+		System.out.println("CustomerList=" + getCustomerList());
+		System.out.println("VendorList=" + getVendorList());
+		System.out.println("ContactsList=" + getContactsList());
+		System.out.println("GLFile=" + getGLFile());
+		System.out.println("GSNFile=" + getGSNFile());
+		System.out.println("CheckRegFile=" + getCheckRegFile());
+		System.out.println("CashAcctNo=" + getCashAcctNo());
+		System.out.println("WorkingDirectory=" + getWorkingDirectory());
+		System.out.println("earliestDate=" + getEarliestDate());
+		System.out.println("latestDate=" + getLatestDate());
 	}
 
 	public String getEntityName()
