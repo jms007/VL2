@@ -21,21 +21,25 @@ import java.io.*;
  *
  * @author jms
  */
-public class StatementTXT extends AbstractStatement {
-	public StatementTXT(VL2Config vl2FileMan, Chart chart, String glFilename, Julian earliestDate, Julian latestDate,
+public class StatementTXT extends AbstractStatement
+{
+	public StatementTXT(VL2Config vl2Config, Chart chart, String glFilename, Julian earliestDate, Julian latestDate,
 			int reportLevel, String outfileName, LogFile logger) throws VLException
 	{
-		setup(vl2FileMan, chart, true, earliestDate, latestDate, reportLevel, outfileName, logger);
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		setup(vl2Config, chart, true, earliestDate, latestDate, reportLevel, outfileName, logger);
 	}
 
 	public StmtTable initialize(int reportLevel, String outfileName) throws VLException
 	{
-		try {
+		try
+		{
 			logger.logDebug("[StatementTXT.initialize]");
 			outfile = new UsefulFile(outfileName, "w");
 			calculateColumns(chart, reportLevel);
 			return null;
-		} catch (IOException iox) {
+		} catch (IOException iox)
+		{
 			throw new VLException(VLException.IOX, iox.getMessage());
 		}
 	}
@@ -48,7 +52,8 @@ public class StatementTXT extends AbstractStatement {
 			image += "\f";
 		if (format.contains("center"))
 			image += Strings.center(element.getAttribute("title"), maxLineLength);
-		else {
+		else
+		{
 			if (chart.getShowacct())
 				image += Strings.leftJustify(" ", chart.maxAccountNo.length() + 1);
 			image += chart.getIndention(element.getLevel());
@@ -77,7 +82,8 @@ public class StatementTXT extends AbstractStatement {
 		int formatLevel = account.getLevel();
 		if (account.getType().equalsIgnoreCase("T"))
 			--formatLevel;
-		if (chart.getShowacct()) {
+		if (chart.getShowacct())
+		{
 			if (account.getType().equalsIgnoreCase("A"))
 				image += Strings.leftJustify(account.getAccountNo(), chart.maxAccountNo.length()) + " ";
 			else
@@ -144,7 +150,7 @@ public class StatementTXT extends AbstractStatement {
 
 	UsefulFile outfile;
 	int dollarIndent = 10;
-	public final static long MAX_DOLLAR_AMOUNT = 99999999999L; // $ 999,999,999.99
+	public final static long MAX_DOLLAR_AMOUNT = 999999999L; // $ 9,999,999.99
 	int dollarFieldLength;
 	int maxLineLength;
 }

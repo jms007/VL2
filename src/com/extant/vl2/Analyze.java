@@ -13,6 +13,8 @@ import com.extant.utilities.Julian;
 import com.extant.utilities.LogFile;
 import java.io.IOException;
 import java.util.Vector;
+import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JRadioButton;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -26,16 +28,16 @@ import javax.swing.JTextField;
  *
  * @author jms
  */
-public class Analyze extends javax.swing.JDialog implements TreeSelectionListener {
+public class Analyze extends JDialog implements TreeSelectionListener
+{
+	VL2Config vl2Config;
 
-	VL2Config vl2FileMan;
-
-	public Analyze(javax.swing.JFrame parent, boolean modal, Chart chart, ChartTree tree, VL2Config vl2FileMan)
+	public Analyze(JFrame parent, boolean modal, Chart chart, ChartTree tree, VL2Config vl2Config)
 	{
 		super(parent, modal);
 		initComponents();
 		this.parent = parent;
-		this.vl2FileMan = vl2FileMan;
+		this.vl2Config = vl2Config;
 		setup();
 	}
 
@@ -69,7 +71,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		rbSortByAmount = new javax.swing.JRadioButton();
 
 		setTitle("Analyze Account");
-		addWindowListener(new java.awt.event.WindowAdapter() {
+		addWindowListener(new java.awt.event.WindowAdapter()
+		{
 			public void windowClosing(java.awt.event.WindowEvent evt)
 			{
 				closeDialog(evt);
@@ -87,7 +90,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		btnAnalyze.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		btnAnalyze.setText("Analyze");
 		btnAnalyze.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-		btnAnalyze.addActionListener(new java.awt.event.ActionListener() {
+		btnAnalyze.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				btnAnalyzeActionPerformed(evt);
@@ -98,7 +102,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		btnAnalyzeCancel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		btnAnalyzeCancel.setText("Cancel");
 		btnAnalyzeCancel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-		btnAnalyzeCancel.addActionListener(new java.awt.event.ActionListener() {
+		btnAnalyzeCancel.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				btnAnalyzeCancelActionPerformed(evt);
@@ -125,7 +130,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 
 		rbAllTrans.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbAllTrans.setText("Include All Transactions");
-		rbAllTrans.addActionListener(new java.awt.event.ActionListener() {
+		rbAllTrans.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				manageDateButtons(evt);
@@ -135,7 +141,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 
 		rbDates.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbDates.setText("Specify  Dates");
-		rbDates.addActionListener(new java.awt.event.ActionListener() {
+		rbDates.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				manageDateButtons(evt);
@@ -157,7 +164,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 
 		rbSortByDescr.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbSortByDescr.setText("Description");
-		rbSortByDescr.addActionListener(new java.awt.event.ActionListener() {
+		rbSortByDescr.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				manageSortButtons(evt);
@@ -167,7 +175,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 
 		rbSortByDate.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbSortByDate.setText("Date");
-		rbSortByDate.addActionListener(new java.awt.event.ActionListener() {
+		rbSortByDate.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				manageSortButtons(evt);
@@ -177,7 +186,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 
 		rbSortByAmount.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbSortByAmount.setText("Amount");
-		rbSortByAmount.addActionListener(new java.awt.event.ActionListener() {
+		rbSortByAmount.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				manageSortButtons(evt);
@@ -290,9 +300,11 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 		Vector entries = new Vector(100, 100);
 		String dateFormat = "mm-dd-yyyy";
 		int dateSpace = dateFormat.length() + 1;
-		try {
-			UsefulFile glFile = new UsefulFile(vl2FileMan.getGLFile(), "r");
-			while (!glFile.EOF()) {
+		try
+		{
+			UsefulFile glFile = new UsefulFile(vl2Config.getGLFile(), "r");
+			while (!glFile.EOF())
+			{
 				glEntry = new GLEntry(glFile.readLine(UsefulFile.ALL_WHITE));
 				if (chart.match(acctNo, glEntry, startDate, endDate))
 					entries.addElement(glEntry);
@@ -309,8 +321,10 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 			int[] p = Sorts.sort(sortFields);
 
 			long total = 0L;
-			if (rbSortByDate.isSelected() || rbSortByAmount.isSelected()) {
-				for (int i = 0; i < p.length; ++i) {
+			if (rbSortByDate.isSelected() || rbSortByAmount.isSelected())
+			{
+				for (int i = 0; i < p.length; ++i)
+				{
 					GLEntry thisEntry = (GLEntry) entries.elementAt(p[i]);
 					total += thisEntry.getSignedAmount();
 					results.append(thisEntry.getJulianDate().toString(dateFormat) + " " + thisEntry.getField("JREF")
@@ -318,7 +332,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 							+ thisEntry.getField("DESCR") + " " + thisEntry.getField("AMOUNT") + " " + "\n");
 
 				}
-			} else if (rbSortByDescr.isSelected()) {
+			} else if (rbSortByDescr.isSelected())
+			{
 				int descrWidth = ((String) sortFields.elementAt(0)).length();
 				String thisPayer = "";
 				String lastPayer = "";
@@ -326,19 +341,24 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 				String lastDescr = "";
 				long payerSubtotal = 0L;
 				long subtotal = 0L;
-				for (int i = 0; i < p.length; ++i) {
+				for (int i = 0; i < p.length; ++i)
+				{
 					GLEntry thisEntry = (GLEntry) entries.elementAt(p[i]);
 					thisDescr = thisEntry.getField("DESCR");
-					if (ckboxSubtotal.isSelected()) {
+					if (ckboxSubtotal.isSelected())
+					{
 						int pSlash = thisDescr.indexOf("/");
-						if (pSlash >= 0) {
+						if (pSlash >= 0)
+						{
 							thisPayer = thisDescr.substring(0, pSlash);
 							thisDescr = thisDescr.substring(pSlash + 1);
 						} else
 							thisPayer = "";
 
-						if (!thisDescr.equals(lastDescr)) {
-							if (!lastDescr.equals("")) {
+						if (!thisDescr.equals(lastDescr))
+						{
+							if (!lastDescr.equals(""))
+							{
 								results.append(Strings.leftJustify(" ", dateSpace) + "SubTotal "
 										+ Strings.leftJustify(lastDescr, descrWidth)
 										+ Strings.rightJustify(Strings.formatPennies(subtotal, ""), 26 - dateSpace)
@@ -347,8 +367,10 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 							}
 							lastDescr = thisDescr;
 						}
-						if (!thisPayer.equals(lastPayer)) {
-							if (!lastPayer.equals("")) {
+						if (!thisPayer.equals(lastPayer))
+						{
+							if (!lastPayer.equals(""))
+							{
 								results.append(Strings.leftJustify(" ", dateSpace) + "Payer Total "
 										+ Strings.leftJustify(lastPayer, 10)
 										+ Strings.rightJustify(Strings.formatPennies(payerSubtotal, ""), 42 - dateSpace)
@@ -366,7 +388,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 							+ " " + thisEntry.getField("DRCR") + " " + thisEntry.getNormalizedAccountNo() + " "
 							+ thisEntry.getField("DESCR") + " " + thisEntry.getField("AMOUNT") + " " + "\n");
 				}
-				if (ckboxSubtotal.isSelected()) {
+				if (ckboxSubtotal.isSelected())
+				{
 					results.append(Strings.leftJustify(" ", dateSpace) + "SubTotal "
 							+ Strings.leftJustify(lastDescr, descrWidth)
 							+ Strings.rightJustify(Strings.formatPennies(subtotal, ""), 26 - dateSpace) + "*\n \n");
@@ -380,7 +403,8 @@ public class Analyze extends javax.swing.JDialog implements TreeSelectionListene
 			results.append(Strings.leftJustify(" ", dateSpace) + "Total"
 					+ Strings.rightJustify(Strings.formatPennies(total, ""), 59 - dateSpace) + "**\n");
 			showText("Account Analysis", results.toString());
-		} catch (IOException | VLException x) {
+		} catch (IOException | VLException x)
+		{
 			statusBar.setText(x.getMessage());
 		}
 	}

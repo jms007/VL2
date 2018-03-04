@@ -37,7 +37,8 @@ import java.awt.MediaTracker;
  *
  * @author jms
  */
-public class VL2 extends JFrame implements ActionListener {
+public class VL2 extends JFrame implements ActionListener
+{
 
 	private static VL2Config vl2Config;
 
@@ -74,7 +75,8 @@ public class VL2 extends JFrame implements ActionListener {
 		System.out.println("Enter VL2Init");
 
 		{ // Display Logo only on initial call
-			try {
+			try
+			{
 				Image logo = null;
 				System.out.println("Logo section ...");
 				Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -91,7 +93,8 @@ public class VL2 extends JFrame implements ActionListener {
 				Container contentPane = getContentPane();
 				contentPane.add(logoPanel, 0);
 				logoPanel.setVisible(true);
-			} catch (Exception x) {
+			} catch (Exception x)
+			{
 				System.out.println("cannot display logo: " + x.getMessage());
 			}
 			System.out.println("finished with logo");
@@ -100,7 +103,8 @@ public class VL2 extends JFrame implements ActionListener {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		VL2MenuFrame.setLocation((((int) screenSize.getWidth() - 550) / 2), (((int) screenSize.getHeight() - 450) / 2));
 		VL2MenuFrame.setPreferredSize(new Dimension(550, 450));
-		if (VL2MenuFrame == null) {
+		if (VL2MenuFrame == null)
+		{
 			System.out.println("Entering VL2Init: VL2MenuFrame is null");
 			System.exit(106);
 		}
@@ -130,6 +134,7 @@ public class VL2 extends JFrame implements ActionListener {
 		if (logger.getLogLevel() >= LogFile.DEBUG_LOG_LEVEL)
 			logger.whereAreWe(new Error());
 		VL2MenuFrame.setTitle(vl2Config.getEntityLongName());
+		workDir = vl2Config.getWorkingDirectory();
 
 		// Set Initial GSN
 		new GSNMan(vl2Config, logger);
@@ -142,7 +147,8 @@ public class VL2 extends JFrame implements ActionListener {
 		logger.logDebug("workDir=" + workDir);
 		logger.logDebug("entityPropsFilename=" + entityPropsFilename);
 
-		try {
+		try
+		{
 			logger.logInfo("Checking Files ...");
 			// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
@@ -154,9 +160,11 @@ public class VL2 extends JFrame implements ActionListener {
 			chart = new Chart();
 			chart.init(chartFilename, logger); // throws IOException & VLException
 			// chartTree = new ChartTree(props, chart, logger);
-		} catch (IOException iox) {
+		} catch (IOException iox)
+		{
 			logger.logFatal("IO error checking chart: " + iox.getMessage());
-		} catch (VLException vlx) {
+		} catch (VLException vlx)
+		{
 			logger.logFatal("VL Error checking chart: " + vlx.getMessage());
 		}
 		// catch (ParserConfigurationException pcx)
@@ -165,9 +173,11 @@ public class VL2 extends JFrame implements ActionListener {
 		// { logger.logFatal("SAX Exception: " + sax.getMessage()); }
 
 		// Build ChartTree (initially invisible, location & size not specified)
-		try {
+		try
+		{
 			chartTree = new ChartTree(vl2Config, chart, logger);
-		} catch (ParserConfigurationException | SAXException | IOException | VLException x) {
+		} catch (ParserConfigurationException | SAXException | IOException | VLException x)
+		{
 			logger.logFatal("ChartTree build: " + x.getMessage());
 		}
 
@@ -192,15 +202,16 @@ public class VL2 extends JFrame implements ActionListener {
 			logger.logFatal("Unable to find " + GLFile);
 		glCheck = new GLCheck();
 		glCheck.glCheck(GLFile, chart, "token", vl2Config, logger);
-		if (glCheck.getNErrors() > 0) {
+		if (glCheck.getNErrors() > 0)
+		{
 			System.out.println("GL File Error Report:");
 			System.out.print(glCheck.getReport());
 			// logger.logFatal("Error(s) in " + GLFile);
 		} else
 			logger.logInfo("No errors found in " + GLFile);
 
-		if (glCheck.getNEntries() > 0) {
-
+		if (glCheck.getNEntries() > 0)
+		{
 			logger.logInfo("ALL CHECKS COMPLETE - NO ERRORS FOUND.");
 		}
 	}
@@ -333,16 +344,20 @@ public class VL2 extends JFrame implements ActionListener {
 		logger.log("MainMenu command: " + command);
 
 		// File
-		if (command.equals("Directory Tree")) {
-			try {
+		if (command.equals("Directory Tree"))
+		{
+			try
+			{
 				Four11 four11 = new Four11(VL2Config.getAccountingDataDirectory());
 				four11.showTree();
-			} catch (UtilitiesException ux) {
+			} catch (UtilitiesException ux)
+			{
 				logger.log("Directory Tree failed: " + ux.getMessage());
 			}
 		}
 
-		else if (command.equals("Print Check")) {
+		else if (command.equals("Print Check"))
+		{
 			CheckPrinter2 cp2 = new CheckPrinter2(vl2Config);
 			cp2.setSize(800, 600);
 			cp2.setLocation(600, 200);
@@ -350,24 +365,28 @@ public class VL2 extends JFrame implements ActionListener {
 			cp2.setVisible(true);
 		}
 
-		else if (command.equals("Exit")) {
+		else if (command.equals("Exit"))
+		{
 			VL2MenuFrame.dispose();
 			System.exit(0);
 		}
 
 		// Tools
-		else if (command.equals("Options")) {
-			// listProps(props);
+		else if (command.equals("Options"))
+		{
+			// muListProps(props);
 		}
 
-		else if (command.equals("Edit Vendor List")) {
+		else if (command.equals("Edit Vendor List"))
+		{
 			Container contentPane;
 			contentPane = this.getContentPane();
 			contentPane.setPreferredSize(new Dimension(600, 450));
 			contentPane = new ListMan4(vl2Config, ListType.VENDOR);
 			VL2MenuFrame.pack();
 			contentPane.setVisible(true);
-		} else if (command.equals("Edit Customer List")) {
+		} else if (command.equals("Edit Customer List"))
+		{
 			Container contentPane;
 			contentPane = new ListMan4(vl2Config, ListType.CUSTOMER, false);
 			contentPane.setPreferredSize(new Dimension(500, 450));
@@ -376,29 +395,36 @@ public class VL2 extends JFrame implements ActionListener {
 		} else if (command.equals("List Properties"))
 			vl2Config.listAllProperties();
 
-		else if (command.equals("Climb Chart Tree")) {
+		else if (command.equals("Climb Chart Tree"))
+		{
 			TreeClimber treeClimber = new TreeClimber();
-			try {
+			try
+			{
 				Document document = treeClimber.buildDocument(chartFilename, logger, rootPaneCheckingEnabled);
 				treeClimber.exploreTree(document);
-			} catch (UtilitiesException ux) {
+			} catch (UtilitiesException ux)
+			{
 				System.out.println("treeClimber failed: " + ux.getMessage());
 			}
 		}
 
 		// Enter Transactions
-		else if (command.equals("Receipts") || command.equals("Disbursements")) {
+		else if (command.equals("Receipts") || command.equals("Disbursements"))
+		{
 			JPanel contentPanel = null;
-			try {
-				contentPanel = new EnterTransactionPanel(chart, logger, command, vl2Config);
-			} catch (IOException iox) {
+			try
+			{
+				contentPanel = new EnterTransactionPanel(chart, chartTree, logger, command, vl2Config);
+			} catch (IOException iox)
+			{
 				logger.logFatal(iox.getMessage());
 			}
 			contentPanel.setPreferredSize(new Dimension(500, 450));
 			VL2MenuFrame.setContentPane(contentPanel);
 			VL2MenuFrame.pack();
 			VL2MenuFrame.setVisible(true);
-		} else if (command.equals("Journal Entries")) {
+		} else if (command.equals("Journal Entries"))
+		{
 			JPanel contentPanel;
 			contentPanel = new EnterJournalTransaction(chart, vl2Config, logger);
 			contentPanel.setPreferredSize(new Dimension(500, 450));
@@ -435,24 +461,27 @@ public class VL2 extends JFrame implements ActionListener {
 
 	private void startTextStmt()
 	{
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-		logger.logDebug("Starting StatementTXT");
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.logDebug("startTextStmt");
 		logger.logDebug("GLFile=" + vl2Config.getGLFile());
 		logger.logDebug("Entity: " + vl2Config.getEntityLongName());
-		try {
+		logger.logDebug("workDir=" + workDir);
+		try
+		{
 			String outFile = workDir + "Stmt.txt";
 			StatementTXT statement = new StatementTXT(vl2Config, VL2.chart, vl2Config.getGLFile(),
 					new Julian(vl2Config.getEarliestDate()), new Julian(vl2Config.getLatestDate()), 0, outFile,
 					VL2.logger);
 			statement.makeStatement();
-			String fileName = workDir + "Stmt.txt";
-			logger.logInfo("Statement is in " + fileName);
-			new ViewFile(fileName, logger);
-		} catch (VLException vlx) {
+			logger.logInfo("Statement is in " + outFile);
+			new ViewFile(outFile, logger);
+		} catch (VLException vlx)
+		{
 			logger.log("Cannot initialize StatementTXT: " + vlx.getMessage());
 			vlx.printStackTrace();
 			return;
-		} catch (UtilitiesException ux) {
+		} catch (UtilitiesException ux)
+		{
 			logger.log("Cannot initialize ViewFile: " + ux.getMessage());
 			return;
 		}
@@ -461,7 +490,7 @@ public class VL2 extends JFrame implements ActionListener {
 	private void listProps(XProperties props)
 	{
 		if (props == null)
-			System.out.println("props is null");
+			System.out.println("props is null!");
 		else
 			System.out.println("props is not null");
 		if (logger == null)
@@ -472,12 +501,14 @@ public class VL2 extends JFrame implements ActionListener {
 			System.out.println("chart is null!");
 		else
 			System.out.println("chart is not null");
-		props.list(System.out);
+		// props.list(System.out);
+		vl2Config.listAllProperties();
 	}
 
 	private void startPDFStmt()
 	{
-		try {
+		try
+		{
 			logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 			logger.logDebug("Starting PDFStmt");
 			logger.logDebug("GLFile=" + vl2Config.getGLFile());
@@ -490,9 +521,11 @@ public class VL2 extends JFrame implements ActionListener {
 
 			logger.logDebug("Statement is in file " + outFilename);
 			new ViewFile(outFilename, logger);
-		} catch (VLException vlx) {
+		} catch (VLException vlx)
+		{
 			logger.log("Failure in StatementPDF: " + vlx.getMessage());
-		} catch (UtilitiesException ux) {
+		} catch (UtilitiesException ux)
+		{
 			logger.log("Cannot initialize ViewFile: " + ux.getMessage());
 		}
 	}
@@ -500,23 +533,28 @@ public class VL2 extends JFrame implements ActionListener {
 	private void startTranReport(int reportType, VL2Config vl2FileMan, LogFile logger)
 	{
 		String outFilename = null;
-		try {
+		try
+		{
 			logger.logDebug("TranReport.DETAIL=" + TranReport.DETAIL);
 			if (reportType == TranReport.DETAIL)
 				outFilename = workDir + "DetailTranReport.txt";
 			else if (reportType == TranReport.SUMMARY)
 				outFilename = workDir + "SummaryTranReport.txt";
 			TranReport tranReport = new TranReport(reportType, chart, vl2FileMan, logger);
-		} catch (IOException iox) {
+		} catch (IOException iox)
+		{
 			logger.log("@startTranReport: " + iox.getMessage());
-		} catch (VLException vlx) {
+		} catch (VLException vlx)
+		{
 			logger.log("@startTranReport: " + vlx.getMessage());
 		}
 
-		try {
+		try
+		{
 			ViewFile viewFile = new ViewFile(outFilename, logger);
 			viewFile.setVisible(true);
-		} catch (UtilitiesException ux) {
+		} catch (UtilitiesException ux)
+		{
 			logger.log("Internal Error: startTranReport@512 (" + ux.getMessage() + ")");
 		}
 	}
@@ -536,13 +574,15 @@ public class VL2 extends JFrame implements ActionListener {
 		// {
 		// logger.log("Unable to print chart: " + vlx.getMessage());
 		// }
-		try {
+		try
+		{
 			// For debugging:
 			// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
 			String outFilename = workDir + "Chart.pdf";
 			StatementPDF statementPDF = new StatementPDF(vl2Config, VL2.chart, outFilename, logger);
-		} catch (VLException vlx) {
+		} catch (VLException vlx)
+		{
 			logger.log("VL2.startPrintChart failed: " + vlx.getMessage());
 		}
 	}

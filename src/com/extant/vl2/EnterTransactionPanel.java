@@ -20,7 +20,8 @@ import java.io.IOException;
  *
  * @author jms
  */
-public class EnterTransactionPanel extends javax.swing.JPanel {
+public class EnterTransactionPanel extends javax.swing.JPanel
+{
 	/**
 	 * Creates new form EnterTransactionPanel
 	 */
@@ -35,7 +36,6 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 	// Code">//GEN-BEGIN:initComponents
 	private void initComponents()
 	{
-
 		txtDate = new javax.swing.JTextField();
 		txtAmount = new javax.swing.JTextField();
 		comboAccount = new javax.swing.JComboBox<>();
@@ -54,7 +54,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
 		txtDate.setBorder(javax.swing.BorderFactory.createTitledBorder("Date"));
-		txtDate.addFocusListener(new java.awt.event.FocusAdapter() {
+		txtDate.addFocusListener(new java.awt.event.FocusAdapter()
+		{
 			public void focusLost(java.awt.event.FocusEvent evt)
 			{
 				txtDateFocusLost(evt);
@@ -63,7 +64,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		add(txtDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 85, -1));
 
 		txtAmount.setBorder(javax.swing.BorderFactory.createTitledBorder("Amount"));
-		txtAmount.addFocusListener(new java.awt.event.FocusAdapter() {
+		txtAmount.addFocusListener(new java.awt.event.FocusAdapter()
+		{
 			public void focusLost(java.awt.event.FocusEvent evt)
 			{
 				txtAmountFocusLost(evt);
@@ -72,13 +74,15 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		add(txtAmount, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 85, 50));
 
 		comboAccount.setBorder(javax.swing.BorderFactory.createTitledBorder("Account"));
-		comboAccount.addFocusListener(new java.awt.event.FocusAdapter() {
+		comboAccount.addFocusListener(new java.awt.event.FocusAdapter()
+		{
 			public void focusLost(java.awt.event.FocusEvent evt)
 			{
 				comboAccountFocusLost(evt);
 			}
 		});
-		comboAccount.addKeyListener(new java.awt.event.KeyAdapter() {
+		comboAccount.addKeyListener(new java.awt.event.KeyAdapter()
+		{
 			public void keyTyped(java.awt.event.KeyEvent evt)
 			{
 				comboAccountKeyTyped(evt);
@@ -87,13 +91,15 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		add(comboAccount, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 110, 410, -1));
 
 		txtDescr.setBorder(javax.swing.BorderFactory.createTitledBorder("Description"));
-		txtDescr.addFocusListener(new java.awt.event.FocusAdapter() {
+		txtDescr.addFocusListener(new java.awt.event.FocusAdapter()
+		{
 			public void focusLost(java.awt.event.FocusEvent evt)
 			{
 				txtDescrFocusLost(evt);
 			}
 		});
-		txtDescr.addKeyListener(new java.awt.event.KeyAdapter() {
+		txtDescr.addKeyListener(new java.awt.event.KeyAdapter()
+		{
 			public void keyTyped(java.awt.event.KeyEvent evt)
 			{
 				txtDescrKeyTyped(evt);
@@ -102,7 +108,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		add(txtDescr, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 502, 40));
 
 		Enter.setText("Enter");
-		Enter.addActionListener(new java.awt.event.ActionListener() {
+		Enter.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				EnterActionPerformed(evt);
@@ -111,7 +118,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		add(Enter, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 240, 99, -1));
 
 		btnView.setText("View Entries");
-		btnView.addActionListener(new java.awt.event.ActionListener() {
+		btnView.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				btnViewActionPerformed(evt);
@@ -120,7 +128,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		add(btnView, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 240, 110, -1));
 
 		Post.setText("Post Entries");
-		Post.addActionListener(new java.awt.event.ActionListener() {
+		Post.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				PostActionPerformed(evt);
@@ -129,7 +138,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		add(Post, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 240, -1, -1));
 
 		Close.setText("Close");
-		Close.addActionListener(new java.awt.event.ActionListener() {
+		Close.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				CloseActionPerformed(evt);
@@ -138,7 +148,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		add(Close, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 270, 100, -1));
 
 		btnClear.setText("Clear Form");
-		btnClear.addActionListener(new java.awt.event.ActionListener() {
+		btnClear.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				btnClearActionPerformed(evt);
@@ -199,7 +210,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 
 	private void CloseActionPerformed(java.awt.event.ActionEvent evt)
 	{// GEN-FIRST:event_CloseActionPerformed
-		if (!unpostedEntries.isEmpty()) {
+		if (!unpostedEntries.isEmpty())
+		{
 			int ans = JOptionPane.showConfirmDialog(new JFrame(),
 					"There are unposted entries.\nDo you want to discard them?", "Unposted Entries",
 					JOptionPane.YES_NO_OPTION);
@@ -225,7 +237,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		logger.logDebug("Enter PostActionPerformed");
 		logger.logDebug("GLFilename=" + vl2Config.getGLFile());
 
-		try { /***** See VL2\Test Data\Notes.txt *****/
+		try
+		{ /***** See VL2\Test Data\Notes.txt *****/
 
 			// Build balancing entry with GSN and status 'F' and add to unpostedEntries
 			GLEntry balEntry = new GLEntry(unpostedEntries.get(0).toString());
@@ -246,7 +259,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 
 			// Update unposted entries with current GSN and calculate total
 			long transBal = 0L;
-			for (int i = 0; i < unpostedEntries.size(); ++i) {
+			for (int i = 0; i < unpostedEntries.size(); ++i)
+			{
 				balEntry = unpostedEntries.get(i);
 				balEntry.setField("GSN", GSNMan.getGSN());
 				balEntry.setField("STATUS", "F");
@@ -259,7 +273,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 
 			// No further checks to do ...
 			// Append the unposted entries to GL file
-			for (int i = 0; i < unpostedEntries.size(); ++i) {
+			for (int i = 0; i < unpostedEntries.size(); ++i)
+			{
 				GLFile.writeLine(unpostedEntries.get(i).toString());
 			}
 
@@ -268,7 +283,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 			unpostedEntries.clear();
 			imbalanceAmount = 0;
 			clearForm();
-		} catch (VLException vlx) { // Undo everything, inform user, and get out leaving GSN unchanged
+		} catch (VLException vlx)
+		{ // Undo everything, inform user, and get out leaving GSN unchanged
 			logger.logFatal("Failed to move unposted transaction to GL0010.DAT (" + vlx.getMessage() + ")");
 			return; // Get out
 		}
@@ -281,18 +297,22 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 
 	private void btnViewActionPerformed(java.awt.event.ActionEvent evt)
 	{// GEN-FIRST:event_btnViewActionPerformed
-		try {
+		try
+		{
 			String tempFilename = "C:\\Temp\\ViewEntries.txt";
 			UsefulFile tempFile = new UsefulFile(tempFilename, "w");
-			for (int i = 0; i < unpostedEntries.size(); ++i) {
+			for (int i = 0; i < unpostedEntries.size(); ++i)
+			{
 				String glEntry = unpostedEntries.get(i).toString();
 				tempFile.writeLine(glEntry);
 			}
 			tempFile.close();
 			new ViewFile(tempFilename, logger, false).setVisible(true);
-		} catch (IOException iox) {
+		} catch (IOException iox)
+		{
 			logger.log("File Error: " + iox.getMessage());
-		} catch (UtilitiesException ux) {
+		} catch (UtilitiesException ux)
+		{
 			logger.log("Util Error: " + ux.getMessage());
 		}
 	}// GEN-LAST:event_btnViewActionPerformed
@@ -319,12 +339,14 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		manageButtons(); // To eliminate losing focus requirement to get "Enter" button enabled
 	}// GEN-LAST:event_txtDescrKeyTyped
 
-	public EnterTransactionPanel(Chart chart, LogFile logger, String transType, VL2Config vl2Config) throws IOException
+	public EnterTransactionPanel(Chart chart, ChartTree chartTree, LogFile logger, String transType,
+			VL2Config vl2Config) throws IOException
 	{
 		initComponents();
 		this.logger = logger;
 		this.transType = transType;
 		this.vl2Config = vl2Config;
+		this.chartTree = chartTree;
 		String entityLongName = vl2Config.getEntityLongName();
 		// this.setTitle(entityLongName);
 		lblCoName.setText(entityLongName);
@@ -340,7 +362,7 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		this.setVisible(true);
 		txtDate.setInputVerifier(new DateVerifier());
 		txtAmount.setInputVerifier(new AmountVerifier());
-		accountFinder = new AccountFinder(chart, logger, comboAccount);
+		accountFinder = new AccountFinder(chart, chartTree, logger, comboAccount);
 		imbalanceAmount = 0L;
 		clearForm();
 		String GLFilename = vl2Config.getGLFile();
@@ -352,7 +374,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 	private void clearForm()
 	{
 		logger.logDebug("Enter clearForm");
-		if (unpostedEntries.isEmpty()) {
+		if (unpostedEntries.isEmpty())
+		{
 			txtDate.setText(new Julian().toString("mm-dd-yyyy"));
 			txtDate.setEnabled(true);
 		}
@@ -364,7 +387,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		manageButtons();
 	}
 
-	class AmountVerifier extends InputVerifier {
+	class AmountVerifier extends InputVerifier
+	{
 		String amountPattern = "\\d*\\.\\d\\d";
 
 		public boolean verify(JComponent jc)
@@ -374,7 +398,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 		}
 	}
 
-	class DateVerifier extends InputVerifier {
+	class DateVerifier extends InputVerifier
+	{
 		public boolean verify(JComponent jc)
 		{
 			JTextField tf = (JTextField) jc;
@@ -426,6 +451,7 @@ public class EnterTransactionPanel extends javax.swing.JPanel {
 
 	// Local Variables
 	LogFile logger;
+	ChartTree chartTree;
 	VL2Config vl2Config;
 	String transType;
 	Julian transDate;

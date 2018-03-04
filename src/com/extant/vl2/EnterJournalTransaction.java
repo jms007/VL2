@@ -20,7 +20,8 @@ import javax.swing.JTextField;
  *
  * @author jms
  */
-public class EnterJournalTransaction extends javax.swing.JPanel {
+public class EnterJournalTransaction extends javax.swing.JPanel
+{
 	/**
 	 * Creates new form EnterJournalTransaction
 	 */
@@ -35,8 +36,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 		txtDebitAmount.setInputVerifier(new AmountVerifier());
 		txtCreditAmount.setInputVerifier(new AmountVerifier());
 		lblEntityName.setText(vl2Config.getEntityLongName());
-		debitAccountFinder = new AccountFinder(chart, logger, comboDebitAccount);
-		creditAccountFinder = new AccountFinder(chart, logger, comboCreditAccount);
+		// debitAccountFinder = new AccountFinder(chart, logger, comboDebitAccount);
+		// creditAccountFinder = new AccountFinder(chart, logger, comboCreditAccount);
 		imbalanceAmount = 0;
 		clearForm();
 		// logger.log("EnterJournal... Initialization Complete");
@@ -84,7 +85,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 		add(txtDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 85, -1));
 
 		comboCreditAccount.setBorder(javax.swing.BorderFactory.createTitledBorder("Credit Account"));
-		comboCreditAccount.addKeyListener(new java.awt.event.KeyAdapter() {
+		comboCreditAccount.addKeyListener(new java.awt.event.KeyAdapter()
+		{
 			public void keyTyped(java.awt.event.KeyEvent evt)
 			{
 				comboCreditAccountKeyTyped(evt);
@@ -93,7 +95,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 		add(comboCreditAccount, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 120, 300, -1));
 
 		comboDebitAccount.setBorder(javax.swing.BorderFactory.createTitledBorder("Debit Account"));
-		comboDebitAccount.addKeyListener(new java.awt.event.KeyAdapter() {
+		comboDebitAccount.addKeyListener(new java.awt.event.KeyAdapter()
+		{
 			public void keyTyped(java.awt.event.KeyEvent evt)
 			{
 				comboDebitAccountKeyTyped(evt);
@@ -102,19 +105,22 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 		add(comboDebitAccount, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 70, 300, -1));
 
 		txtDescr.setBorder(javax.swing.BorderFactory.createTitledBorder("Description"));
-		txtDescr.addFocusListener(new java.awt.event.FocusAdapter() {
+		txtDescr.addFocusListener(new java.awt.event.FocusAdapter()
+		{
 			public void focusLost(java.awt.event.FocusEvent evt)
 			{
 				txtDescrFocusLost(evt);
 			}
 		});
-		txtDescr.addActionListener(new java.awt.event.ActionListener() {
+		txtDescr.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				txtDescrActionPerformed(evt);
 			}
 		});
-		txtDescr.addKeyListener(new java.awt.event.KeyAdapter() {
+		txtDescr.addKeyListener(new java.awt.event.KeyAdapter()
+		{
 			public void keyTyped(java.awt.event.KeyEvent evt)
 			{
 				txtDescrKeyTyped(evt);
@@ -126,7 +132,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 		add(View, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 240, 110, -1));
 
 		btnClear.setText("Clear Form");
-		btnClear.addActionListener(new java.awt.event.ActionListener() {
+		btnClear.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				btnClearActionPerformed(evt);
@@ -135,7 +142,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 		add(btnClear, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 280, 110, -1));
 
 		Enter.setText("Enter");
-		Enter.addActionListener(new java.awt.event.ActionListener() {
+		Enter.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				EnterActionPerformed(evt);
@@ -144,7 +152,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 		add(Enter, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 240, 99, -1));
 
 		Post.setText("Post Entries");
-		Post.addActionListener(new java.awt.event.ActionListener() {
+		Post.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				PostActionPerformed(evt);
@@ -153,7 +162,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 		add(Post, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 240, -1, -1));
 
 		Close.setText("Close");
-		Close.addActionListener(new java.awt.event.ActionListener() {
+		Close.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				CloseActionPerformed(evt);
@@ -204,7 +214,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 
 		// Build the debit entry (if there is one)
 		debitAmount = txtDebitAmount.getText();
-		if (!debitAmount.isEmpty()) {
+		if (!debitAmount.isEmpty())
+		{
 			if (comboDebitAccount.getSelectedIndex() < 0)
 				return;
 			Account selectedDebitAccount = (Account) comboDebitAccount.getSelectedItem();
@@ -218,7 +229,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 
 		// Build the Credit entry (if there is one)
 		creditAmount = txtCreditAmount.getText();
-		if (!creditAmount.isEmpty()) {
+		if (!creditAmount.isEmpty())
+		{
 			if (comboCreditAccount.getSelectedIndex() < 0)
 				return;
 			creditAmount = txtCreditAmount.getText();
@@ -236,10 +248,12 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 	private void PostActionPerformed(java.awt.event.ActionEvent evt)
 	{// GEN-FIRST:event_PostActionPerformed
 		// logger.logDebug("Enter PostActionPerformed");
-		try {
+		try
+		{
 			UsefulFile GLFile = new UsefulFile(vl2Config.getGLFile(), "w+");
 			// Change status to "F" and append the unposted entries to GL file
-			for (int i = 0; i < unpostedEntries.size(); ++i) {
+			for (int i = 0; i < unpostedEntries.size(); ++i)
+			{
 				GLEntry glEntry = unpostedEntries.get(i);
 				glEntry.setField("STATUS", "F");
 				GLFile.writeLine(glEntry.toString());
@@ -249,7 +263,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 			unpostedEntries.clear();
 			imbalanceAmount = 0;
 			clearForm();
-		} catch (Exception x) { // Undo everything, inform user, and get out leaving GSN unchanged
+		} catch (Exception x)
+		{ // Undo everything, inform user, and get out leaving GSN unchanged
 			logger.logFatal("Failed to move unposted transaction(s) to GL0010 (" + x.getMessage() + ")");
 			System.exit(2); // Get out
 		}
@@ -282,12 +297,14 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 
 	private void CloseActionPerformed(java.awt.event.ActionEvent evt)
 	{// GEN-FIRST:event_CloseActionPerformed
-		if (!unpostedEntries.isEmpty()) {
+		if (!unpostedEntries.isEmpty())
+		{
 			JFrame jFrame = new JFrame();
 			MsgBox msgBox = new MsgBox(jFrame, "Unposted Entries",
 					"There are unposted entries!\nDo you want to discard them?", MsgBox.YES_NO);
 			String command = msgBox.getCommand();
-			if (command.equals("Yes")) {
+			if (command.equals("Yes"))
+			{
 				unpostedEntries.clear();
 				this.setVisible(false);
 			}
@@ -323,7 +340,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 		manageStatusBar();
 	}
 
-	class AmountVerifier extends InputVerifier {
+	class AmountVerifier extends InputVerifier
+	{
 		String amountPattern = "\\d*\\.\\d\\d";
 
 		public boolean verify(JComponent jc)
@@ -333,7 +351,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel {
 		}
 	}
 
-	class DateVerifier extends InputVerifier {
+	class DateVerifier extends InputVerifier
+	{
 		public boolean verify(JComponent jc)
 		{
 			JTextField tf = (JTextField) jc;

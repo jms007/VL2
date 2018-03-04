@@ -50,7 +50,8 @@ import java.awt.event.KeyEvent;
  *
  * @author jms
  */
-public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener {
+public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
+{
 	public ShowBal(Chart chart, ChartTree tree, VL2Config vl2FileMan)
 	{
 		logger = VL2.logger;
@@ -80,7 +81,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		txtAccountNo = new javax.swing.JTextField();
 
 		setTitle("Compute Account Balance");
-		addWindowListener(new java.awt.event.WindowAdapter() {
+		addWindowListener(new java.awt.event.WindowAdapter()
+		{
 			public void windowClosing(java.awt.event.WindowEvent evt)
 			{
 				exitForm(evt);
@@ -94,7 +96,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 
 		rbAllTrans.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbAllTrans.setText("Include All Transactions");
-		rbAllTrans.addActionListener(new java.awt.event.ActionListener() {
+		rbAllTrans.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				rbAllTransActionPerformed(evt);
@@ -104,7 +107,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 
 		rbCutoffDate.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbCutoffDate.setText("Specify Cutoff Date ...");
-		rbCutoffDate.addActionListener(new java.awt.event.ActionListener() {
+		rbCutoffDate.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				rbCutoffDateActionPerformed(evt);
@@ -112,7 +116,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		});
 		getContentPane().add(rbCutoffDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 90, -1, -1));
 
-		txtEffDate.addKeyListener(new java.awt.event.KeyAdapter() {
+		txtEffDate.addKeyListener(new java.awt.event.KeyAdapter()
+		{
 			public void keyTyped(java.awt.event.KeyEvent evt)
 			{
 				txtEffDateKeyTyped(evt);
@@ -131,7 +136,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		btnCompute.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		btnCompute.setMnemonic('B');
 		btnCompute.setText("Show Balance");
-		btnCompute.addActionListener(new java.awt.event.ActionListener() {
+		btnCompute.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				btnComputeActionPerformed(evt);
@@ -142,7 +148,8 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		btnClose.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		btnClose.setMnemonic('C');
 		btnClose.setText("Close");
-		btnClose.addActionListener(new java.awt.event.ActionListener() {
+		btnClose.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				btnCloseActionPerformed(evt);
@@ -176,9 +183,11 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 
 	private void btnComputeActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_btnComputeActionPerformed
 	{// GEN-HEADEREND:event_btnComputeActionPerformed
-		try {
+		try
+		{
 			compute();
-		} catch (VLException vlx) {
+		} catch (VLException vlx)
+		{
 			statusBar.setText(vlx.getMessage());
 		}
 	}// GEN-LAST:event_btnComputeActionPerformed
@@ -231,8 +240,10 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		GLEntry glEntry;
 		Julian cutoffDate;
 		boolean include;
-		if (rbCutoffDate.isSelected()) {
-			if (!Julian.isValid(txtEffDate.getText())) {
+		if (rbCutoffDate.isSelected())
+		{
+			if (!Julian.isValid(txtEffDate.getText()))
+			{
 				statusBar.setText("Cutoff Date is not valid");
 				return;
 			}
@@ -247,13 +258,16 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 		long bal = 0L;
 		Julian lastDate = new Julian("1-1-2900");
 		boolean found = false;
-		try {
+		try
+		{
 			glFile = new UsefulFile(glFileName, "r");
-			while (!glFile.EOF()) {
+			while (!glFile.EOF())
+			{
 				image = glFile.readLine(UsefulFile.ALL_WHITE);
 				glEntry = new GLEntry(image);
 				include = Chart.match(acctEntry, glEntry, cutoffDate);
-				if (include) {
+				if (include)
+				{
 					found = true;
 					bal += glEntry.getSignedAmount();
 					if (glEntry.getJulianDate().compareTo(lastDate) > 0)
@@ -261,14 +275,17 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 				}
 			}
 			glFile.close();
-			if (found) {
+			if (found)
+			{
 				lblAnswer1.setText("Balance as of " + cutoffDate.toString("mm-dd-yyyy") + ":");
 				lblAnswer2.setText(Strings.formatPennies(bal, ","));
-			} else {
+			} else
+			{
 				lblAnswer1.setText("No Transactions found");
 				lblAnswer2.setText("");
 			}
-		} catch (IOException iox) {
+		} catch (IOException iox)
+		{
 			statusBar.setText(iox.getMessage());
 		}
 	}
@@ -308,11 +325,11 @@ public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 	private javax.swing.JTextField txtEffDate;
 	// End of variables declaration//GEN-END:variables
 
-	/*****
-	 * How to implement account selection from chart In VL2: add chartTree to the
-	 * parameters In user class: add ChartTree tree in the parameters add implements
-	 * [javax.swing.event.]TreeSelectionListener tree.addTreeSelectionListener(this)
-	 * in the initialization code add method valueChanged(TreeSelectionEvent evt) to
-	 * process the event
-	 *****/
+	// How to implement account selection from chart In VL2:
+	// In user class:
+	// add ChartTree tree in the parameters
+	// add implements [javax.swing.event.]TreeSelectionListener
+	// add tree.addTreeSelectionListener(this) in the initialization code
+	// add method valueChanged(TreeSelectionEvent evt) to process the event
+
 }
