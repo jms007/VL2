@@ -501,7 +501,7 @@ public class VL2 extends JFrame implements ActionListener
 			System.out.println("chart is null!");
 		else
 			System.out.println("chart is not null");
-		// props.list(System.out);
+
 		vl2Config.listAllProperties();
 	}
 
