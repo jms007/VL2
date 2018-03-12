@@ -85,8 +85,8 @@ public class VL2 extends JFrame implements ActionListener
 				if (logo == null)
 					throw new Exception("logo image is null");
 				MediaTracker mediaTracker = new MediaTracker(this);
-				if (mediaTracker == null)
-					throw new Exception("mediaTracker is null!");
+				// if (mediaTracker == null)
+				// throw new Exception("mediaTracker is null!");
 				mediaTracker.addImage(toolkit.getImage(logoSrc), 1);
 				mediaTracker.waitForID(0, 10000);
 				MyPanel logoPanel = new MyPanel(logo, MyPanel.CENTER);
@@ -472,7 +472,6 @@ public class VL2 extends JFrame implements ActionListener
 			StatementTXT statement = new StatementTXT(vl2Config, VL2.chart, vl2Config.getGLFile(),
 					new Julian(vl2Config.getEarliestDate()), new Julian(vl2Config.getLatestDate()), 0, outFile,
 					VL2.logger);
-			statement.makeStatement();
 			logger.logInfo("Statement is in " + outFile);
 			new ViewFile(outFile, logger);
 		} catch (VLException vlx)
