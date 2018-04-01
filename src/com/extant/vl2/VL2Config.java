@@ -32,7 +32,8 @@ public class VL2Config
 	private final String entityName;
 	private final String currentYear;
 
-	private final XProperties props;
+	// private final XProperties props;
+	private XProperties props;
 
 	private String earliestDate;
 	private String latestDate;
@@ -43,8 +44,14 @@ public class VL2Config
 		this.entityName = entityName;
 		this.currentYear = currentYear;
 		String propFile = accountingDataDir + entityName + "\\" + entityName + ".properties";
-		VL2.logger.logDebug("Properties:46" + "Reading properties file: " + propFile);
-		props = new XProperties(propFile);
+		try
+		{
+			VL2.logger.logDebug("Properties:46" + "Reading properties file: " + propFile);
+			props = new XProperties(propFile);
+		} catch (Exception x)
+		{
+			VL2.logger.logFatal("Unable to find " + entityName + "/" + currentYear);
+		}
 	}
 
 	public void listAllProperties()

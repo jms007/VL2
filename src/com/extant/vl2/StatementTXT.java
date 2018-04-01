@@ -96,7 +96,7 @@ public class StatementTXT extends AbstractStatement
 				|| account.getType().equalsIgnoreCase("R"))
 			bal = -bal;
 		image += Strings.rightJustify(Strings.formatPennies(bal, dollarFormat),
-				(reportLevel - formatLevel) * dollarIndent + dollarFieldLength);
+				(reportLevel - formatLevel) * dollarIndent + maxDollarFieldLength);
 		if (element != null)
 			if (element.getAttribute("format").contains("skip"))
 				image += "\r\n";
@@ -108,14 +108,19 @@ public class StatementTXT extends AbstractStatement
 		outfile.close();
 	}
 
-	public void calculateColumns(Chart chart, int reportLevel) throws VLException
+	public int calculateColumns(Chart chart, int reportLevel) throws VLException
 	{ // maxLineLength is used to center text
-		// maxLineAcct is an account at level zero with the maximum dollar amount
-		Account maxLineAcct = new Account("xxx", "yyy", "0", "Description");
-		maxLineAcct.zeroBalances();
-		maxLineAcct.addToBeginBal(-MAX_DOLLAR_AMOUNT);
-		maxLineLength = formatAmountLine(null, maxLineAcct).length();
-		dollarFieldLength = Strings.formatPennies(MAX_DOLLAR_AMOUNT).length();
+		// maxLineAcct is an account at the highest level with the maximum description
+		// length and maximum dollar amount
+		// Account maxLineAcct = new Account("xxx", "yyy", "0", "Description");
+		maxLineLength = 0;
+		if (chart.getShowacct())
+			maxLineLength = chart.getMaxAcctNoLength() + 1;
+		maxLineLength += chart.getMaxAccountTitleLength() + 1;
+		maxLineLength += chart.getIndention(reportLevel).length() + 1;
+		maxLineLength += Strings.formatPennies(MAX_DOLLAR_AMOUNT).length();
+		logger.logDebug("maxLineLength=" + maxLineLength);
+		return maxLineLength;
 	}
 
 	/**
@@ -151,6 +156,6 @@ public class StatementTXT extends AbstractStatement
 	UsefulFile outfile;
 	int dollarIndent = 10;
 	public final static long MAX_DOLLAR_AMOUNT = 999999999L; // $ 9,999,999.99
-	int dollarFieldLength;
+	int maxDollarFieldLength;
 	int maxLineLength;
 }

@@ -10,7 +10,8 @@ import com.extant.utilities.UsefulFile;
  *
  * @author jms
  */
-public class GSNMan {
+public class GSNMan
+{
 
 	private static String GSN;
 	VL2Config vl2Config;
@@ -18,37 +19,23 @@ public class GSNMan {
 
 	public GSNMan(VL2Config vl2Config, LogFile logger)
 	{
-		try {
+		try
+		{
 			this.vl2Config = vl2Config;
 			UsefulFile GSNFile = new UsefulFile(vl2Config.getGSNFile());
 			String image = GSNFile.readLine();
-			if (GSN == null) {
+			if (GSN == null)
+			{
 				String[] temp;
 				temp = image.split("\\|");
 				GSN = temp[0];
 			}
 			GSNFile.close();
-		} catch (IOException iox) {
-			logger.logFatal("Unable to initialize GSN: " + iox.getMessage());
+		} catch (IOException iox)
+		{
+			logger.logFatal("File " + vl2Config.getGSNFile() + " not found.");
 		}
-
 	}
-
-	// String init(VL2Config vl2Config, LogFile logger)
-	// {
-	// try {
-	// this.vl2Config = vl2Config;
-	// UsefulFile GSNFile = new UsefulFile(vl2Config.getGSNFile());
-	// String image = GSNFile.readLine();
-	// String[] temp;
-	// temp = image.split("\\|");
-	// GSN = temp[0];
-	// GSNFile.close();
-	// } catch (IOException iox) {
-	// logger.logFatal("Unable to initialize GSN: " + iox.getMessage());
-	// }
-	// return GSN;
-	// }
 
 	public static String getGSN()
 	{
@@ -61,9 +48,11 @@ public class GSNMan {
 		int gsn = Integer.decode(GSN);
 		++gsn;
 		GSN = new Integer(gsn).toString();
-		try {
+		try
+		{
 			updateNV();
-		} catch (IOException iox) {
+		} catch (IOException iox)
+		{
 			System.out.println("GSNMan.incrementGSN: " + iox.getMessage());
 			System.exit(200);
 		}

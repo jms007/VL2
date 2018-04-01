@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
-//import com.lowagie.text.DocumentException;
-//import javax.security.auth.login.AccountNotFoundException;
-
 import com.extant.utilities.Julian;
 import com.extant.utilities.LogFile;
 import com.extant.utilities.Strings;
@@ -36,17 +33,17 @@ public abstract class AbstractStatement
 			else
 				this.reportLevel = reportLevel;
 			this.logger = logger;
-			logger.log("[AbstractStatement.setup]");
-			// if ( this.outfileName.length() > 0 )
-			// this.outfileName = workDir + outfileName;
+			// For debugging:
+			logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+			logger.logDebug("[AbstractStatement.setup]");
 			dollarFormat = chart.getDollarFormat();
 			dateFormat = chart.getDateFormat();
 			shortDateFormat = chart.getShortDateFormat();
+			// You cannot feed nulls to extractBalances() for begin & end
 			this.begin = begin;
 			this.end = end;
-			// !! You cannot feed nulls to extractBalances() for begin & end
-			if (reportLevel <= 0)
-				reportLevel = chart.getMaxLevel();
+			// if (reportLevel <= 0)
+			// reportLevel = chart.getMaxLevel();
 			if (showAmounts)
 			{
 				logger.logDebug("   calling VLUtil.extractBalances(" + glFilename + ",<chart>,"
@@ -80,12 +77,14 @@ public abstract class AbstractStatement
 	public String makeStatement() throws VLException
 	{
 		Enumeration chartElements = chart.chartElements();
+		nElements = 0L;
 		while (chartElements.hasMoreElements())
 		{
 			ChartElement element = (ChartElement) chartElements.nextElement();
+			++nElements;
 			processChartElement(element);
 		}
-		// close();
+		logger.logDebug("nElements=" + nElements);
 		return outfileName;
 	}
 
@@ -93,6 +92,7 @@ public abstract class AbstractStatement
 	{
 		try
 		{
+			logger.logDebug("process element#" + nElements + ": " + element.toString());
 			String elementName = element.name;
 			if (elementName.equals("chart") || elementName.equals("section") || elementName.equals("group"))
 			{
@@ -101,8 +101,7 @@ public abstract class AbstractStatement
 			}
 
 			else if (elementName.equals("account") && showAmounts)
-			{ // Print ending balance in this account & add to
-				// level total
+			{ // Print ending balance in this account & add to level total
 				int accountIndex = element.getAccountIndex(); // !!Mystery VLException from this line
 				Account account;
 				account = chart.getAccount(accountIndex);
@@ -117,7 +116,10 @@ public abstract class AbstractStatement
 				Account account = new Account("", element.getLevelString(), element.getAttribute("type"),
 						element.getAttribute("title"));
 				account.zeroBalances();
-				account.addToBeginBal(levelTotals[element.getLevel()]);
+				account.addToDeltaBal(levelTotals[element.getLevel()]);
+				logger.logDebug("total " + element.getAttribute("title") + " BeginBal=" + account.getBeginBal()
+						+ " EndBal=" + account.getEndBal() + " element level=" + element.getLevel() + " reportLevel="
+						+ reportLevel);
 				if (account.getEndBal() != 0L && element.getLevel() <= reportLevel)
 				{
 					cPrint(element, account, false);
@@ -136,20 +138,19 @@ public abstract class AbstractStatement
 	{
 		if (!showAmounts)
 			return;
-		String label = "Retained Earnings at " + begin.toString(dateFormat);
+		String label = "R/E at " + begin.toString(dateFormat);
 		Account pl = new Account(thisAccount.getAccountNo(), Strings.format(thisAccount.getLevel() + 1, "#"),
 				thisAccount.getType(), label);
 		pl.addToBeginBal(thisAccount.getBeginBal());
 		cPrint(element, pl, false); // net worth at beginning of period
 
-		label = "Retained Earnings Change in Period ";
-		// thisAccount.setTitle( label );
+		label = "R/E Change in Period ";
 		pl.setTitle(label);
 		pl.zeroBalances();
 		pl.addToDeltaBal(thisAccount.getDeltaBal());
 		cPrint(element, pl, false); // p&l change during the period
 
-		label = "Retained Earnings at " + end.toString(dateFormat);
+		label = "R/E at " + end.toString(dateFormat);
 		thisAccount.setTitle(label);
 		pl.setTitle(label);
 		pl.addToBeginBal(thisAccount.getBeginBal());
@@ -163,6 +164,16 @@ public abstract class AbstractStatement
 
 	public void cPrint(ChartElement element, Account account, boolean conditional) throws VLException
 	{
+		if (logger.isLoggingDebug())
+		{
+			logger.log("cPrint:");
+			if (element != null)
+				logger.log("    element=" + element.toString());
+			if (account != null)
+				logger.log("    account=" + account.toString());
+			logger.log("    conditional=" + conditional);
+		}
+
 		if (conditional)
 		{
 			for (int i = 0; i < cPrintBuffer.size(); ++i)
@@ -221,4 +232,5 @@ public abstract class AbstractStatement
 	String glFilename;
 	long levelTotals[];
 	boolean showAmounts;
+	long nElements;
 }

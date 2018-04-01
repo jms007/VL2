@@ -54,8 +54,8 @@ public class VL2 extends JFrame implements ActionListener
 	static ChartTree chartTree = null;
 	static JTree chartJTree = null;
 	static GLCheck glCheck = null;
-	static Julian EarliestDate;
-	static Julian LatestDate;
+	// static Julian EarliestDate;
+	// static Julian LatestDate;
 	static String cashAcctNo;
 	static LogFile logger = null;
 
@@ -122,12 +122,18 @@ public class VL2 extends JFrame implements ActionListener
 		if (msgBox.getCommand().equals("Cancel"))
 			logger.logFatal("User Cancel (Enter Entity Name)");
 		entityName = msgBox.getResponse().toUpperCase();
-		msgBox = new MsgBox(VL2MenuFrame, "Year", "Enter the year (yy)", "", new String[] { "OK", "Cancel" });
+		msgBox = new MsgBox(VL2MenuFrame, "Year", "Enter the year (yy)", "17", new String[] { "OK", "Cancel" });
 		if (msgBox.getCommand().equals("Cancel"))
 			logger.logFatal("User Cancel (Enter year)");
 		yy = msgBox.getResponse();
 
-		vl2Config = new VL2Config(entityName, yy);
+		try
+		{
+			vl2Config = new VL2Config(entityName, yy);
+		} catch (IOException iox)
+		{
+			logger.logFatal("Unable to find " + entityName + "/" + yy);
+		}
 
 		// Make a progress report
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
@@ -145,21 +151,20 @@ public class VL2 extends JFrame implements ActionListener
 		logger.logDebug("entityName=" + entityName);
 		logger.logDebug("year=" + yy);
 		logger.logDebug("workDir=" + workDir);
-		logger.logDebug("entityPropsFilename=" + entityPropsFilename);
+		// logger.logDebug("entityPropsFilename=" + entityPropsFilename);
 
 		try
 		{
 			logger.logInfo("Checking Files ...");
 			// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
-			// Check Chart, Build & Display Chart Tree
+			// Check Chart file
 			chartFilename = vl2Config.getChartFile();
 			logger.logDebug("Checking Chart file: " + chartFilename);
 			if (!new File(chartFilename).exists())
 				logger.logFatal("Unable to find " + chartFilename);
 			chart = new Chart();
 			chart.init(chartFilename, logger); // throws IOException & VLException
-			// chartTree = new ChartTree(props, chart, logger);
 		} catch (IOException iox)
 		{
 			logger.logFatal("IO error checking chart: " + iox.getMessage());
@@ -167,10 +172,7 @@ public class VL2 extends JFrame implements ActionListener
 		{
 			logger.logFatal("VL Error checking chart: " + vlx.getMessage());
 		}
-		// catch (ParserConfigurationException pcx)
-		// { logger.logFatal("ParserConfigurationError: " + pcx.getMessage()); }
-		// catch (SAXException sax)
-		// { logger.logFatal("SAX Exception: " + sax.getMessage()); }
+		logger.logInfo("Chart initialized without error");
 
 		// Build ChartTree (initially invisible, location & size not specified)
 		try
@@ -181,8 +183,7 @@ public class VL2 extends JFrame implements ActionListener
 			logger.logFatal("ChartTree build: " + x.getMessage());
 		}
 
-		logger.logInfo("Chart initialized without error");
-
+		// Position chart tree in display
 		// Point is (x,y)
 		// Dimension is (width, height)
 		Point location = this.getLocation();
@@ -196,36 +197,29 @@ public class VL2 extends JFrame implements ActionListener
 		logger.logInfo("Chart tree initialization & display complete.");
 
 		// Check GL file
+
+		// For Debugging:
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		String GLFile = vl2Config.getGLFile();
+		int nErrors;
 		logger.logDebug("Checking GLFile " + GLFile);
 		if (!new File(GLFile).exists())
 			logger.logFatal("Unable to find " + GLFile);
 		glCheck = new GLCheck();
 		glCheck.glCheck(GLFile, chart, "token", vl2Config, logger);
+		nErrors = glCheck.getNErrors();
 		if (glCheck.getNErrors() > 0)
 		{
-			System.out.println("GL File Error Report:");
+			System.out.println("GL File Error Report (" + nErrors + "):");
 			System.out.print(glCheck.getReport());
 			// logger.logFatal("Error(s) in " + GLFile);
 		} else
-			logger.logInfo("No errors found in " + GLFile);
-
-		if (glCheck.getNEntries() > 0)
-		{
-			logger.logInfo("ALL CHECKS COMPLETE - NO ERRORS FOUND.");
-		}
+			logger.logInfo("No errors found in " + GLFile + " (" + glCheck.getNEntries() + " entries)");
 	}
 
 	public void VL2Start(String[] args)
 	{
 		logger.logInfo("Enter VL2Start");
-		// if (VL2MenuFrame == null) logger.logDebug("Entering VL2Start: VL2MenuFrame is
-		// null!");
-		// Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		// int screenWidth = (int)screenSize.getWidth();
-		// int screenHeight = (int)screenSize.getHeight();
-		// int xCenter = screenWidth/2;
-		// int yCenter = screenHeight/2;
 
 		// Create the main menu bar
 		JMenuBar greenMenuBar = new JMenuBar();
@@ -466,9 +460,14 @@ public class VL2 extends JFrame implements ActionListener
 		logger.logDebug("GLFile=" + vl2Config.getGLFile());
 		logger.logDebug("Entity: " + vl2Config.getEntityLongName());
 		logger.logDebug("workDir=" + workDir);
+		System.out.println("earliestDate=" + vl2Config.getEarliestDate());
+		System.out.println("latestDate=" + vl2Config.getLatestDate());
 		try
 		{
 			String outFile = workDir + "Stmt.txt";
+
+			logger.logDebug("earliestDate: " + new Julian(vl2Config.getEarliestDate()));
+			logger.logDebug("latestDate: " + new Julian(vl2Config.getLatestDate()));
 			StatementTXT statement = new StatementTXT(vl2Config, VL2.chart, vl2Config.getGLFile(),
 					new Julian(vl2Config.getEarliestDate()), new Julian(vl2Config.getLatestDate()), 0, outFile,
 					VL2.logger);
@@ -529,17 +528,17 @@ public class VL2 extends JFrame implements ActionListener
 		}
 	}
 
-	private void startTranReport(int reportType, VL2Config vl2FileMan, LogFile logger)
+	private void startTranReport(int reportType, VL2Config vl2Config, LogFile logger)
 	{
 		String outFilename = null;
 		try
 		{
-			logger.logDebug("TranReport.DETAIL=" + TranReport.DETAIL);
 			if (reportType == TranReport.DETAIL)
 				outFilename = workDir + "DetailTranReport.txt";
-			else if (reportType == TranReport.SUMMARY)
+			else // if (reportType == TranReport.SUMMARY)
 				outFilename = workDir + "SummaryTranReport.txt";
-			TranReport tranReport = new TranReport(reportType, chart, vl2FileMan, logger);
+			TranReport tranReport = new TranReport(reportType, chart, vl2Config, logger);
+			logger.logDebug("startTranReport: outFilename=" + outFilename);
 		} catch (IOException iox)
 		{
 			logger.log("@startTranReport: " + iox.getMessage());

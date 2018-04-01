@@ -177,7 +177,7 @@ public class VLUtil
 
 	/*
 	 * extractBalances computes the beginning balance (as of the begin date) and
-	 * delta amount (up to and including the end date) in each account contained in
+	 * delta amount (up to and including the end date) for each account contained in
 	 * chart. These values are stored in the accounts contained in the Chart.
 	 *
 	 * If a transaction is found in the G/L for an account which is not in the
@@ -190,7 +190,9 @@ public class VLUtil
 	public static int extractBalances(String glFileName, Chart chart, Julian begin, Julian end, LogFile logger)
 			throws IOException, VLException
 	{
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		// For debugging:
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+
 		logger.logDebug("enter extractBalances begin=" + begin.toString("yymmdd") + "   end=" + end.toString("yymmdd"));
 		GLEntry glEntry;
 		String currentAcctNo = "";
@@ -234,7 +236,11 @@ public class VLUtil
 				currentAccount.addToDeltaBal(glEntry.getSignedAmount());
 				// Add Income & Expense items to P/L Account Delta balance
 				if (currentAccount.getType().equals("I") || currentAccount.getType().equals("E"))
-					plAccount.addToDeltaBal(glEntry.getSignedAmount());
+				{
+					long pl = glEntry.getSignedAmount();
+					plAccount.addToDeltaBal(pl);
+					logger.logDebug("adding " + Strings.formatPennies(pl));
+				}
 				if (glEntry.getDescrLength() > maxDescrLength)
 					maxDescrLength = glEntry.getDescrLength();
 			}

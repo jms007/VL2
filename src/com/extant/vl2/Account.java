@@ -6,9 +6,7 @@
 
 package com.extant.vl2;
 
-import com.extant.utilities.Julian;
-import com.extant.utilities.Strings.*;
-import com.extant.utilities.LogFile;
+import com.extant.utilities.*;
 import java.util.Vector;
 
 /**
@@ -44,7 +42,7 @@ public class Account
 		this.accountNo = accountNo;
 		if (this.accountNo == null)
 			logger.logFatal("Account constructor accountNo is null");
-		this.accountLevel = Strings.parseInt(accountLevel);
+		this.accountLevel = com.extant.utilities.Strings.parseInt(accountLevel);
 		this.accountType = accountType;
 		this.title = title;
 	}

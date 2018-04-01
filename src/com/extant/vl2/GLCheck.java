@@ -6,7 +6,6 @@
 
 package com.extant.vl2;
 
-import com.extant.utilities.XProperties;
 import com.extant.utilities.Julian;
 import com.extant.utilities.Strings;
 import com.extant.utilities.UsefulFile;
@@ -18,24 +17,26 @@ import java.io.IOException;
  * @author jms
  */
 
-public class GLCheck {
+public class GLCheck
+{
 	public int glCheck(String glFilename, Chart chart, String fileType // "fixed" or "token"
 			, VL2Config props, LogFile loggerParm)
 	{
-		if (loggerParm == null) {
+		if (loggerParm == null)
+		{
 			System.out.println("entering glCheck: loggerparm is null; creating new LogFile");
 			logger = new LogFile();
 		} else
 			logger = loggerParm;
 		this.chart = chart;
-		this.vl2FileMan = props;
+		this.props = props;
 
 		// For debugging:
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		// logger.setLogAll(true);
 
 		report = "";
-		nErrors = -1;
+		nErrors = 0;
 		lineNo = 0;
 		// if (chart == null)
 		// {
@@ -56,23 +57,26 @@ public class GLCheck {
 	public void checkTokenFile(String glFilename)
 	{
 		UsefulFile f;
-		String image;
+		String image = "";
 
 		logger.logDebug("Checking Tokenized File " + glFilename);
-		try {
+		try
+		{
 			GLEntry glEntry;
 			f = new UsefulFile(glFilename, "r");
-			if (f.length() == 0) {
+			if (f.length() == 0)
+			{
 				emptyGL = true;
 				report += "GL0010 is empty";
 				finish();
 			} else
 				emptyGL = false;
-			while (!f.EOF()) {
+			while (!f.EOF())
+			{
 				image = f.readLine();
 				++lineNo;
 				if (image.length() < 3)
-					continue; // Ignore blank lines
+					continue; // Ignore short lines
 				glEntry = new GLEntry(image);
 				if (!chart.isValidAccount(glEntry.getAccountNo()))
 					reportError("Line " + lineNo + " Account not in chart:" + glEntry.getAccountNo());
@@ -89,30 +93,36 @@ public class GLCheck {
 			}
 			f.close();
 			reportInfo("EarliestDate=" + earliestDate.toString("yymmdd"));
-			vl2FileMan.setEarliestDate(earliestDate.toString("yymmdd"));
+			props.setEarliestDate(earliestDate.toString("yymmdd"));
 			reportInfo("LatestDate=" + latestDate.toString("yymmdd"));
-			vl2FileMan.setLatestDate(latestDate.toString("yymmdd"));
+			props.setLatestDate(latestDate.toString("yymmdd"));
 
 			if (bal != 0)
 				reportError("File " + glFilename + " is out of balance by " + bal);
 			finish();
-		} catch (VLException x) {
+		} catch (VLException x)
+		{
 			reportError("VLException in Line " + lineNo + ": " + x.getMessage());
-		} catch (IOException x) {
+			reportError(image);
+		} catch (IOException x)
+		{
 			reportError("IO Error in Line " + lineNo + ": " + x.getMessage());
 		}
 	}
 
 	public void checkFixedFile(String glFile)
 	{
-		try {
+		try
+		{
 			String image;
 			logger.logDebug("Checking Fixed File " + glFile + ": ");
 			UsefulFile f = new UsefulFile(glFile, "r");
-			while (!f.EOF()) {
+			while (!f.EOF())
+			{
 				image = f.readLine();
 				++lineNo;
-				if (image.length() != 78) {
+				if (image.length() != 78)
+				{
 					reportError("Line " + lineNo + ": wrong length (" + image.length() + ")");
 					continue;
 				}
@@ -135,7 +145,8 @@ public class GLCheck {
 			f.close();
 			emptyGL = lineNo < 2;
 			finish();
-		} catch (Exception x) {
+		} catch (Exception x)
+		{
 			logger.logFatal(x.getMessage());
 		}
 	}
@@ -147,16 +158,18 @@ public class GLCheck {
 
 	public void finish()
 	{
-		if (emptyGL) {
+		if (emptyGL)
+		{
 			reportError("No transactions found");
 		}
-		if (earliestDate != null && latestDate != null) {
+		if (earliestDate != null && latestDate != null)
+		{
 			report += lineNo + " entries, " + nJournals + " Journals.\n" + "Covering dates "
 					+ earliestDate.toString("mm-dd-yyyy") + " to " + latestDate.toString("mm-dd-yyyy") + "\n";
-			vl2FileMan.setEarliestDate(earliestDate.toString("yymmdd"));
-			vl2FileMan.setLatestDate(latestDate.toString("yymmdd"));
-
-		} else {
+			// props.setProperty("EarliestDate", earliestDate.toString("yymmdd"));
+			// props.setProperty("LatestDate", latestDate.toString("yymmdd"));
+		} else
+		{
 			reportError("dates are not set");
 		}
 		// report += lineNo + " records, " +
@@ -164,16 +177,16 @@ public class GLCheck {
 		reportJournalBal();
 		if (bal != 0L)
 			reportError("General Ledger is out of balance by " + Strings.formatPennies(bal, ","));
-		if (nErrors > 0)
-			report += Strings.plurals("Error", nErrors) + " found.\n";
-		else
-			logger.logDebug("GLCheck normal completion");
+		report += Strings.plurals("Error", nErrors) + " found.\n";
+		logger.logDebug("GLCheck normal completion");
+		System.out.print("GLCheck report:\n" + report);
 	}
 
 	private void calcJournalBal(GLEntry glEntry)
 	{
 		for (int i = 0; i < nJournals; ++i)
-			if (journals[i].equals(glEntry.getField("jRef"))) {
+			if (journals[i].equals(glEntry.getField("jRef")))
+			{
 				journalBals[i] += glEntry.getSignedAmount();
 				return;
 			}
@@ -192,7 +205,7 @@ public class GLCheck {
 
 	private void reportInfo(String msg)
 	{
-		report += "[" + lineNo + "] " + msg + "\n";
+		report += msg + "\n";
 	}
 
 	private void reportError(String msg)
@@ -232,7 +245,7 @@ public class GLCheck {
 	}
 
 	// Global variables
-	VL2Config vl2FileMan;
+	VL2Config props;
 	GLEntry glEntry;
 	Chart chart;
 	int lineNo;
