@@ -10,6 +10,7 @@ import com.extant.utilities.Julian;
 import com.extant.utilities.Strings;
 import com.extant.utilities.UsefulFile;
 import com.extant.utilities.LogFile;
+import java.lang.Integer;
 import java.io.IOException;
 
 /**
@@ -35,6 +36,8 @@ public class GLCheck
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		// logger.setLogAll(true);
 
+		currentYear = Integer.parseInt(props.getCurrentYear());
+		System.out.println("currentYear=" + currentYear);
 		report = "";
 		nErrors = 0;
 		lineNo = 0;
@@ -78,9 +81,10 @@ public class GLCheck
 				if (image.length() < 3)
 					continue; // Ignore short lines
 				glEntry = new GLEntry(image);
-				if (glEntry.getJulianDate().getYear() != currentYear)
+				int transactionYear = glEntry.getJulianDate().getYear() % 100;
+				if (transactionYear != currentYear)
 				{
-					logger.log("transactionDate is not in currentYear:");
+					logger.log("line " + lineNo + " transactionDate is not in currentYear:");
 					logger.logFatal("currentYear=" + currentYear + " transactionDate="
 							+ glEntry.getJulianDate().toString("yymmdd"));
 				}
@@ -252,7 +256,7 @@ public class GLCheck
 
 	// Global variables
 	VL2Config props;
-	int currentYear = props.getCurrentYear();
+	int currentYear;
 	GLEntry glEntry;
 	Chart chart;
 	int lineNo;
