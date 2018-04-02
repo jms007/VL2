@@ -78,6 +78,12 @@ public class GLCheck
 				if (image.length() < 3)
 					continue; // Ignore short lines
 				glEntry = new GLEntry(image);
+				if (glEntry.getJulianDate().getYear() != currentYear)
+				{
+					logger.log("transactionDate is not in currentYear:");
+					logger.logFatal("currentYear=" + currentYear + " transactionDate="
+							+ glEntry.getJulianDate().toString("yymmdd"));
+				}
 				if (!chart.isValidAccount(glEntry.getAccountNo()))
 					reportError("Line " + lineNo + " Account not in chart:" + glEntry.getAccountNo());
 				if (earliestDate == null)
@@ -246,6 +252,7 @@ public class GLCheck
 
 	// Global variables
 	VL2Config props;
+	int currentYear = props.getCurrentYear();
 	GLEntry glEntry;
 	Chart chart;
 	int lineNo;
