@@ -37,7 +37,6 @@ public class GLCheck
 		// logger.setLogAll(true);
 
 		currentYear = Integer.parseInt(props.getCurrentYear());
-		System.out.println("currentYear=" + currentYear);
 		report = "";
 		nErrors = 0;
 		lineNo = 0;
