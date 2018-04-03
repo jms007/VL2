@@ -176,12 +176,15 @@ public class VLUtil
 	// }
 
 	/*
-	 * extractBalances computes the beginning balance (as of the begin date) and
-	 * delta amount (up to and including the end date) for each account contained in
-	 * chart. These values are stored in the accounts contained in the Chart.
+	 * extractBalances processes the GLFile to compute the beginning balance (as of
+	 * the begin date) and the delta amount (up to and including the end date) for
+	 * each account contained in the chart. These values are stored in beginBal and
+	 * deltaVal fields contained in the Account.
+	 * 
+	 * All transactions between begin date and end date are attached to the account.
 	 *
-	 * If a transaction is found in the G/L for an account which is not in the
-	 * chart, a VLException is thrown.
+	 * If a transaction is found in the GL for an account which is not in the chart,
+	 * a VLException is thrown.
 	 *
 	 * This method does not compute total amounts. If you need the total amounts,
 	 * follow this call with a call to OopStatement.ComputeTotals which will set the
@@ -191,7 +194,7 @@ public class VLUtil
 			throws IOException, VLException
 	{
 		// For debugging:
-		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
 		logger.logDebug("enter extractBalances begin=" + begin.toString("yymmdd") + "   end=" + end.toString("yymmdd"));
 		GLEntry glEntry;
@@ -244,12 +247,11 @@ public class VLUtil
 				if (glEntry.getDescrLength() > maxDescrLength)
 					maxDescrLength = glEntry.getDescrLength();
 			}
-			// else the transaction date is > end and thus has no effect
+			// else the transaction date is after end date and thus has no effect
 		}
 		glFile.close();
 		// Now add a fake closing transaction to Net Worth Account
-		// (I think this is to make Statement show the correct ending balance in P/L
-		// Account)
+		// to make Statement show the correct ending balance in that Account
 
 		String s = Strings.formatPennies(-plAccount.getDeltaBal());
 		logger.logDebug("VLUtil.extractBalances: s=" + s);
