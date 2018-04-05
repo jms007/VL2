@@ -408,7 +408,10 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 
 			// or use Julian
 			transDate = new Julian(tf.getText());
-			return transDate.isValid();
+			String yy = transDate.toString("yy");
+			String currentYear = vl2Config.getCurrentYear();
+			logger.log("yy=" + yy + " currentYear=" + currentYear);
+			return transDate.isValid() && yy.equals(vl2Config.getCurrentYear());
 		}
 
 		String datePattern = "\\d{1,2}[-/]\\d{1,2}[-/]\\d\\d";
@@ -454,6 +457,7 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 	ChartTree chartTree;
 	VL2Config vl2Config;
 	String transType;
+	int currentYear;
 	Julian transDate;
 	String drcr;
 	String amount;

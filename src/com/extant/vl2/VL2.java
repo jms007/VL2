@@ -455,7 +455,7 @@ public class VL2 extends JFrame implements ActionListener
 
 	private void startTextStmt()
 	{
-		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		logger.logDebug("startTextStmt");
 		logger.logDebug("GLFile=" + vl2Config.getGLFile());
 		logger.logDebug("Entity: " + vl2Config.getEntityLongName());
@@ -559,29 +559,16 @@ public class VL2 extends JFrame implements ActionListener
 
 	public void startPrintChart()
 	{
-		System.out.println("enter startPrintChart");
-		PrintChart printChart = new PrintChart();
-		// try
-		// {
-		// printPDF( XProperties props, Chart chart, String outfileName, LogFile logger
-		// )
-		// printChart.printPDF(props, VL2.chart, props.getString("WorkDir")+"Chart.pdf",
-		// logger);
-		// }
-		// catch (VLException vlx)
-		// {
-		// logger.log("Unable to print chart: " + vlx.getMessage());
-		// }
+		// This method will print the Chart in .txt format
+		logger.logDebug("enter startPrintChart");
 		try
 		{
-			// For debugging:
-			// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-
-			String outFilename = workDir + "Chart.pdf";
-			StatementPDF statementPDF = new StatementPDF(vl2Config, VL2.chart, outFilename, logger);
-		} catch (VLException vlx)
+			PrintChartTxt printChartTxt = new PrintChartTxt();
+			printChartTxt.initialize(workDir + "Chart.txt", chart, new Julian(vl2Config.getEarliestDate()),
+					new Julian(vl2Config.getLatestDate()), logger);
+		} catch (IOException iox)
 		{
-			logger.log("VL2.startPrintChart failed: " + vlx.getMessage());
+			logger.logFatal("Unable to create Chart outFile");
 		}
 	}
 

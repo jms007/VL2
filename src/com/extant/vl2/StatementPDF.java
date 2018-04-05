@@ -24,12 +24,13 @@ import com.lowagie.text.*;
  *
  * @author jms
  */
-public class StatementPDF extends AbstractStatement {
+public class StatementPDF extends AbstractStatement
+{
 	public StatementPDF()
 	{
 	}
 
-	// Use this constructor to make a statement
+	// Use this constructor to make a .pdf statement
 	public StatementPDF(VL2Config vl2FileMan, Chart chart, Julian begin, Julian end, int reportLevel,
 			String outfileName, LogFile logger) throws VLException
 	{
@@ -41,31 +42,36 @@ public class StatementPDF extends AbstractStatement {
 	// Use this constructor to make a chart listing
 	// (props, VL2.chart, glFilename, outFilename, logger);
 
-	public StatementPDF(VL2Config vl2FileMan, Chart chart, String outFilename, LogFile logger) throws VLException
+	public StatementPDF(VL2Config vl2Config, Chart chart, String outFilename, LogFile logger) throws VLException
 	{
 		makingChart = true;
 		makingStatement = false;
-		setup(vl2FileMan, chart, makingStatement, begin, end, 0, outFilename, logger);
+		setup(vl2Config, chart, makingStatement, begin, end, 0, outFilename, logger);
 	}
 
 	public StmtTable initialize(int reportLevel, String outfileName) throws VLException
 	{
-		try {
-			if (Strings.contains(outfileName, ".pdf")) {
+		try
+		{
+			if (Strings.contains(outfileName, ".pdf"))
+			{
 				stmtTable = new StmtTable(chart, reportLevel, outfileName);
 				return stmtTable;
 			} else
 				return null;
-		} catch (IOException iox) {
+		} catch (IOException iox)
+		{
 			throw new VLException(VLException.IOX, iox.getMessage());
-		} catch (DocumentException dx) {
+		} catch (DocumentException dx)
+		{
 			throw new VLException(VLException.DOCUMENT, dx.getMessage());
 		}
 	}
 
 	void printTextLine(ChartElement element) throws VLException
 	{ // Builds a line which contains text only (no amount)
-		try {
+		try
+		{
 			String format = element.getAttribute("format");
 			if (format.contains("newpage"))
 				stmtTable.newPage();
@@ -73,7 +79,8 @@ public class StatementPDF extends AbstractStatement {
 				stmtTable.center(element.getAttribute("title"));
 			else
 				addTextLine(element);
-			if (begin != null && end != null) {
+			if (begin != null && end != null)
+			{
 				if (format.contains("ending"))
 					stmtTable.center(end.toString(dateFormat));
 				if (format.contains("period"))
@@ -81,9 +88,11 @@ public class StatementPDF extends AbstractStatement {
 			}
 			if (format.contains("skip"))
 				stmtTable.center("");
-		} catch (BadElementException bex) {
+		} catch (BadElementException bex)
+		{
 			throw new VLException(VLException.BAD_ELEMENT, bex.getMessage());
-		} catch (DocumentException dx) {
+		} catch (DocumentException dx)
+		{
 			throw new VLException(VLException.DOCUMENT, dx.getMessage());
 		}
 	}
@@ -113,7 +122,8 @@ public class StatementPDF extends AbstractStatement {
 			return;
 
 		// Adds a line containing an amount
-		try {
+		try
+		{
 			Vector<Cell> cells = new Vector<Cell>(reportLevel * 2);
 			int accountLevel = account.getLevel();
 			if (account.getType().equals("T"))
@@ -121,7 +131,8 @@ public class StatementPDF extends AbstractStatement {
 			int colSpan = reportLevel - accountLevel + 1;
 
 			Cell acctNo = new Cell("");
-			if (chart.getShowacct() && account.getType().equalsIgnoreCase("A")) {
+			if (chart.getShowacct() && account.getType().equalsIgnoreCase("A"))
+			{
 				acctNo = new Cell(account.getAccountNo());
 				acctNo.setHorizontalAlignment(Cell.ALIGN_LEFT);
 			}
@@ -145,7 +156,8 @@ public class StatementPDF extends AbstractStatement {
 			amount.setColspan(3);
 			cells.addElement(amount);
 			stmtTable.addRow(cells);
-		} catch (BadElementException bex) {
+		} catch (BadElementException bex)
+		{
 			throw new VLException(VLException.BAD_ELEMENT, bex.getMessage());
 		}
 	}
@@ -175,9 +187,11 @@ public class StatementPDF extends AbstractStatement {
 	public void close() throws VLException
 	{
 		logger.log(logger.DEBUG, "[" + this.getClass().getSimpleName() + "] close()");
-		try {
+		try
+		{
 			stmtTable.finish();
-		} catch (DocumentException dx) {
+		} catch (DocumentException dx)
+		{
 			throw new VLException(VLException.DOCUMENT, dx.getMessage());
 		}
 		logger.logDebug("StatementPDF.close - Normal Exit");

@@ -1,6 +1,6 @@
 /*
  * StatementTXT.java
- * Provides the methods for producing statments and chart listings in .txt format.
+ * Provides the methods to produce financial statements and chart listings in .txt format.
  *
  * Created on February 21, 2005, 11:04 AM
  *

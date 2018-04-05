@@ -27,7 +27,8 @@ import com.lowagie.text.DocumentException;
  *
  * @author jms
  */
-public class PrintChart {
+public class PrintChart
+{
 	// Local variables
 	VL2Config vl2Config;
 	String workDir;
@@ -70,13 +71,19 @@ public class PrintChart {
 	public void doit() throws IOException, VLException, BadElementException, DocumentException
 	{
 		Enumeration elements = chart.chartElements();
-		while (elements.hasMoreElements()) {
+		while (elements.hasMoreElements())
+		{
 			ChartElement element = (ChartElement) elements.nextElement();
 			logger.logDebug("[PrintChart.doit] element: " + element.toString());
 			// Do not print the out-of-balance warnings
 			if (element.getAttribute("title").startsWith("*****"))
 				continue;
-			if (element.name.equals("account") || element.name.equals("total")) {
+			if (element.name.equals("chart"))
+				printChartElement(element);
+			else if (element.name.equals("section"))
+				printSectionElement(element);
+			else if (element.name.equals("account") || element.name.equals("total"))
+			{
 				int level = element.getLevel();
 				if (element.name.equals("total"))
 					--level;

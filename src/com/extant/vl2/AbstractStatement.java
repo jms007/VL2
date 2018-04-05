@@ -76,12 +76,15 @@ public abstract class AbstractStatement
 
 	public String makeStatement() throws VLException
 	{
-		Enumeration chartElements = chart.chartElements();
+		boolean listElements = true;
+		Enumeration<ChartElement> chartElements = chart.chartElements();
 		nElements = 0L;
 		while (chartElements.hasMoreElements())
 		{
 			ChartElement element = (ChartElement) chartElements.nextElement();
 			++nElements;
+			if (listElements)
+				System.out.println("ELEMENT[" + nElements + "]" + element.toString());
 			processChartElement(element);
 		}
 		logger.logDebug("nElements=" + nElements);
