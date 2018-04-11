@@ -27,6 +27,8 @@ import javax.swing.JComboBox;
  */
 public class VLUtil
 {
+	static LogFile logger = VL2.logger;
+
 	public static String getAccountingRoot()
 	{
 		System.out.println("VLUtil.getAccountingRoot( ) is obsolete");
@@ -68,11 +70,14 @@ public class VLUtil
 	 * GL files: for yy0100 fixDate returns 12/31/<yy-1> for yy1232 fixDate returns
 	 * 1/1/<yy+1> for valid dates, fixDate just returns the valid Julian
 	 *
-	 * Actually, I don't think we need this at all ... Julian seems to do this
-	 * without coaching.
+	 * Actually, we may not need this at all ... Julian seems to do this without
+	 * coaching.
 	 */
 	public static Julian fixDate(String sDate)
 	{
+		// LogFile logger = VL2.logger;
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.logDebug("fixDate: sDate=" + sDate);
 		if (Julian.isValid(sDate))
 			return new Julian(sDate);
 		Julian thisDate;
@@ -176,10 +181,10 @@ public class VLUtil
 	// }
 
 	/*
-	 * extractBalances processes the GLFile to compute the beginning balance (as of
-	 * the begin date) and the delta amount (up to and including the end date) for
-	 * each account contained in the chart. These values are stored in beginBal and
-	 * deltaVal fields contained in the Account.
+	 * computeAccountBalances processes the GLFile to compute the beginning balance
+	 * (as of the begin date) and the delta amount (up to and including the end
+	 * date) for each account contained in the chart. These values are stored in
+	 * beginBal and deltaVal fields in the Account.
 	 * 
 	 * All transactions between begin date and end date are attached to the account.
 	 *
@@ -190,13 +195,14 @@ public class VLUtil
 	 * follow this call with a call to OopStatement.ComputeTotals which will set the
 	 * totals in the appropriate ChartEntry's
 	 */
-	public static int extractBalances(String glFileName, Chart chart, Julian begin, Julian end, LogFile logger)
+	public static int computeAccountBalances(String glFileName, Chart chart, Julian begin, Julian end, LogFile logger)
 			throws IOException, VLException
 	{
 		// For debugging:
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
-		logger.logDebug("enter extractBalances begin=" + begin.toString("yymmdd") + "   end=" + end.toString("yymmdd"));
+		logger.logDebug(
+				"enter computeAccountBalances: begin=" + begin.toString("yymmdd") + "   end=" + end.toString("yymmdd"));
 		GLEntry glEntry;
 		String currentAcctNo = "";
 		Account currentAccount = null;
@@ -228,13 +234,14 @@ public class VLUtil
 
 			if (glEntry.getFixedJulianDate().isEarlierThan(begin))
 			{
+				// Add these transactions to beginBal
 				currentAccount.addToBeginBal(glEntry.getSignedAmount());
 				// Add Income & Expense items to P/L Account Begin balance
 				if (currentAccount.getType().equals("I") || currentAccount.getType().equals("E"))
 					plAccount.addToBeginBal(glEntry.getSignedAmount());
 			} else if (!glEntry.getFixedJulianDate().isLaterThan(end))
 			{
-				// Add this transaction to the account
+				// Add this transaction to the account deltaBal
 				currentAccount.addGLEntry(glEntry);
 				currentAccount.addToDeltaBal(glEntry.getSignedAmount());
 				// Add Income & Expense items to P/L Account Delta balance
@@ -254,7 +261,7 @@ public class VLUtil
 		// to make Statement show the correct ending balance in that Account
 
 		String s = Strings.formatPennies(-plAccount.getDeltaBal());
-		logger.logDebug("VLUtil.extractBalances: s=" + s);
+		logger.logDebug("VLUtil.computeAccountBalances: s=" + s);
 
 		GLEntry netIncome = new GLEntry("CLOS", "  0", "E", "C", "100", plAccount.getAccountNo(), s,
 				"Computed Net Income", end.toString("yymmdd"));
@@ -263,26 +270,33 @@ public class VLUtil
 		return maxDescrLength;
 	}
 
-	/*****
-	 * FOR TESTING ***** public static void main( String[] args ) { String option =
-	 * null; if ( args.length < 1 ) { option = "extract"; } // Default else option =
-	 * args[0];
-	 * 
-	 * if ( option.equals( "date" ) ) { String date = "020100"; Console.println(
-	 * date + " --> " + VLUtil.fixDate( date ).toString( "mm-dd-yyyy" ) ); date =
-	 * "011232"; Console.println( date + " --> " + VLUtil.fixDate( date ).toString(
-	 * "mm-dd-yyyy" ) ); } // else if ( option.equals( "extract" ) ) // { // String
-	 * glFilename = "C:\\Test\\GL0010.DAT"; // try // { // Vector entries =
-	 * VLUtil.glExtract( glFilename, // new int[] {0}, new String[] {"CD08"}, // new
-	 * Julian( "1-1-02" ), new Julian( "8-20-02" ) ); // Console.println(
-	 * Strings.plurals( "Entry", entries.size() ) + " extracted." ); // if (
-	 * Console.prompt( "Wanna see?", "N" ).equalsIgnoreCase( "Y" ) ) // for (int
-	 * i=0; i<entries.size(); ++i) // Console.println( entries.elementAt( i
-	 * ).toString() ); // } // //catch (IOException iox) { Console.println(
-	 * iox.getMessage() ); } // //catch (VLException vlx) { Console.println(
-	 * vlx.getMessage() ); } // Console.println( "Done" ); // } else {
-	 * Console.println( args[0] + " is not a valid parameter." ); System.exit( 1 );
-	 * } System.exit( 0 ); } /** END OF TEST
-	 **/
+	public void computeTotals(Chart chart)
+	{
+		ChartElement[] chartElements = chart.elementList;
+		int nElements = chartElements.length;
+		long[] levelTotals = new long[chart.getMaxLevel()];
+		int currentLevel;
+		ChartElement element;
+		String name;
 
+		for (int i = 0; i < levelTotals.length; ++i)
+			levelTotals[i] = 0L;
+		for (int i = 0; i < nElements; ++i)
+		{
+			element = chartElements[i];
+			name = element.name;
+			currentLevel = element.getLevel();
+			Account currentAccount = chart.getAccount(element.accountIndex);
+			if (name.equals("group"))
+				++currentLevel;
+			else if (name.equals("account"))
+				levelTotals[currentLevel] += currentAccount.getEndBal();
+			else if (name.equals("total"))
+			{
+				element.setTotal(levelTotals[currentLevel]);
+				levelTotals[currentLevel] = 0L;
+				--currentLevel;
+			}
+		}
+	}
 }
