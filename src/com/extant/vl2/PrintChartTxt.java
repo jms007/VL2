@@ -12,34 +12,38 @@ public class PrintChartTxt
 	String outputFilename;
 	UsefulFile outFile;
 	Chart chart;
-	Julian earliestDate;
-	Julian latestDate;
-	int indent;
 	int nElements = 0;
-	int maxAcctNoLength;
 	ChartElement element;
 	String image;
-	int pageWidth = 80;
+	String blanks = "";
+	String[] column = new String[4];
+	int[] colWidth = new int[4];
+	// int[] end = new int[4];
+	// int[] colWidth = new int[4];
+	int maxLineLength;
 	LogFile logger;
 
-	public void initialize(String outputFilename, Chart chart, Julian earliestDate, Julian latestDate, LogFile logger)
-			throws IOException // (Creating outFile failed)
+	public void initialize(String outputFilename, Chart chart, LogFile logger) throws IOException // (Creating outFile
+																									// failed)
 	{
 		this.outputFilename = outputFilename;
-		outFile = new UsefulFile(outputFilename, "w");
 		this.chart = chart;
-		this.earliestDate = earliestDate;
-		this.latestDate = latestDate;
 		this.logger = logger;
-		indent = chart.getIndent();
-		maxAcctNoLength = chart.getMaxAcctNoLength();
-		// For debugging:
-		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+
+		outFile = new UsefulFile(outputFilename, "w");
+		setColumns();
+		for (int i = 0; i < maxLineLength; ++i)
+			blanks += " ";
+		image = blanks;
+
 		run();
 	}
 
 	public void run()
 	{
+		// For debugging:
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+
 		Enumeration<ChartElement> chartElements = chart.chartElements();
 		while (chartElements.hasMoreElements())
 		{
@@ -65,48 +69,101 @@ public class PrintChartTxt
 		else if (element.name.equals("total"))
 			processTotal(element);
 
-		processFormat(element);
-		printImage();
 		return;
 	}
 
 	private void printImage()
 	{
-		logger.logDebug("printImage: " + image);
 		processFormat(element);
-		outFile.appendLine(image);
 		image = "";
+		for (int i = 1; i <= 3; ++i)
+		{
+			logger.logDebug("col" + i + "=" + column[i]);
+			image += column[i];
+		}
+		logger.logDebug("printImage: '" + image + "'");
+		outFile.appendLine(image);
+		resetColumns();
 	}
 
-	private void processFormat(ChartElement element)
+	private boolean processFormat(ChartElement element)
 	{
+		boolean print;
+		logger.logDebug("image='" + image + "'");
 		String format = element.getAttribute("format");
-		if (format.contains("newpage"))
-			image += "\f";
+		// if (format.contains("newpage"))
+		// image = "\f" + image;
 		if (format.contains("skip"))
-			image += "\n";
-		if (format.contains("begin"))
-			image += earliestDate.toString(chart.getDateFormat());
-		if (format.contains("period"))
-			image += earliestDate.toString(chart.getDateFormat()) + " - " + latestDate.toString(chart.getDateFormat());
+		{
+			outFile.appendLine("\n");
+		}
+		// if (format.contains("begin"))
+		// image += earliestDate.toString(chart.getDateFormat());
+		// if (format.contains("period"))
+		// image += earliestDate.toString(chart.getDateFormat()) + " - " +
+		// latestDate.toString(chart.getDateFormat());
 		if (format.contains("center"))
-			image = Strings.center(image, pageWidth);
+		{
+			String temp = image.trim();
+			temp = Strings.center(temp, maxLineLength);
+			logger.logDebug("center: " + temp);
+			image = temp;
+			outFile.appendLine(image);
+			print = false;
+		}
+		print = true;
+		return print;
 	}
 
-	private String calcIndention()
+	private void setColumns()
 	{
-		String indention = "";
-		for (int i = 0; i < element.level; ++i)
-			indention += "          ".substring(0, indent);
-		return indention;
+		blanks = "";
+		for (int i = 0; i < 100; ++i)
+			blanks += " ";
+
+		// Col 1 - Account No
+		column[1] = blanks.substring(0, chart.getMaxAcctNoLength());
+		colWidth[1] = column[1].length();
+		logger.logDebug("colWidth[1]=" + colWidth[1]);
+		// begin[2] = end[1] + 1;
+		// end[1] = begin[1] + chart.getMaxAcctNoLength();
+		// colWidth[1] = end[1] - begin[1] + 1;
+
+		// col 2 - Group Title
+		column[2] = blanks.substring(0, chart.getMaxGroupTitle().length());
+		colWidth[2] = column[2].length();
+		logger.logDebug("colWidth[2]=" + colWidth[2]);
+		// begin[2] = end[1] + 1;
+		// end[2] = begin[2] + chart.getMaxGroupTitle().length();
+		// colWidth[2] = end[2] - begin[2] + 1;
+
+		// col3 - Account Title
+		column[3] = blanks.substring(0, chart.getMaxAccountTitleLength());
+		colWidth[3] = column[3].length();
+		logger.logDebug("colWidth[3]=" + colWidth[3]);
+		// begin[3] = end[2] + 1;
+		// end[3] = begin[3] + chart.getMaxAccountTitleLength();
+		// colWidth[3] = end[3] - begin[3] + 1;
+
+		maxLineLength = colWidth[1] + colWidth[2] + colWidth[3];
+		logger.logDebug("maxLineLength=" + maxLineLength);
+		blanks = blanks.substring(0, maxLineLength);
+	}
+
+	private void resetColumns()
+	{
+		for (int i = 1; i < 3; ++i)
+			column[i] = blanks.substring(0, colWidth[i]);
 	}
 
 	private void processChart(ChartElement element)
-	{
+	{ // center
 		logger.logDebug("processChart:" + element.toString());
 		image = "CHART OF ACCOUNTS";
 		printImage();
 		String title = element.getAttribute("title");
+		if (title == null)
+			return;
 		if (title.length() > 0)
 		{
 			image = title;
@@ -115,29 +172,40 @@ public class PrintChartTxt
 	}
 
 	private void processSection(ChartElement element)
-	{
+	{ // center
 		logger.logDebug("processSection:" + element.toString());
-		image = calcIndention() + element.getAttribute("title");
+		image = element.getAttribute("title");
 		printImage();
 	}
 
 	private void processGroup(ChartElement element)
-	{
+	{ // col2
+		logger.log("Processing group element!");
 		logger.logDebug("processGroup:" + element.toString());
-		image = calcIndention() + element.getAttribute("title");
+		String s = element.getAttribute("title");
+		putInCol(2, Strings.leftJustify(s, colWidth[2]));
 		printImage();
 	}
 
 	private void processAccount(ChartElement element)
-	{
+	{ // no -> col1 title ->col2
 		logger.logDebug("processAccount:" + element.toString());
-		String entry = calcIndention() + element.getAttribute("title");
-		image = Strings.leftJustify(element.getAttribute("no"), maxAcctNoLength);
-		image += entry;
+		String s = element.getAttribute("no");
+		putInCol(1, Strings.leftJustify(s, colWidth[1]));
+		s = element.getAttribute("title");
+		putInCol(2, Strings.leftJustify(s, colWidth[2]));
+		printImage();
 	}
 
 	private void processTotal(ChartElement element)
-	{
+	{ // totals do not appear in chart
 		logger.logDebug("processTotal:" + element.toString());
+	}
+
+	private void putInCol(int col, String s)
+	{
+		logger.logDebug("putting '" + s + "' in col " + col);
+		column[col] = s + blanks.substring(0, (colWidth[col] - s.length()));
+		logger.logDebug("column[" + col + "]=" + column[col] + "length=" + column[col].length());
 	}
 }
