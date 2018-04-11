@@ -1,6 +1,6 @@
 /*
  * Chart.java
- * The vl.Chart class using the XML description of the Chart of Accounts
+ * The Chart class built from the XML description of the Chart of Accounts
  *
  * 10-19-06 Added errors for (a) no P/L account and (b) multiple P/L accounts
  * Created on September 4, 2006, 8:34 PM
@@ -162,7 +162,13 @@ public class Chart extends DefaultHandler implements Enumeration
 				maxAccountNo = s;
 			}
 
-		if (eName.equals("account"))
+		if (eName.equals("group"))
+		{
+			s = attrs.getValue("title");
+			if (s.length() > maxGroupTitle.length())
+				maxGroupTitle = s;
+			chartElements.addElement(chartElement); // added 4-9-18 to include group in elements
+		} else if (eName.equals("account"))
 		{
 			logger.logDebug("Creating Account: " + attrs.getValue("no") + " '" + attrs.getValue("title") + "'");
 			if (findAcctByNo(attrs.getValue("no")) != null)
@@ -200,8 +206,8 @@ public class Chart extends DefaultHandler implements Enumeration
 			dateFormat = attrs.getValue("date");
 			chartVersion = attrs.getValue("version");
 			chartElements.addElement(chartElement);
-		}
-
+		} else
+			logger.log("unexpected element name: " + eName);
 		++elementCount;
 		++level;
 	}
@@ -214,7 +220,8 @@ public class Chart extends DefaultHandler implements Enumeration
 		{
 			logger.log("Chart parsing is complete.");
 			elementList = new ChartElement[chartElements.size()];
-			logger.log("chartElements[" + chartElements.size() + "]=" + chartElements.lastElement().toString());
+			// Show the last element (if debug)
+			logger.logDebug("chartElements[" + chartElements.size() + "]=" + chartElements.lastElement().toString());
 			// Copy all ChartElement's from chartElements to elementList
 			if (chartElements == null)
 				logger.logFatal("Chart:237: chartElements is null!");
@@ -224,6 +231,11 @@ public class Chart extends DefaultHandler implements Enumeration
 				elementList[i] = chartElements.get(i);
 		}
 		--level;
+	}
+
+	public ChartElement[] getChartElementList()
+	{
+		return elementList;
 	}
 
 	// findAcctByNo will locate an account given either
@@ -477,6 +489,11 @@ public class Chart extends DefaultHandler implements Enumeration
 		return maxAccountNo;
 	}
 
+	public String getMaxGroupTitle()
+	{
+		return maxGroupTitle;
+	}
+
 	public String getFileName()
 	{
 		return chartFilename;
@@ -657,4 +674,5 @@ public class Chart extends DefaultHandler implements Enumeration
 	int maxLevel = 0;
 	String maxAccountNo = "";
 	String maxAccountTitle = "";
+	String maxGroupTitle = "";
 }
