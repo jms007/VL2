@@ -23,9 +23,9 @@ import java.util.Enumeration;
  * 
  * @author jms
  */
-public class TranReport extends JDialog {
-	public TranReport(int reportType, Chart chart, VL2Config vl2FileMan, LogFile logger)
-			throws IOException, VLException
+public class TranReport extends JDialog
+{
+	public TranReport(int reportType, Chart chart, VL2Config vl2FileMan, LogFile logger) throws IOException, VLException
 	{
 		this.chart = chart;
 		this.vl2FileMan = vl2FileMan;
@@ -71,8 +71,8 @@ public class TranReport extends JDialog {
 		outfile = new UsefulFile(outFilename, "w");
 		printTitle(outfile, reportType, begin.toString(dateFormat), end.toString(dateFormat), vl2FileMan);
 		// Compute balances and add GL transactions to the accounts
-		logger.logDebug("calling extractBalances begin=" + begin + "   end=" + end);
-		VLUtil.extractBalances(vl2FileMan.getGLFile(), chart, begin, end, logger);
+		logger.logDebug("calling computeAccountBalances begin=" + begin + "   end=" + end);
+		VLUtil.computeAccountBalances(vl2FileMan.getGLFile(), chart, begin, end, logger);
 
 		// Console.println( "[TranReport.makeReport] plTrans:\n" +
 		// chart.getPLAccount().glEntries.elementAt( 0 ).toString() );
@@ -81,7 +81,8 @@ public class TranReport extends JDialog {
 		// chart.getPLAccount().getEndBal() );
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		Enumeration accounts = chart.acctsByNumber();
-		while (accounts.hasMoreElements()) {
+		while (accounts.hasMoreElements())
+		{
 			Account account = (Account) accounts.nextElement();
 			logger.logDebug(account.accountNo);
 			if (account.glEntries.isEmpty() && account.getBeginBal() == 0L)

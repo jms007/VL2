@@ -31,12 +31,12 @@ public class StatementPDF extends AbstractStatement
 	}
 
 	// Use this constructor to make a .pdf statement
-	public StatementPDF(VL2Config vl2FileMan, Chart chart, Julian begin, Julian end, int reportLevel,
-			String outfileName, LogFile logger) throws VLException
+	public StatementPDF(VL2Config vl2Config, Chart chart, Julian begin, Julian end, int reportLevel, String outfileName,
+			LogFile logger) throws VLException
 	{
 		makingChart = false;
 		makingStatement = true;
-		setup(vl2FileMan, chart, makingStatement, begin, end, reportLevel, outfileName, logger);
+		setup(vl2Config, chart, makingStatement, begin, end, reportLevel, outfileName, logger);
 	}
 
 	// Use this constructor to make a chart listing

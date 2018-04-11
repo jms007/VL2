@@ -46,10 +46,10 @@ public abstract class AbstractStatement
 			// reportLevel = chart.getMaxLevel();
 			if (showAmounts)
 			{
-				logger.logDebug("   calling VLUtil.extractBalances(" + glFilename + ",<chart>,"
+				logger.logDebug("   calling VLUtil.computeAccountBalances(" + glFilename + ",<chart>,"
 						+ begin.toString("yymmdd") + "," + end.toString("yymmdd") + ")");
-				VLUtil.extractBalances(glFilename, chart, begin, end, logger);
-				logger.logDebug("   back from extractBalances()");
+				VLUtil.computeAccountBalances(glFilename, chart, begin, end, logger);
+				logger.logDebug("   back from computeAccountBalances()");
 				levelTotals = new long[chart.getMaxLevel() + 1];
 				for (int i = 0; i < levelTotals.length; ++i)
 					levelTotals[i] = 0L;
@@ -57,12 +57,12 @@ public abstract class AbstractStatement
 
 			// Overwrite confirmation is obtained in ReportOptions under VL
 			// !! BUT ReportOptions does not run if executing stand-alone
-			if (outfileName.length() > 0)
-			{
-				File f = new File(outfileName);
-				if (f.exists())
-					f.delete();
-			}
+			// if (outfileName.length() > 0)
+			// {
+			// File f = new File(outfileName);
+			// if (f.exists())
+			// f.delete();
+			// }
 
 			logger.logDebug("   calling initialize( " + reportLevel + ",'" + outfileName + "')");
 			initialize(reportLevel, outfileName);

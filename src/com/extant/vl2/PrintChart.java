@@ -8,18 +8,11 @@
 package com.extant.vl2;
 
 import com.extant.utilities.*;
-//import com.extant.utilities.Console;
-//import com.extant.utilities.Strings;
-//import com.extant.utilities.Julian;
-//import com.extant.utilities.LogFile;
-////import com.extant.utilities.VLException;
-//import com.extant.utilities.Clip;
-//import com.extant.utilities.ViewFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.StringTokenizer;
-import javax.swing.JFrame;
+//import java.util.StringTokenizer;
+//import javax.swing.JFrame;
 import com.lowagie.text.BadElementException;
 import com.lowagie.text.DocumentException;
 
@@ -79,10 +72,10 @@ public class PrintChart
 			if (element.getAttribute("title").startsWith("*****"))
 				continue;
 			if (element.name.equals("chart"))
-				printChartElement(element);
+				continue; // printChartElement(element);
 			else if (element.name.equals("section"))
-				printSectionElement(element);
-			else if (element.name.equals("account") || element.name.equals("total"))
+				continue; // printSectionElement(element);
+			if (element.name.equals("account") || element.name.equals("total"))
 			{
 				int level = element.getLevel();
 				if (element.name.equals("total"))
@@ -104,24 +97,3 @@ public class PrintChart
 		chart.setShowacct(showacctSave);
 	}
 }
-
-/**
- * @param args
- *            the command line arguments ini=<iniFileName> dir=<workDirectory>
- *            o=<output file name>
- */
-/*****
- * FOR TESTING ***** public static void main(String[] args) { try { PrintChart
- * printChart = new PrintChart(); Clip clip = new Clip( args, new String[] {
- * "ini=E:\\ACCOUNTING\\EXTANT\\EXTANT.properties" ,
- * "dir=E:\\ACCOUNTING\\EXTANT\\GL17\\" , "o=CHART.PDF" } ); XProperties props =
- * new XProperties( clip.getParam( "ini" ), "VL" ); String workDir =
- * clip.getParam( "dir" ); props.setProperty( "WorkDirectory", workDir ); Chart
- * chart = new Chart(); chart.init( props.getString( "ChartFile"), logger );
- * String filename = workDir + clip.getParam( "o" ); printChart.printPDF( props,
- * chart, filename, logger ); printChart.doit(); Console.println( "Output is in
- * file " + filename ); new ViewFile( filename, logger ).setVisible( true ); }
- * catch (Exception x) { Console.println( x.getMessage() ); x.printStackTrace();
- * } } }
- * 
- *****/
