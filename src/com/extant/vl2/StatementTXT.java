@@ -1,6 +1,7 @@
 /*
  * StatementTXT.java
- * Provides the methods to produce financial statements and chart listings in .txt format.
+ * Provides the methods to produce financial statements and chart listings
+ * in .txt format.
  *
  * Created on February 21, 2005, 11:04 AM
  *
@@ -8,7 +9,6 @@
 
 package com.extant.vl2;
 
-//import com.extant.VL.AbstractStatement;
 import com.extant.utilities.*;
 //import com.extant.utilities.XProperties;
 //import com.extant.utilities.Strings;
@@ -23,11 +23,14 @@ import java.io.*;
  */
 public class StatementTXT extends AbstractStatement
 {
-	public StatementTXT(VL2Config vl2Config, Chart chart, String glFilename, Julian earliestDate, Julian latestDate,
-			int reportLevel, String outfileName, LogFile logger) throws VLException
+	public StatementTXT(VL2Config vl2Config, Chart chart, int reportLevel, String outfileName, LogFile logger)
+			throws VLException
 	{
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-		setup(vl2Config, chart, true, earliestDate, latestDate, reportLevel, outfileName, logger);
+		// String glFilename = vl2Config.getGLFile();
+		String earliest = vl2Config.getEarliestDate();
+		String latest = vl2Config.getLatestDate();
+		setup(vl2Config, chart, true, new Julian(earliest), new Julian(latest), reportLevel, outfileName, logger);
 	}
 
 	public StmtTable initialize(int reportLevel, String outfileName) throws VLException
