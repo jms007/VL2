@@ -456,23 +456,21 @@ public class VL2 extends JFrame implements ActionListener
 	private void startTextStmt()
 	{
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		String earliestDate = vl2Config.getEarliestDate();
+		String latestDate = vl2Config.getLatestDate();
 		logger.logDebug("startTextStmt");
 		logger.logDebug("GLFile=" + vl2Config.getGLFile());
 		logger.logDebug("Entity: " + vl2Config.getEntityLongName());
 		logger.logDebug("workDir=" + workDir);
-		System.out.println("earliestDate=" + vl2Config.getEarliestDate());
-		System.out.println("latestDate=" + vl2Config.getLatestDate());
+		logger.logDebug("earliestDate=" + earliestDate);
+		logger.logDebug("latestDate=" + latestDate);
 		try
 		{
-			String outFile = workDir + "Stmt.txt";
+			String outfileName = workDir + "Stmt.txt";
+			StatementTXT statement = new StatementTXT(vl2Config, chart, 0, outfileName, VL2.logger);
 
-			logger.logDebug("earliestDate: " + new Julian(vl2Config.getEarliestDate()));
-			logger.logDebug("latestDate: " + new Julian(vl2Config.getLatestDate()));
-			StatementTXT statement = new StatementTXT(vl2Config, VL2.chart, vl2Config.getGLFile(),
-					new Julian(vl2Config.getEarliestDate()), new Julian(vl2Config.getLatestDate()), 0, outFile,
-					VL2.logger);
-			logger.logInfo("Statement is in " + outFile);
-			new ViewFile(outFile, logger);
+			logger.logInfo("Statement is in " + outfileName);
+			new ViewFile(outfileName, logger);
 		} catch (VLException vlx)
 		{
 			logger.log("Cannot initialize StatementTXT: " + vlx.getMessage());
@@ -564,8 +562,7 @@ public class VL2 extends JFrame implements ActionListener
 		try
 		{
 			PrintChartTxt printChartTxt = new PrintChartTxt();
-			printChartTxt.initialize(workDir + "Chart.txt", chart, new Julian(vl2Config.getEarliestDate()),
-					new Julian(vl2Config.getLatestDate()), logger);
+			printChartTxt.initialize(workDir + "Chart.txt", chart, logger);
 		} catch (IOException iox)
 		{
 			logger.logFatal("Unable to create Chart outFile");
