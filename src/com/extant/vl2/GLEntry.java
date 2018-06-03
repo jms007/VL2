@@ -28,7 +28,7 @@ public class GLEntry
 	{
 	}
 
-	// Constructs a GLEntry from its (variable-length) String form
+	// Constructs a GLEntry from its token (variable-length) String form
 	public GLEntry(String image) throws VLException
 	{
 		logger = VL2.logger;

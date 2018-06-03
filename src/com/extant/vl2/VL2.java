@@ -200,6 +200,7 @@ public class VL2 extends JFrame implements ActionListener
 
 		// For Debugging:
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+
 		String GLFile = vl2Config.getGLFile();
 		int nErrors;
 		logger.logDebug("Checking GLFile " + GLFile);
@@ -287,9 +288,9 @@ public class VL2 extends JFrame implements ActionListener
 		muAudit.add(muValidate);
 		muValidate.addActionListener(this);
 
-		// JMenuItem muSearch = new JMenuItem("Search");
-		// muAudit.add(muSearch);
-		// muSearch.addActionListener(this);
+		JMenuItem muSearch = new JMenuItem("Search");
+		muAudit.add(muSearch);
+		muSearch.addActionListener(this);
 
 		greenMenuBar.add(muAudit);
 

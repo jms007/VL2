@@ -20,13 +20,14 @@ import javax.swing.JRadioButton;
  *
  * @author jms
  */
-public class Search extends javax.swing.JFrame {
-	public Search(VL2Config vl2FileMan)
+public class Search extends javax.swing.JFrame
+{
+	public Search(VL2Config vl2Config)
 	{
 		initComponents();
 		lineBreak = System.lineSeparator();
-		glFilename = vl2FileMan.getGLFile();
-		this.vl2FileMan = vl2FileMan;
+		glFilename = vl2Config.getGLFile();
+		this.vl2Config = vl2Config;
 		report = new StringBuffer(1000);
 		TextDialog textDialog = new TextDialog(this, true);
 		super.setVisible(true);
@@ -51,8 +52,10 @@ public class Search extends javax.swing.JFrame {
 		lblStatusBar = new javax.swing.JLabel();
 		lblTitle = new javax.swing.JLabel();
 
+		rbIncludeAll.setSelected(true); // default
 		setTitle("Search");
-		addWindowListener(new java.awt.event.WindowAdapter() {
+		addWindowListener(new java.awt.event.WindowAdapter()
+		{
 			public void windowClosing(java.awt.event.WindowEvent evt)
 			{
 				exitForm(evt);
@@ -64,7 +67,8 @@ public class Search extends javax.swing.JFrame {
 		rbIncludeAll.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbIncludeAll.setMnemonic('I');
 		rbIncludeAll.setText("Include All Transactions");
-		rbIncludeAll.addActionListener(new java.awt.event.ActionListener() {
+		rbIncludeAll.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				manageGUI(evt);
@@ -75,7 +79,8 @@ public class Search extends javax.swing.JFrame {
 		rbDates.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		rbDates.setMnemonic('D');
 		rbDates.setText("Specify Dates");
-		rbDates.addActionListener(new java.awt.event.ActionListener() {
+		rbDates.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				manageGUI(evt);
@@ -86,7 +91,8 @@ public class Search extends javax.swing.JFrame {
 		btnSearch.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		btnSearch.setMnemonic('O');
 		btnSearch.setText("Search");
-		btnSearch.addActionListener(new java.awt.event.ActionListener() {
+		btnSearch.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				btnSearchActionPerformed(evt);
@@ -97,7 +103,8 @@ public class Search extends javax.swing.JFrame {
 		btnClose.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 		btnClose.setMnemonic('C');
 		btnClose.setText("Close");
-		btnClose.addActionListener(new java.awt.event.ActionListener() {
+		btnClose.addActionListener(new java.awt.event.ActionListener()
+		{
 			public void actionPerformed(java.awt.event.ActionEvent evt)
 			{
 				btnCloseActionPerformed(evt);
@@ -135,15 +142,17 @@ public class Search extends javax.swing.JFrame {
 
 	private void btnSearchActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_btnSearchActionPerformed
 	{// GEN-HEADEREND:event_btnSearchActionPerformed
-		try {
+		try
+		{
 			if (report.length() > 0)
 				report.delete(0, report.length() - 1);
 			txtString.setText(txtString.getText().toUpperCase());
 			String report = doit();
-			if (nEntries > 0) {
+			if (nEntries > 0)
+			{
 				TextDialog textDialog = new TextDialog(this, true);
 				textDialog.setTitle("Search Results");
-				String defaultOutFile = vl2FileMan.getWorkingDirectory() + "SearchMatches.txt";
+				String defaultOutFile = vl2Config.getWorkingDirectory() + "SearchMatches.txt";
 				textDialog.setOutfileName(defaultOutFile);
 				textDialog.setText(report);
 				textDialog.setVisible(true);
@@ -151,7 +160,8 @@ public class Search extends javax.swing.JFrame {
 			// there are no matches - don't show the report at all
 			else
 				lblStatusBar.setText("No matches were found.");
-		} catch (IOException iox) {
+		} catch (IOException iox)
+		{
 			lblStatusBar.setText(iox.getMessage());
 		}
 	}// GEN-LAST:event_btnSearchActionPerformed
@@ -164,16 +174,20 @@ public class Search extends javax.swing.JFrame {
 	private void manageGUI(java.awt.event.ActionEvent evt)// GEN-FIRST:event_manageGUI
 	{// GEN-HEADEREND:event_manageGUI
 		JRadioButton button = null;
-		if (evt == null) { // Initialize
+		if (evt == null)
+		{ // Initialize
 			button = rbIncludeAll;
 			rbIncludeAll.setSelected(true);
 			rbDates.setSelected(!rbIncludeAll.isSelected());
-		} else {
-			if (evt.getActionCommand().equals(rbDates.getText())) {
+		} else
+		{
+			if (evt.getActionCommand().equals(rbDates.getText()))
+			{
 				button = rbDates;
 				rbIncludeAll.setSelected(!rbDates.isSelected());
 
-			} else if (evt.getActionCommand().equals(rbIncludeAll.getText())) {
+			} else if (evt.getActionCommand().equals(rbIncludeAll.getText()))
+			{
 				button = rbIncludeAll;
 				rbDates.setSelected(!rbIncludeAll.isSelected());
 			}
@@ -203,20 +217,24 @@ public class Search extends javax.swing.JFrame {
 	{
 		setup();
 		needle = txtString.getText();
-		if (rbDates.isSelected()) {
-			if (!Julian.isValid(txtStartDate.getText())) {
+		if (rbDates.isSelected())
+		{
+			if (!Julian.isValid(txtStartDate.getText()))
+			{
 				lblStatusBar.setText("Start Date is not valid");
 				txtStartDate.requestFocus();
 				return "";
 			}
-			if (!Julian.isValid(txtEndDate.getText())) {
+			if (!Julian.isValid(txtEndDate.getText()))
+			{
 				lblStatusBar.setText("End Date is not valid");
 				txtEndDate.requestFocus();
 				return "";
 			}
 			startDate = new Julian(txtStartDate.getText());
 			endDate = new Julian(txtEndDate.getText());
-		} else {
+		} else
+		{
 			startDate = null;
 			endDate = null;
 		}
@@ -235,13 +253,14 @@ public class Search extends javax.swing.JFrame {
 		// //!! Apply '?' wildcard to match any character
 		// needle = needle.replace( '?', ' ' );
 		UsefulFile file = new UsefulFile(glFilename, "r");
-		nTries = 0;
-		while (!file.EOF()) {
+		lineNo = 0;
+		while (!file.EOF())
+		{
 			image = file.readLine(UsefulFile.ALL_WHITE).toUpperCase();
-			++nTries;
+			++lineNo;
 			// Match on needle anywhere in the record
 			if (image.contains(needle))
-				addEntry(image);
+				addEntry("found in line " + lineNo.toString() + ": " + image);
 		}
 		file.close();
 	}
@@ -249,10 +268,12 @@ public class Search extends javax.swing.JFrame {
 	private void addEntry(String image)
 	{
 		GLEntry glEntry;
-		try {
+		try
+		{
 			glEntry = new GLEntry(image);
-		} catch (VLException vlx) {
-			report.append("error in this record: " + image + lineBreak);
+		} catch (VLException vlx)
+		{
+			report.append("error in record " + lineNo + ": " + image + lineBreak);
 			return;
 		}
 
@@ -261,7 +282,8 @@ public class Search extends javax.swing.JFrame {
 			include &= glEntry.getJulianDate().getDayNumber() >= startDate.getDayNumber();
 		if (endDate != null)
 			include &= glEntry.getJulianDate().getDayNumber() <= endDate.getDayNumber();
-		if (include) {
+		if (include)
+		{
 			report.append(image + lineBreak);
 			total += glEntry.getSignedAmount();
 			++nEntries;
@@ -276,11 +298,12 @@ public class Search extends javax.swing.JFrame {
 	// {
 	// try
 	// {
-	// Clip clip = new Clip( args );
+	// Clip clip = new Clip(args);
 	// new Search();
+	// } catch (UtilitiesException ux)
+	// {
+	// Console.println(ux.getMessage());
 	// }
-	// catch (UtilitiesException ux)
-	// { Console.println(ux.getMessage() ); }
 	// }
 
 	String glFilename;
@@ -289,11 +312,11 @@ public class Search extends javax.swing.JFrame {
 	Julian startDate = null;
 	Julian endDate = null;
 	StringBuffer report;
-	int nTries;
+	Integer lineNo;
 	int nEntries;
 	long total;
 	// StringBuffer comboAcctBuffer;
-	VL2Config vl2FileMan;
+	VL2Config vl2Config;
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
 	private javax.swing.JButton btnClose;

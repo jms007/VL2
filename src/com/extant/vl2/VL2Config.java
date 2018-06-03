@@ -31,10 +31,7 @@ public class VL2Config
 	private final String accountingDataDir;
 	private final String entityName;
 	private final String currentYear;
-
-	// private final XProperties props;
 	private XProperties props;
-
 	private String earliestDate;
 	private String latestDate;
 

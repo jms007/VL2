@@ -40,13 +40,6 @@ public class GLCheck
 		report = "";
 		nErrors = 0;
 		lineNo = 0;
-		// if (chart == null)
-		// {
-		// chart = new Chart();
-		// try {chart.init(chartFilename); }
-		// catch (Exception x)
-		// { logger.logFatal(x.getMessage()); }
-		// }
 		if (fileType.equals("fixed"))
 			checkFixedFile(glFilename);
 		else if (fileType.equals("token"))
@@ -61,7 +54,7 @@ public class GLCheck
 		UsefulFile f;
 		String image = "";
 
-		logger.logDebug("Checking Tokenized File " + glFilename);
+		logger.logDebug("Processing Tokenized File " + glFilename);
 		try
 		{
 			GLEntry glEntry;
@@ -78,17 +71,27 @@ public class GLCheck
 				image = f.readLine();
 				++lineNo;
 				if (image.length() < 3)
-					continue; // Ignore short lines
+					continue; // Ignore (but count) short lines
 				glEntry = new GLEntry(image);
 				int transactionYear = glEntry.getJulianDate().getYear() % 100;
 				if (transactionYear != currentYear)
 				{
-					logger.log("line " + lineNo + " transactionDate is not in currentYear:");
-					logger.logFatal("currentYear=" + currentYear + " transactionDate="
-							+ glEntry.getJulianDate().toString("yymmdd"));
+					String errorMsg = "line " + lineNo + " transactionDate is not in currentYear:\\n";
+					errorMsg += "currentYear=" + currentYear + " transactionDate="
+							+ glEntry.getJulianDate().toString("yymmdd");
+					reportError(errorMsg);
+					continue;
 				}
-				if (!chart.isValidAccount(glEntry.getAccountNo()))
+				String accountNo = glEntry.getAccountNo();
+				if (chart.isValidAccount(accountNo))
+				{
+					Account account = chart.findAcctByNo(accountNo);
+					account.addToDeltaBal(glEntry.getSignedAmount());
+				} else
+				{
 					reportError("Line " + lineNo + " Account not in chart:" + glEntry.getAccountNo());
+					continue;
+				}
 				if (earliestDate == null)
 					earliestDate = glEntry.getFixedJulianDate();
 				else if (glEntry.getFixedJulianDate().isEarlierThan(earliestDate))
@@ -98,7 +101,7 @@ public class GLCheck
 				else if (glEntry.getFixedJulianDate().isLaterThan(latestDate))
 					latestDate = glEntry.getFixedJulianDate();
 				calcJournalBal(glEntry);
-				bal += glEntry.getSignedAmount();
+				glBal += glEntry.getSignedAmount();
 			}
 			f.close();
 			reportInfo("EarliestDate=" + earliestDate.toString("yymmdd"));
@@ -106,8 +109,8 @@ public class GLCheck
 			reportInfo("LatestDate=" + latestDate.toString("yymmdd"));
 			props.setLatestDate(latestDate.toString("yymmdd"));
 
-			if (bal != 0)
-				reportError("File " + glFilename + " is out of balance by " + bal);
+			if (glBal != 0)
+				reportError("File " + glFilename + " is out of balance by " + glBal);
 			finish();
 		} catch (VLException x)
 		{
@@ -124,7 +127,7 @@ public class GLCheck
 		try
 		{
 			String image;
-			logger.logDebug("Checking Fixed File " + glFile + ": ");
+			logger.logDebug("Processing Fixed File " + glFile + ": ");
 			UsefulFile f = new UsefulFile(glFile, "r");
 			while (!f.EOF())
 			{
@@ -149,7 +152,7 @@ public class GLCheck
 				else if (glEntry.getFixedJulianDate().isLaterThan(latestDate))
 					latestDate = glEntry.getFixedJulianDate();
 				calcJournalBal(glEntry);
-				bal += glEntry.getSignedAmount();
+				glBal += glEntry.getSignedAmount();
 			}
 			f.close();
 			emptyGL = lineNo < 2;
@@ -163,32 +166,6 @@ public class GLCheck
 	public int getNEntries()
 	{
 		return lineNo;
-	}
-
-	public void finish()
-	{
-		if (emptyGL)
-		{
-			reportError("No transactions found");
-		}
-		if (earliestDate != null && latestDate != null)
-		{
-			report += lineNo + " entries, " + nJournals + " Journals.\n" + "Covering dates "
-					+ earliestDate.toString("mm-dd-yyyy") + " to " + latestDate.toString("mm-dd-yyyy") + "\n";
-			// props.setProperty("EarliestDate", earliestDate.toString("yymmdd"));
-			// props.setProperty("LatestDate", latestDate.toString("yymmdd"));
-		} else
-		{
-			reportError("dates are not set");
-		}
-		// report += lineNo + " records, " +
-		// nJournals + " Journals.\n";
-		reportJournalBal();
-		if (bal != 0L)
-			reportError("General Ledger is out of balance by " + Strings.formatPennies(bal, ","));
-		report += Strings.plurals("Error", nErrors) + " found.\n";
-		logger.logDebug("GLCheck normal completion");
-		System.out.print("GLCheck report:\n" + report);
 	}
 
 	private void calcJournalBal(GLEntry glEntry)
@@ -253,6 +230,34 @@ public class GLCheck
 		return latestDate;
 	}
 
+	public void finish() throws VLException
+	{
+		if (emptyGL)
+		{
+			reportError("No transactions found");
+		}
+		if (earliestDate != null && latestDate != null)
+		{
+			report += lineNo + " entries, " + nJournals + " Journals.\n" + "Covering dates "
+					+ earliestDate.toString("mm-dd-yyyy") + " to " + latestDate.toString("mm-dd-yyyy") + "\n";
+			// props.setProperty("EarliestDate", earliestDate.toString("yymmdd"));
+			// props.setProperty("LatestDate", latestDate.toString("yymmdd"));
+		} else
+		{
+			reportError("dates are not set");
+		}
+		// report += lineNo + " records, " +
+		// nJournals + " Journals.\n";
+		reportJournalBal();
+		if (glBal != 0L)
+			reportError("General Ledger is out of balance by " + Strings.formatPennies(glBal, ","));
+		report += Strings.plurals("Error", nErrors) + " found.\n";
+		System.out.print("GLCheck report:\n" + report);
+		if (nErrors > 0)
+			throw new VLException(VLException.GL_ERRORS);
+		logger.log("GLCheck normal completion");
+	}
+
 	// Global variables
 	VL2Config props;
 	int currentYear;
@@ -263,7 +268,7 @@ public class GLCheck
 	boolean emptyGL = false;
 	Julian earliestDate = null;
 	Julian latestDate = null;
-	long bal = 0L;
+	long glBal = 0L;
 	String report = "";
 	String journals[] = new String[100];
 	long journalBals[] = new long[100];

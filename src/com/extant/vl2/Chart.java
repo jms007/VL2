@@ -33,7 +33,6 @@ import org.xml.sax.SAXException;
  */
 public class Chart extends DefaultHandler implements Enumeration
 {
-
 	public Chart()
 	{
 	}
