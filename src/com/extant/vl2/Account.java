@@ -121,21 +121,6 @@ public class Account
 		return title;
 	}
 
-	public long getBeginBal()
-	{
-		return beginBal;
-	}
-
-	public long getDeltaBal()
-	{
-		return deltaBal;
-	}
-
-	public long getEndBal()
-	{
-		return beginBal + deltaBal;
-	}
-
 	public void setTitle(String title)
 	{
 		this.title = title;
@@ -173,6 +158,21 @@ public class Account
 	public void addToDeltaBal(long value)
 	{
 		deltaBal += value;
+	}
+
+	public long getBeginBal()
+	{
+		return beginBal;
+	}
+
+	public long getDeltaBal()
+	{
+		return deltaBal;
+	}
+
+	public long getEndBal()
+	{
+		return beginBal + deltaBal;
 	}
 
 	public void addGLEntry(GLEntry glEntry)
