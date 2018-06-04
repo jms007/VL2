@@ -32,8 +32,8 @@ public class Account
 						// E - Expense
 						// R - Retained Earnings/Net Worth
 	String title;
-	private long beginBal = 0L;
-	private long deltaBal = 0L;
+	public long beginBal = 0L;
+	public long deltaBal = 0L;
 	Vector<GLEntry> glEntries = new Vector<GLEntry>(100, 100);
 	LogFile logger = VL2.logger;
 
@@ -136,6 +136,11 @@ public class Account
 		return beginBal + deltaBal;
 	}
 
+	public void setTitle(String title)
+	{
+		this.title = title;
+	}
+
 	public void zeroBalances()
 	{
 		beginBal = deltaBal = 0L;
@@ -147,27 +152,17 @@ public class Account
 		glEntries.removeAllElements();
 	}
 
-	// The next 2 methods (addToBal and updateBalances) are not currently (5-10-03)
-	// used
-	// and have not been tested.
-	public void addToBal(Julian begin, Julian end, long value, Julian trDate)
+	// 5-10-03 The next 3 methods (addToBal, addToBeginBal, and addToDeltaBal)
+	// are not currently used and have not been tested.
+	// 6- 3-18 These methods are now used by class ComputeAccountTotals
+
+	public void addToBal(GLEntry glEntry)
 	{
-		if (trDate.isLaterThan(end))
-			return;
-		if (trDate.isEarlierThan(begin))
+		long value = glEntry.getSignedAmount();
+		if (glEntry.getField("JREF").equals("BALF"))
 			addToBeginBal(value);
 		else
 			addToDeltaBal(value);
-	}
-
-	public void updateBalances(Julian begin, Julian end)
-	{
-		zeroBalances();
-		for (int i = 0; i < glEntries.size(); ++i)
-		{
-			GLEntry glEntry = (GLEntry) glEntries.elementAt(i);
-			addToBal(begin, end, glEntry.getSignedAmount(), glEntry.getFixedJulianDate());
-		}
 	}
 
 	public void addToBeginBal(long value)
@@ -180,21 +175,6 @@ public class Account
 		deltaBal += value;
 	}
 
-	public void setTitle(String title)
-	{
-		this.title = title;
-	}
-
-	// public String setProperty( String key, String value )
-	// {
-	// return (String)props.setProperty( key, value );
-	// }
-	//
-	// public String getProperty( String key )
-	// {
-	// return props.getProperty( key, "" );
-	// }
-	//
 	public void addGLEntry(GLEntry glEntry)
 	{
 		glEntries.addElement(glEntry);
@@ -202,7 +182,7 @@ public class Account
 
 	public String toString()
 	{
-		return accountNo + " " + title + " begin=" + com.extant.utilities.Strings.formatPennies(beginBal) + " delta="
-				+ com.extant.utilities.Strings.formatPennies(deltaBal);
+		return accountNo + " " + title + " begin=" + Strings.formatPennies(beginBal) + " delta="
+				+ Strings.formatPennies(deltaBal);
 	}
 }
