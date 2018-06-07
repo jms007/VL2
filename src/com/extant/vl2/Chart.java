@@ -43,7 +43,6 @@ public class Chart extends DefaultHandler implements Enumeration
 	 */
 	public void init(String chartFilename, LogFile logger) throws IOException, VLException
 	{
-		Exception x;
 		this.logger = logger;
 		try
 		{
@@ -453,6 +452,11 @@ public class Chart extends DefaultHandler implements Enumeration
 		return shortDateFormat;
 	}
 
+	public Vector<Account> getAccounts()
+	{
+		return accounts;
+	}
+
 	public int getNAccounts()
 	{
 		return nAccounts;
@@ -587,6 +591,33 @@ public class Chart extends DefaultHandler implements Enumeration
 		return errorReport + "No. of errors = " + nErrors + "\n";
 	}
 
+	public void addToBeginBal(long amount)
+	{
+		beginBal += amount;
+		logger.logDebug("Chart adding " + amount + " to beginBal resulting in " + beginBal);
+	}
+
+	public void addToDeltaBal(long amount)
+	{
+		deltaBal += amount;
+		logger.logDebug("Chart adding " + amount + " to deltaBal resulting in " + deltaBal);
+	}
+
+	public long getBeginBal()
+	{
+		return beginBal;
+	}
+
+	public long getDeltaBal()
+	{
+		return deltaBal;
+	}
+
+	public long getTotalBal()
+	{
+		return beginBal + deltaBal;
+	}
+
 	/***** FOR TESTING *****/
 	public static void main(String[] args)
 	{
@@ -674,4 +705,6 @@ public class Chart extends DefaultHandler implements Enumeration
 	String maxAccountNo = "";
 	String maxAccountTitle = "";
 	String maxGroupTitle = "";
+	long beginBal = 0L;
+	long deltaBal = 0L;
 }

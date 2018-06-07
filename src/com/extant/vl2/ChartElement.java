@@ -60,7 +60,6 @@ public class ChartElement
 	public void setTotal(long total)
 	// throws VLException
 	{
-		this.total = total;
 		if (name.equals("total"))
 			this.total = total;
 		// else throw new VLException
@@ -109,5 +108,7 @@ public class ChartElement
 	Properties props;
 	int level;
 	int accountIndex;
+	long beginTotal;
+	long deltaTotal;
 	long total;
 }

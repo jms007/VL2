@@ -37,8 +37,11 @@ public class TranReport extends JDialog
 
 	private void setup() throws IOException, VLException
 	{
-		String image;
-		GLEntry glEntry;
+		// String image;
+		// GLEntry glEntry;
+		// For Debugging:
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+
 		workDir = vl2FileMan.getWorkingDirectory();
 		if (reportType == DETAIL)
 			outFilename = workDir + "DetailTranReport.txt";
@@ -55,6 +58,7 @@ public class TranReport extends JDialog
 		end = new Julian(vl2FileMan.getLatestDate());
 		sBegin = begin.toString("mm-dd-yyyy");
 		sEnd = end.toString("mm-dd-yyyy");
+		logger.logDebug("TranReport|setup: " + sBegin + " " + sEnd);
 	}
 
 	public void makeReport() throws IOException, VLException

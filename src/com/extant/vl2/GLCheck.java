@@ -43,13 +43,19 @@ public class GLCheck
 		if (fileType.equals("fixed"))
 			checkFixedFile(glFilename);
 		else if (fileType.equals("token"))
-			checkTokenFile(glFilename);
+			try
+			{
+				checkTokenFile(glFilename);
+			} catch (VLException vlx)
+			{
+				System.out.println("Exception in token file: " + vlx.getMessage());
+			}
 		else
 			logger.logFatal("GLCheck: Invalid File Type = " + fileType);
 		return nErrors;
 	}
 
-	public void checkTokenFile(String glFilename)
+	public void checkTokenFile(String glFilename) throws VLException
 	{
 		UsefulFile f;
 		String image = "";
@@ -114,11 +120,10 @@ public class GLCheck
 			finish();
 		} catch (VLException x)
 		{
-			reportError("VLException in Line " + lineNo + ": " + x.getMessage());
-			reportError(image);
+			reportError("Line " + lineNo + ": '" + image + "' " + x.getMessage());
 		} catch (IOException x)
 		{
-			reportError("IO Error in Line " + lineNo + ": " + x.getMessage());
+			System.out.println("GLCheck IO Error in Line " + lineNo + ": " + x.getMessage());
 		}
 	}
 
@@ -181,7 +186,7 @@ public class GLCheck
 		++nJournals;
 	}
 
-	private void reportJournalBal()
+	private void reportJournalBal() throws VLException
 	{
 		for (int i = 0; i < nJournals; ++i)
 			if (journalBals[i] != 0L)
@@ -194,10 +199,11 @@ public class GLCheck
 		report += msg + "\n";
 	}
 
-	private void reportError(String msg)
+	private void reportError(String msg) throws VLException
 	{
 		report += msg + "\n";
 		++nErrors;
+		throw new VLException(6, msg);
 	}
 
 	public String getReport()

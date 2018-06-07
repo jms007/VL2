@@ -116,12 +116,11 @@ public class StatementTXT extends AbstractStatement
 		// maxLineAcct is an account at the highest level with the maximum description
 		// length and maximum dollar amount
 		// Account maxLineAcct = new Account("xxx", "yyy", "0", "Description");
-		maxLineLength = 0;
-		if (chart.getShowacct())
-			maxLineLength = chart.getMaxAcctNoLength() + 1;
-		maxLineLength += chart.getMaxAccountTitleLength() + 1;
+		maxLineLength = chart.getMaxAccountTitleLength() + 1;
 		maxLineLength += chart.getIndention(reportLevel).length() + 1;
 		maxLineLength += Strings.formatPennies(MAX_DOLLAR_AMOUNT).length();
+		if (chart.getShowacct())
+			maxLineLength = chart.getMaxAcctNoLength() + 1;
 		logger.logDebug("maxLineLength=" + maxLineLength);
 		return maxLineLength;
 	}

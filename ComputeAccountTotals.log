@@ -1,0 +1,405 @@
+2018-06-03 19:34:50 [ 0] ***** ComputeAccountTotals starting 2458272~70490~06/03/2018~19:34:50*****
+2018-06-03 19:34:50 [ 0] Chart parsing is complete.
+2018-06-03 19:34:50 [11] Chart initialized without error
+2018-06-03 22:20:46 [ 0] ***** ComputeAccountTotals starting 2458272~80446~06/03/2018~22:20:46*****
+2018-06-03 22:20:46 [ 0] logLevel changed from 19 to 99
+2018-06-03 22:20:46 [ 0]    com.extant.utilities.LogFile.setLogLevel(LogFile.java:153)
+2018-06-03 22:20:46 [ 0]    com.extant.vl2.ComputeAccountTotals.initialize(ComputeAccountTotals.java:21)
+2018-06-03 22:20:46 [91] Building Chart file: C:\Users\jms\OneDrive\ACCOUNTING\EXTANT\GL18\CHART.XML
+2018-06-03 22:20:46 [91] Chart.init: chartFilename=C:\Users\jms\OneDrive\ACCOUNTING\EXTANT\GL18\CHART.XML
+2018-06-03 22:20:46 [91] ELEMENT[0]:chart
+2018-06-03 22:20:46 [91]    title=Extant LLC
+2018-06-03 22:20:46 [91]    conum=FILE E:/ACCOUNTING/EXTANT/GL17 - 100
+2018-06-03 22:20:46 [91]    date=mmmm dd, yyyy
+2018-06-03 22:20:46 [91]    edit=(,
+2018-06-03 22:20:46 [91]    format=center,skip
+2018-06-03 22:20:46 [91]    indent=3
+2018-06-03 22:20:46 [91]    shortdate=mm-dd-yy
+2018-06-03 22:20:46 [91]    showacct=N
+2018-06-03 22:20:46 [91]    version=3.0
+2018-06-03 22:20:46 [91] ELEMENT[1]:section
+2018-06-03 22:20:46 [91]    format=ending,center,skip
+2018-06-03 22:20:46 [91]    title=BALANCE SHEET
+2018-06-03 22:20:46 [91] ELEMENT[2]:group
+2018-06-03 22:20:46 [91]    format=center,skip
+2018-06-03 22:20:46 [91]    title=ASSETS
+2018-06-03 22:20:46 [91] ELEMENT[3]:group
+2018-06-03 22:20:46 [91]    title=Cash in Banks
+2018-06-03 22:20:46 [91] ELEMENT[4]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A1000
+2018-06-03 22:20:46 [91]    no=1000
+2018-06-03 22:20:46 [91]    title=JP Morgan Chase
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] Creating Account: 1000 'JP Morgan Chase'
+2018-06-03 22:20:46 [91] ELEMENT[5]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Cash in Banks
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] ELEMENT[6]:group
+2018-06-03 22:20:46 [91]    title=Accounts Receivable
+2018-06-03 22:20:46 [91] ELEMENT[7]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A1201-JMS
+2018-06-03 22:20:46 [91]    no=1201/JMS
+2018-06-03 22:20:46 [91]    title=Jan M. Smith
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] Creating Account: 1201/JMS 'Jan M. Smith'
+2018-06-03 22:20:46 [91] ELEMENT[8]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A1201-XINV
+2018-06-03 22:20:46 [91]    no=1201/XINV
+2018-06-03 22:20:46 [91]    title=Extant Investments LLC
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] Creating Account: 1201/XINV 'Extant Investments LLC'
+2018-06-03 22:20:46 [91] ELEMENT[9]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Accounts Receivable
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] ELEMENT[10]:group
+2018-06-03 22:20:46 [91]    title=Loans Receivable
+2018-06-03 22:20:46 [91] ELEMENT[11]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A1301-JMS
+2018-06-03 22:20:46 [91]    no=1301/JMS
+2018-06-03 22:20:46 [91]    title=Jan M Smith
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] Creating Account: 1301/JMS 'Jan M Smith'
+2018-06-03 22:20:46 [91] ELEMENT[12]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Loans Receivable
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] ELEMENT[13]:group
+2018-06-03 22:20:46 [91]    title=Capital Equipment
+2018-06-03 22:20:46 [91] ELEMENT[14]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A1400
+2018-06-03 22:20:46 [91]    no=1400
+2018-06-03 22:20:46 [91]    title=Merlin Aircraft N53DA
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] Creating Account: 1400 'Merlin Aircraft N53DA'
+2018-06-03 22:20:46 [91] ELEMENT[15]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Capital Equipment
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] ELEMENT[16]:group
+2018-06-03 22:20:46 [91]    title=Software
+2018-06-03 22:20:46 [91] ELEMENT[17]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A1500
+2018-06-03 22:20:46 [91]    no=1500
+2018-06-03 22:20:46 [91]    title=Extant Accounting System
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] Creating Account: 1500 'Extant Accounting System'
+2018-06-03 22:20:46 [91] ELEMENT[18]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Software
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] ELEMENT[19]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    format=skip
+2018-06-03 22:20:46 [91]    title=Total Assets
+2018-06-03 22:20:46 [91]    type=A
+2018-06-03 22:20:46 [91] ELEMENT[20]:group
+2018-06-03 22:20:46 [91]    format=center,skip
+2018-06-03 22:20:46 [91]    title=LIABILITIES & MEMBERS EQUITY
+2018-06-03 22:20:46 [91] ELEMENT[21]:group
+2018-06-03 22:20:46 [91]    title=Liabilities
+2018-06-03 22:20:46 [91] ELEMENT[22]:group
+2018-06-03 22:20:46 [91]    title=Accounts Payable
+2018-06-03 22:20:46 [91] ELEMENT[23]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A2100-XINV
+2018-06-03 22:20:46 [91]    no=2100/XINV
+2018-06-03 22:20:46 [91]    title=Extant Investments LLC
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] Creating Account: 2100/XINV 'Extant Investments LLC'
+2018-06-03 22:20:46 [91] ELEMENT[24]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A2100-JMS
+2018-06-03 22:20:46 [91]    no=2100/JMS
+2018-06-03 22:20:46 [91]    title=Jan M. Smith
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] Creating Account: 2100/JMS 'Jan M. Smith'
+2018-06-03 22:20:46 [91] ELEMENT[25]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Accounts Payable
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] ELEMENT[26]:group
+2018-06-03 22:20:46 [91]    title=Loans Payable
+2018-06-03 22:20:46 [91] ELEMENT[27]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A2200-JMS
+2018-06-03 22:20:46 [91]    no=2200/JMS
+2018-06-03 22:20:46 [91]    title=Jan M. Smith
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] Creating Account: 2200/JMS 'Jan M. Smith'
+2018-06-03 22:20:46 [91] ELEMENT[28]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Loans Payable
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] ELEMENT[29]:group
+2018-06-03 22:20:46 [91]    title=Accounts Payable
+2018-06-03 22:20:46 [91] ELEMENT[30]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A1300-XINV
+2018-06-03 22:20:46 [91]    no=1300/XINV
+2018-06-03 22:20:46 [91]    title=Extant Investments LLC
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] Creating Account: 1300/XINV 'Extant Investments LLC'
+2018-06-03 22:20:46 [91] ELEMENT[31]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Accounts Payable
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] ELEMENT[32]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Liabilities
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] ELEMENT[33]:group
+2018-06-03 22:20:46 [91]    title=Members Equity
+2018-06-03 22:20:46 [91] ELEMENT[34]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A3000-JMS
+2018-06-03 22:20:46 [91]    no=3000/JMS
+2018-06-03 22:20:46 [91]    title=Members Contributions
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] Creating Account: 3000/JMS 'Members Contributions'
+2018-06-03 22:20:46 [91] ELEMENT[35]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A3900
+2018-06-03 22:20:46 [91]    no=3900
+2018-06-03 22:20:46 [91]    title=Retained Earnings
+2018-06-03 22:20:46 [91]    type=R
+2018-06-03 22:20:46 [91] Creating Account: 3900 'Retained Earnings'
+2018-06-03 22:20:46 [91] ELEMENT[36]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Members Equity
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] ELEMENT[37]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Liabilities & Members Equity
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] ELEMENT[38]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Net Profit (Loss)
+2018-06-03 22:20:46 [91]    type=L
+2018-06-03 22:20:46 [91] ELEMENT[39]:section
+2018-06-03 22:20:46 [91]    format=newpage,period,center,skip,title
+2018-06-03 22:20:46 [91]    title=INCOME STATEMENT
+2018-06-03 22:20:46 [91] ELEMENT[40]:group
+2018-06-03 22:20:46 [91]    title=RECEIPTS
+2018-06-03 22:20:46 [91] ELEMENT[41]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A6010
+2018-06-03 22:20:46 [91]    no=6010
+2018-06-03 22:20:46 [91]    title=Receipts from Leases
+2018-06-03 22:20:46 [91]    type=I
+2018-06-03 22:20:46 [91] Creating Account: 6010 'Receipts from Leases'
+2018-06-03 22:20:46 [91] ELEMENT[42]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A6090
+2018-06-03 22:20:46 [91]    no=6090
+2018-06-03 22:20:46 [91]    title=Receipts from Insurance Claims
+2018-06-03 22:20:46 [91]    type=I
+2018-06-03 22:20:46 [91] Creating Account: 6090 'Receipts from Insurance Claims'
+2018-06-03 22:20:46 [91] ELEMENT[43]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A6099
+2018-06-03 22:20:46 [91]    no=6099
+2018-06-03 22:20:46 [91]    title=Other Receipts
+2018-06-03 22:20:46 [91]    type=I
+2018-06-03 22:20:46 [91] Creating Account: 6099 'Other Receipts'
+2018-06-03 22:20:46 [91] ELEMENT[44]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Receipts
+2018-06-03 22:20:46 [91]    type=I
+2018-06-03 22:20:46 [91] ELEMENT[45]:group
+2018-06-03 22:20:46 [91]    format=center,skip
+2018-06-03 22:20:46 [91]    title=EXPENSES
+2018-06-03 22:20:46 [91] ELEMENT[46]:group
+2018-06-03 22:20:46 [91]    title=Aircraft Repairs
+2018-06-03 22:20:46 [91] ELEMENT[47]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7001-MATHER
+2018-06-03 22:20:46 [91]    no=7001/MATHER
+2018-06-03 22:20:46 [91]    title=Mather Aviation
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7001/MATHER 'Mather Aviation'
+2018-06-03 22:20:46 [91] ELEMENT[48]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7001-WINNER
+2018-06-03 22:20:46 [91]    no=7001/WINNER
+2018-06-03 22:20:46 [91]    title=Winner Aviation
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7001/WINNER 'Winner Aviation'
+2018-06-03 22:20:46 [91] ELEMENT[49]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7001-DT
+2018-06-03 22:20:46 [91]    no=7001/DT
+2018-06-03 22:20:46 [91]    title=DynaTech Aviation
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7001/DT 'DynaTech Aviation'
+2018-06-03 22:20:46 [91] ELEMENT[50]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Aircraft Repairs
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] ELEMENT[51]:group
+2018-06-03 22:20:46 [91]    title=Aircraft Maintenance & Management
+2018-06-03 22:20:46 [91] ELEMENT[52]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7192-DT
+2018-06-03 22:20:46 [91]    no=7192/DT
+2018-06-03 22:20:46 [91]    title=DynaTech Aviation
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7192/DT 'DynaTech Aviation'
+2018-06-03 22:20:46 [91] ELEMENT[53]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7192-WINNER
+2018-06-03 22:20:46 [91]    no=7192/WINNER
+2018-06-03 22:20:46 [91]    title=Winner Aviation
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7192/WINNER 'Winner Aviation'
+2018-06-03 22:20:46 [91] ELEMENT[54]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Aircraft Maintenance & Management
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] ELEMENT[55]:group
+2018-06-03 22:20:46 [91]    title=G&A
+2018-06-03 22:20:46 [91] ELEMENT[56]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7200
+2018-06-03 22:20:46 [91]    no=7200
+2018-06-03 22:20:46 [91]    title=Organization Expenses
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7200 'Organization Expenses'
+2018-06-03 22:20:46 [91] ELEMENT[57]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7210
+2018-06-03 22:20:46 [91]    no=7210
+2018-06-03 22:20:46 [91]    title=Labor Costs
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7210 'Labor Costs'
+2018-06-03 22:20:46 [91] ELEMENT[58]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7220
+2018-06-03 22:20:46 [91]    no=7220
+2018-06-03 22:20:46 [91]    title=Legal Expense
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7220 'Legal Expense'
+2018-06-03 22:20:46 [91] ELEMENT[59]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7230
+2018-06-03 22:20:46 [91]    no=7230
+2018-06-03 22:20:46 [91]    title=Accounting Expense
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7230 'Accounting Expense'
+2018-06-03 22:20:46 [91] ELEMENT[60]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7240
+2018-06-03 22:20:46 [91]    no=7240
+2018-06-03 22:20:46 [91]    title=Office Rent
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7240 'Office Rent'
+2018-06-03 22:20:46 [91] ELEMENT[61]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7250
+2018-06-03 22:20:46 [91]    no=7250
+2018-06-03 22:20:46 [91]    title=Office Supplies
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7250 'Office Supplies'
+2018-06-03 22:20:46 [91] ELEMENT[62]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7260
+2018-06-03 22:20:46 [91]    no=7260
+2018-06-03 22:20:46 [91]    title=Travel
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7260 'Travel'
+2018-06-03 22:20:46 [91] ELEMENT[63]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7270
+2018-06-03 22:20:46 [91]    no=7270
+2018-06-03 22:20:46 [91]    title=Insurance
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7270 'Insurance'
+2018-06-03 22:20:46 [91] ELEMENT[64]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7280
+2018-06-03 22:20:46 [91]    no=7280
+2018-06-03 22:20:46 [91]    title=Fuel
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7280 'Fuel'
+2018-06-03 22:20:46 [91] ELEMENT[65]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7290
+2018-06-03 22:20:46 [91]    no=7290
+2018-06-03 22:20:46 [91]    title=Fees
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7290 'Fees'
+2018-06-03 22:20:46 [91] ELEMENT[66]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A7399
+2018-06-03 22:20:46 [91]    no=7399
+2018-06-03 22:20:46 [91]    title=Other G&A Expenses
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 7399 'Other G&A Expenses'
+2018-06-03 22:20:46 [91] ELEMENT[67]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total G&A Expenses
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] ELEMENT[68]:group
+2018-06-03 22:20:46 [91]    title=Taxes
+2018-06-03 22:20:46 [91] ELEMENT[69]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A8810
+2018-06-03 22:20:46 [91]    no=8810
+2018-06-03 22:20:46 [91]    title=Property Taxes
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 8810 'Property Taxes'
+2018-06-03 22:20:46 [91] ELEMENT[70]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A8820
+2018-06-03 22:20:46 [91]    no=8820
+2018-06-03 22:20:46 [91]    title=Income Taxes
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 8820 'Income Taxes'
+2018-06-03 22:20:46 [91] ELEMENT[71]:account
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    id=A8890
+2018-06-03 22:20:46 [91]    no=8890
+2018-06-03 22:20:46 [91]    title=Other Taxes
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] Creating Account: 8890 'Other Taxes'
+2018-06-03 22:20:46 [91] ELEMENT[72]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Taxes
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] ELEMENT[73]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Total Expenses
+2018-06-03 22:20:46 [91]    type=E
+2018-06-03 22:20:46 [91] ELEMENT[74]:total
+2018-06-03 22:20:46 [91]    amount=0
+2018-06-03 22:20:46 [91]    title=Net Profit (Loss)
+2018-06-03 22:20:46 [91]    type=I
+2018-06-03 22:20:46 [ 0] Chart parsing is complete.
+2018-06-03 22:20:46 [91] chartElements[75]=total;02;34;amount=0|type=I|title=Net Profit (Loss);
+2018-06-03 22:20:46 [11] Chart initialized without error
+2018-06-03 22:20:46 [91] Chart adding 23736651 to beginBal resulting in 23736651
+2018-06-03 22:20:46 [91] Chart adding 100000 to deltaBal resulting in 100000
+2018-06-03 22:20:46 [91] Chart adding -100000 to deltaBal resulting in 0
+2018-06-03 22:20:46 [91] Chart adding 175850 to deltaBal resulting in 175850
+2018-06-03 22:20:46 [91] Chart adding -175850 to deltaBal resulting in 0
+2018-06-03 22:20:46 [91] Chart adding 292209 to deltaBal resulting in 292209
+2018-06-03 22:20:46 [91] Chart adding -292209 to deltaBal resulting in 0
+2018-06-03 22:20:46 [91] Chart adding 3750 to deltaBal resulting in 3750
+2018-06-03 22:20:46 [91] Chart adding -3750 to deltaBal resulting in 0
+2018-06-03 22:20:46 [91] Chart adding 141984 to deltaBal resulting in 141984
+2018-06-03 22:20:46 [91] Chart adding -141984 to deltaBal resulting in 0
+2018-06-03 22:20:46 [91] Chart adding 100000 to deltaBal resulting in 100000
+2018-06-03 22:20:46 [91] Chart adding -100000 to deltaBal resulting in 0
+2018-06-03 22:20:46 [91] Chart adding 235400 to deltaBal resulting in 235400
+2018-06-03 22:20:46 [91] Chart adding -235400 to deltaBal resulting in 0
+2018-06-03 22:20:46 [91] Chart adding 117700 to deltaBal resulting in 117700
+2018-06-03 22:20:46 [91] Chart adding -117700 to deltaBal resulting in 0
+2018-06-03 22:20:46 [91] Chart adding 5000 to deltaBal resulting in 5000
+2018-06-03 22:20:46 [91] Chart adding -5000 to deltaBal resulting in 0

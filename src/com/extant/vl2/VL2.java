@@ -235,6 +235,10 @@ public class VL2 extends JFrame implements ActionListener
 		muPrintCheck.addActionListener(this);
 		muFile.add(muPrintCheck);
 
+		JMenuItem muTest = new JMenuItem("Test");
+		muTest.addActionListener(this);
+		muFile.add(muTest);
+
 		JMenuItem muExit = new JMenuItem("Exit");
 		muExit.addActionListener(this);
 		muFile.add(muExit);
@@ -358,6 +362,11 @@ public class VL2 extends JFrame implements ActionListener
 			cp2.setLocation(600, 200);
 			cp2.pack();
 			cp2.setVisible(true);
+		}
+
+		else if (command.equals("Test"))
+		{
+			new ComputeAccountTotals().initialize(chart, vl2Config);
 		}
 
 		else if (command.equals("Exit"))
@@ -506,7 +515,8 @@ public class VL2 extends JFrame implements ActionListener
 	{
 		try
 		{
-			logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+			// For Debugging:
+			// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 			logger.logDebug("Starting PDFStmt");
 			logger.logDebug("GLFile=" + vl2Config.getGLFile());
 			String outFilename = workDir + "StmtPDF.pdf";
@@ -536,7 +546,7 @@ public class VL2 extends JFrame implements ActionListener
 				outFilename = workDir + "DetailTranReport.txt";
 			else // if (reportType == TranReport.SUMMARY)
 				outFilename = workDir + "SummaryTranReport.txt";
-			TranReport tranReport = new TranReport(reportType, chart, vl2Config, logger);
+			new TranReport(reportType, chart, vl2Config, logger);
 			logger.logDebug("startTranReport: outFilename=" + outFilename);
 		} catch (IOException iox)
 		{

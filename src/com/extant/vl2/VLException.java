@@ -15,8 +15,8 @@ public class VLException extends java.lang.Exception
 	int code;
 	public static String Messages[] = { "Unknown VL Error: ", "Invalid Field Length: ", "DRCR Field is not valid: ",
 			"Amount Field is not valid: ", "Account Number contains imbedded space: ",
-			"Transaction Date is not valid: ", "One or more entries contain errors", "Internal Error: ",
-			"Error(s) in Chart File ", "File Not Found: ", "No Retained Earnings Account Found",
+			"Transaction Date is not valid: ", "GL entries contain errors", "Internal Error: ",
+			"Error(s) in Chart File ", "File Not Found: ", "Retained Earnings Account not found",
 			"Account not in Chart: ", "Chart contains duplicate Accounts", "Incorrect Version of Chart: ",
 			"Unrecognized source for EFT file: ", "Syntax error in CSV file: ", "IO Error while processing file ",
 			"Basic/Persistent Data Services Unavailable", "Invalid Record Length ", "Inconsistent Dates: ",
