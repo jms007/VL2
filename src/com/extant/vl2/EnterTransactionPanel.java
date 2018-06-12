@@ -195,7 +195,6 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 		amount = txtAmount.getText();
 		Account selectedAccount = (Account) comboAccount.getSelectedItem();
 		String accountNo = selectedAccount.getAccountNo();
-		// txtDescr.setText(txtDescr.getText().toUpperCase());
 		logger.logDebug("enter trans: accountNo=" + accountNo);
 		GLEntry glEntry = new GLEntry(jRef, GSNMan.getGSN(), "E", drcr, "100", accountNo, amount, descr,
 				transDate.toString("yymmdd"));
@@ -334,8 +333,8 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 
 	private void txtDescrKeyTyped(java.awt.event.KeyEvent evt)
 	{// GEN-FIRST:event_txtDescrKeyTyped
-		String descr = txtDescr.getText();
-		txtDescr.setText(descr.toUpperCase());
+		String descr = txtDescr.getText().toUpperCase();
+		txtDescr.setText(descr);
 		manageButtons(); // To eliminate losing focus requirement to get "Enter" button enabled
 	}// GEN-LAST:event_txtDescrKeyTyped
 

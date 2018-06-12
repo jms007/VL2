@@ -6,7 +6,7 @@ package com.extant.vl2;
  * These are the elements resulting from a parse of the XML chart.
  * All elements have a 'name' and a 'level'.  Elements which
  * represent real accounts have an index to the Account in class Chart.
- * Elements which represent totals have a total field.
+ * Elements which represent accounts or totals have total fields.
  * Other properties can be added using method putAttribute(name,value)
  *     and accessed using getAttribute(name)
  *

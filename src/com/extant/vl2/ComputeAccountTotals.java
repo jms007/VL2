@@ -3,7 +3,6 @@ package com.extant.vl2;
 import java.io.File;
 import java.io.IOException;
 import com.extant.utilities.*;
-//import java.util.Vector;
 
 public class ComputeAccountTotals
 {
@@ -74,8 +73,8 @@ public class ComputeAccountTotals
 		{
 			if (elements[i].name.equals("group"))
 				beginTotal = deltaTotal = 0L;
-			else if (elements[i].name.equals("account"))
-				beginTotal += elements[i].beginBal;
+			// else if (elements[i].name.equals("account"))
+			// beginTotal += elements[i].beginBal;
 
 		}
 	}

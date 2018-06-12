@@ -39,6 +39,9 @@ import java.awt.MediaTracker;
  */
 public class VL2 extends JFrame implements ActionListener
 {
+	public VL2()
+	{
+	}
 
 	private static VL2Config vl2Config;
 
@@ -57,7 +60,7 @@ public class VL2 extends JFrame implements ActionListener
 	// static Julian EarliestDate;
 	// static Julian LatestDate;
 	static String cashAcctNo;
-	static LogFile logger = null;
+	static LogFile logger;
 
 	XProperties aprops; // accounting props
 
@@ -427,10 +430,15 @@ public class VL2 extends JFrame implements ActionListener
 			VL2MenuFrame.setContentPane(contentPanel);
 			VL2MenuFrame.pack();
 			VL2MenuFrame.setVisible(true);
-		} else if (command.equals("Journal Entries"))
+		}
+
+		// Journal Entries
+		else if (command.equals("Journal Entries"))
 		{
+			if (logger == null)
+				System.out.println("VL:Journal Entries command: logger is null!");
 			JPanel contentPanel;
-			contentPanel = new EnterJournalTransaction(chart, vl2Config, logger);
+			contentPanel = new EnterJournalTransaction(chart, chartTree, vl2Config, logger);
 			contentPanel.setPreferredSize(new Dimension(500, 450));
 			VL2MenuFrame.setContentPane(contentPanel);
 			VL2MenuFrame.pack();
@@ -465,6 +473,7 @@ public class VL2 extends JFrame implements ActionListener
 
 	private void startTextStmt()
 	{
+		// For debugging
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		String earliestDate = vl2Config.getEarliestDate();
 		String latestDate = vl2Config.getLatestDate();
@@ -499,10 +508,12 @@ public class VL2 extends JFrame implements ActionListener
 			System.out.println("props is null!");
 		else
 			System.out.println("props is not null");
+
 		if (logger == null)
 			System.out.println("logger is null!");
 		else
 			System.out.println("logger is not null");
+
 		if (chart == null)
 			System.out.println("chart is null!");
 		else

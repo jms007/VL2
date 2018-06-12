@@ -29,7 +29,7 @@ package com.extant.vl2;
 import com.extant.utilities.Sorts;
 import com.extant.utilities.Strings;
 import com.extant.utilities.LogFile;
-import java.io.IOException;
+//import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.swing.JComboBox;

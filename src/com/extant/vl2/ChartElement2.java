@@ -7,7 +7,8 @@ package com.extant.vl2;
  * All elements have a 'name' and a 'level'.  Elements which
  * represent real accounts have an index to the Account in class Chart.
  * Elements which represent totals have a total field.
- * Other properties can be [added/retrieved] using methods [putAttribute(name,value)/getAttribute(name)]
+ * Other properties can be [added/retrieved] using methods
+ *  	[putAttribute(name,value)/getAttribute(name)]
  *
  * Created on September 10, 2006, 8:23 AM
  */
