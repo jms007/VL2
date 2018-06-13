@@ -55,18 +55,26 @@ public class ChartElement2
 					"getAccountIndex from " + name + " " + getAttribute("no"));
 	}
 
-	public void setTotal(long total) throws VLException
+	public void setBegin(long beginBal) throws VLException
 	{
 		if (name.equals("total"))
-			this.total = total;
+			this.setBegin(beginBal);
+		else
+			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "setTotal in " + name + " " + getAttribute("no"));
+	}
+
+	public void setDelta(long deltaBal) throws VLException
+	{
+		if (name.equals("total"))
+			this.setDelta(deltaBal);
 		else
 			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "setTotal in " + name + " " + getAttribute("no"));
 	}
 
 	public long getTotal() throws VLException
 	{
-		if (name.equals("total"))
-			return total;
+		if (name.equals("account") || name.equals("total"))
+			return beginBal + deltaBal;
 		else
 			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "getTotal from " + name + " " + getAttribute("no"));
 	}
@@ -104,5 +112,6 @@ public class ChartElement2
 	Properties props;
 	int level;
 	int accountIndex;
-	long total;
+	long beginBal;
+	long deltaBal;
 }

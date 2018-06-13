@@ -115,7 +115,8 @@ public class VL2 extends JFrame implements ActionListener
 		String logFilename = VL2Config.getAccountingDataDirectory() + "VL2.log";
 		logger = new LogFile(logFilename, true);
 		logger.log("Log File " + logFilename + " opened");
-		logger.log("***** STARTING VL2 " + new Julian().toString("") + " *****");
+		String version = "06-12-18";
+		logger.log("***** STARTING VL2 version " + version + " " + new Julian().toString("") + " *****");
 
 		// For Debugging
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
@@ -155,6 +156,9 @@ public class VL2 extends JFrame implements ActionListener
 		logger.logDebug("year=" + yy);
 		logger.logDebug("workDir=" + workDir);
 		// logger.logDebug("entityPropsFilename=" + entityPropsFilename);
+
+		// For Testing:
+		ComputeAccountTotals computeAccountTotals = new ComputeAccountTotals();
 
 		try
 		{

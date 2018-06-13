@@ -65,7 +65,7 @@ public class ComputeAccountTotals
 		}
 
 		// Compute totals
-		ChartElement[] elements = chart.elementList;
+		ChartElement2[] elements = chart.elementList;
 		long beginTotal;
 		long deltaTotal;
 

@@ -29,20 +29,21 @@ public class VLUtil
 {
 	static LogFile logger = VL2.logger;
 
-	public static String getAccountingRoot()
-	{
-		System.out.println("VLUtil.getAccountingRoot( ) is obsolete");
-		System.exit(1);
-
-		for (int i = 0; i < Strings.ALPHA_UPPER.length(); ++i)
-		{
-			String disk = Strings.ALPHA_UPPER.substring(i, i + 1);
-			if (new File(disk + ":\\ACCOUNTING").exists())
-				return disk + ":\\ACCOUNTING\\";
-		}
-		return null;
-	}
-
+	// Use VL2Config.getAccountingDataDirectory()
+	// public static String getAccountingRoot()
+	// {
+	// System.out.println("VLUtil.getAccountingRoot( ) is obsolete");
+	// System.exit(1);
+	//
+	// for (int i = 0; i < Strings.ALPHA_UPPER.length(); ++i)
+	// {
+	// String disk = Strings.ALPHA_UPPER.substring(i, i + 1);
+	// if (new File(disk + ":\\ACCOUNTING").exists())
+	// return disk + ":\\ACCOUNTING\\";
+	// }
+	// return null;
+	// }
+	//
 	// public static void postEntries
 	// ( Vector glEntries
 	// , String glFileName
@@ -195,14 +196,15 @@ public class VLUtil
 	 * follow this call with a call to OopStatement.ComputeTotals which will set the
 	 * totals in the appropriate ChartEntry's
 	 */
-	public static int computeAccountBalances(String glFileName, Chart chart, Julian begin, Julian end, LogFile logger)
+	public static int computeAccountBalances(String glFileName, Chart chart, String begins, String ends, LogFile logger)
 			throws IOException, VLException
 	{
 		// For debugging:
 		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
-		logger.logDebug(
-				"enter computeAccountBalances: begin=" + begin.toString("yymmdd") + "   end=" + end.toString("yymmdd"));
+		logger.logDebug("enter computeAccountBalances: begin=" + "   end=");
+		Julian begin = new Julian(begins);
+		Julian end = new Julian(ends);
 		GLEntry glEntry;
 		String currentAcctNo = "";
 		Account currentAccount = null;
@@ -223,13 +225,9 @@ public class VLUtil
 			{
 				currentAcctNo = glEntry.getAccountNo();
 				currentAccount = chart.findAcctByNo(currentAcctNo);
-				// Console.println("currentAcctNo="+currentAcctNo + " currentAccount=" +
-				// currentAccount);
 				if (currentAccount == null)
-				{
 					throw new VLException(VLException.ACCT_NOT_IN_CHART,
 							"[VLUtil.extractBalances] " + currentAcctNo + " (GL Line " + lineNo + ")");
-				}
 			}
 
 			if (glEntry.getFixedJulianDate().isEarlierThan(begin))
@@ -272,29 +270,33 @@ public class VLUtil
 
 	public void computeTotals(Chart chart)
 	{
-		ChartElement[] chartElements = chart.elementList;
-		int nElements = chartElements.length;
-		long[] levelTotals = new long[chart.getMaxLevel()];
-		int currentLevel;
-		ChartElement element;
+		ChartElement2[] chartElements = chart.getChartElementList();
+		// int nElements = chartElements.length;
+		long[][] levelTotals = new long[chart.getMaxLevel()][2]; // [level][0]=begin [level][1]=delta
+		int currentLevel = 0;
+		ChartElement2 currentElement;
+		Account currentAccount;
 		String name;
 
 		for (int i = 0; i < levelTotals.length; ++i)
-			levelTotals[i] = 0L;
-		for (int i = 0; i < nElements; ++i)
+			for (int j = 0; j < 2; ++j)
+				levelTotals[i][j] = 0L;
+		for (int i = 0; i < chartElements.length; ++i)
 		{
-			element = chartElements[i];
-			name = element.name;
-			currentLevel = element.getLevel();
-			Account currentAccount = chart.getAccount(element.accountIndex);
+			currentElement = chartElements[i];
+			name = currentElement.name;
+			currentLevel = currentElement.getLevel();
 			if (name.equals("group"))
 				++currentLevel;
 			else if (name.equals("account"))
-				levelTotals[currentLevel] += currentAccount.getEndBal();
-			else if (name.equals("total"))
 			{
-				element.setTotal(levelTotals[currentLevel]);
-				levelTotals[currentLevel] = 0L;
+				currentAccount = chart.getAccount(currentElement.accountIndex);
+				levelTotals[currentLevel][0] += currentAccount.getBeginBal();
+				levelTotals[currentLevel][1] += currentAccount.getDeltaBal();
+			} else if (name.equals("total"))
+			{
+				levelTotals[currentLevel - 1][0] = levelTotals[currentLevel][0];
+				levelTotals[currentLevel - 1][1] = levelTotals[currentLevel][1];
 				--currentLevel;
 			}
 		}

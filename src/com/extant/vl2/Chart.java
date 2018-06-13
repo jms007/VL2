@@ -55,7 +55,7 @@ public class Chart extends DefaultHandler implements Enumeration
 				throw new IOException("Input file is not of type XML");
 			this.chartFilename = chartFilename;
 			accounts = new Vector<Account>(500, 100);
-			chartElements = new Vector<ChartElement>(500, 100);
+			chartElements = new Vector<ChartElement2>(500, 100);
 			maxLevel = 0;
 			elementCount = 0;
 			level = 0;
@@ -133,10 +133,12 @@ public class Chart extends DefaultHandler implements Enumeration
 		 * logger.logDebug(logMessage); /***** END OF TEST
 		 *****/
 
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		// For Debugging
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+
 		logger.logDebug("ELEMENT[" + elementCount + "]:" + eName);
-		ChartElement chartElement;
-		chartElement = new ChartElement(eName, level, accounts.size());
+		ChartElement2 chartElement;
+		chartElement = new ChartElement2(eName, level, accounts.size());
 		for (int i = 0; i < attrs.getLength(); ++i)
 		{
 			String aName = attrs.getLocalName(i);
@@ -217,7 +219,7 @@ public class Chart extends DefaultHandler implements Enumeration
 		if (qName.trim().equals("chart"))
 		{
 			logger.log("Chart parsing is complete.");
-			elementList = new ChartElement[chartElements.size()];
+			elementList = new ChartElement2[chartElements.size()];
 			// Show the last element (if debug)
 			logger.logDebug("chartElements[" + chartElements.size() + "]=" + chartElements.lastElement().toString());
 			// Copy all ChartElement's from chartElements to elementList
@@ -231,7 +233,7 @@ public class Chart extends DefaultHandler implements Enumeration
 		--level;
 	}
 
-	public ChartElement[] getChartElementList()
+	public ChartElement2[] getChartElementList()
 	{
 		return elementList;
 	}
@@ -387,11 +389,11 @@ public class Chart extends DefaultHandler implements Enumeration
 		return descrs;
 	}
 
-	public ChartElement[] getElementList()
+	public ChartElement2[] getElementList()
 	{
-		ChartElement elementList[] = new ChartElement[chartElements.size()];
+		ChartElement2 elementList[] = new ChartElement2[chartElements.size()];
 		for (int i = 0; i < elementList.length; ++i)
-			elementList[i] = (ChartElement) chartElements.elementAt(i);
+			elementList[i] = (ChartElement2) chartElements.elementAt(i);
 		return elementList;
 	}
 
@@ -678,10 +680,10 @@ public class Chart extends DefaultHandler implements Enumeration
 	int nErrors;
 	String errorReport;
 	int level;
-	ChartElement[] elementList;
+	ChartElement2[] elementList;
+	Vector<ChartElement2> chartElements;
 	private int elementCount;
 	private Vector<Account> accounts;
-	private Vector<ChartElement> chartElements;
 	private int nAccounts;
 	private int acctsByChartP[];
 	private int acctsByNumberP[];

@@ -74,7 +74,8 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 			throws ParserConfigurationException, SAXException, IOException, VLException
 	{
 		this.logger = logger;
-		if (logger == null) {
+		if (logger == null)
+		{
 			System.out.println("ChartTree constructor: logger is null");
 			System.exit(1);
 		}
@@ -107,7 +108,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 	 * elementList; }
 	 */
 
-	private JTree buildTree(ChartElement elementList[]) throws VLException
+	private JTree buildTree(ChartElement2 elementList[]) throws VLException
 	{
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		root = new ChartTreeNode(elementList[0]);
@@ -126,12 +127,14 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 		return tree;
 	}
 
-	private int build(ChartElement elementList[], int index, ChartTreeNode parent, int level) throws VLException
+	private int build(ChartElement2 elementList[], int index, ChartTreeNode parent, int level) throws VLException
 	{
 		logger.logDebug("entering build  index=" + index);
-		while (elementList[index].getLevel() == level) {
+		while (elementList[index].getLevel() == level)
+		{
 			logger.logDebug("processing " + elementList[index].toString() + "  index=" + index + "  level=" + level);
-			if (isElement(elementList[index], new String[] { "chart", "section", "group" })) {
+			if (isElement(elementList[index], new String[] { "chart", "section", "group" }))
+			{
 				logger.logDebug("adding expandable node to " + parent.toString() + ": " + elementList[index]);
 				ChartTreeNode x = new ChartTreeNode(elementList[index]);
 				parent.add(x);
@@ -139,10 +142,12 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 				logger.logDebug("continuing build  index=" + index + "  level=" + level);
 				if (index >= elementList.length)
 					return index;
-			} else { // Either an Account or a Total element
+			} else
+			{ // Either an Account or a Total element
 				logger.logDebug("processing " + elementList[index].toString());
 				String title = elementList[index].getAttribute("title");
-				if (!title.startsWith("*****")) { // Bypass warnings
+				if (!title.startsWith("*****"))
+				{ // Bypass warnings
 					logger.logDebug("adding node to " + parent.toString() + ": " + elementList[index]);
 					ChartTreeNode accountNode = new ChartTreeNode(elementList[index]);
 					parent.add(accountNode);
@@ -178,7 +183,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 		return elementList;
 	}
 
-	private String formatNode(ChartElement element, String nodeDescrSpec) throws VLException
+	private String formatNode(ChartElement2 element, String nodeDescrSpec) throws VLException
 	{
 		String nodeData = "";
 		// There are no options for the text-only elements
@@ -187,25 +192,30 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 			return element.getAttribute("title");
 
 		String attributeValue = null;
-		if (nodeDescrSpec.contains("no")) {
+		if (nodeDescrSpec.contains("no"))
+		{
 			attributeValue = element.getAttribute("no");
 			if (attributeValue != null)
 				nodeData += "[" + attributeValue + "] ";
 		}
-		if (nodeDescrSpec.contains("title")) {
+		if (nodeDescrSpec.contains("title"))
+		{
 			attributeValue = element.getAttribute("title");
 			if (attributeValue != null)
 				nodeData += attributeValue + " ";
 		}
-		if (nodeDescrSpec.contains("type")) {
+		if (nodeDescrSpec.contains("type"))
+		{
 			attributeValue = element.getAttribute("type");
 			if (attributeValue != null)
 				nodeData += "'" + attributeValue + "' ";
 		}
 
-		if (element.getName().equals("account") || element.getName().equals("total")) {
+		if (element.getName().equals("account") || element.getName().equals("total"))
+		{
 			// String formatAmount = "??1";
-			if (nodeDescrSpec.contains("amount")) {
+			if (nodeDescrSpec.contains("amount"))
+			{
 				long amount = 0L;
 				if (element.getName().equals("account"))
 					amount = chart.getAccount(element.getAccountIndex()).getEndBal();
@@ -258,7 +268,8 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 	{
 		int button = e.getButton();
 		int clickCount = e.getClickCount();
-		if (selectedNode != null) {
+		if (selectedNode != null)
+		{
 			// Console.println( "dispatch button " + button + " " + clickCount + " click(s)
 			// on " + selectedNode.toString() );
 			// Send message only if this is an account node
@@ -301,8 +312,10 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 		Object[] listeners = listenerList.getListenerList();
 		// Process the listeners last to first, notifying
 		// those that are interested in this event
-		for (int i = listeners.length - 2; i >= 0; i -= 2) {
-			if (listeners[i] == PropertyChangeListener.class) {
+		for (int i = listeners.length - 2; i >= 0; i -= 2)
+		{
+			if (listeners[i] == PropertyChangeListener.class)
+			{
 				// Lazily create the event:
 				// if (propertyChangeEvent == null)
 				// fooEvent = new FooEvent(this);
@@ -321,7 +334,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 		listenerList.remove(PropertyChangeListener.class, listener);
 	}
 
-	public static boolean isElement(ChartElement element, String[] elementNames)
+	public static boolean isElement(ChartElement2 element, String[] elementNames)
 	{
 		for (int i = 0; i < elementNames.length; ++i)
 			if (element.name.equals(elementNames[i]))
@@ -346,7 +359,8 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 	/***** FOR TESTING *****/
 	public static void main(String[] args)
 	{
-		try {
+		try
+		{
 			Clip clip = new Clip(args,
 					new String[] { "d=E:\\ACCOUNTING\\EXTANT\\GL17\\", "p=E:\\ACCOUNTING\\EXTANT\\EXTANT.properties" });
 			LogFile logger = new LogFile();
@@ -367,37 +381,41 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 			// ( XProperties props, String chartFilename, Julian begin, Julian end, LogFile
 			// logger )
 			// ChartTree chartTree = new ChartTree(props, chart, logger);
-			ChartElement elements[] = chart.getElementList();
+			ChartElement2 elements[] = chart.getElementList();
 			// new DisplayTree( "Chart of Accounts", tree, new Point(200,200), new
 			// Dimension(400, 1000) );
 			ViewTree viewTree = new ViewTree("View Chart Tree", tree);
-		} catch (Throwable x) {
+		} catch (Throwable x)
+		{
 			x.printStackTrace();
 		}
 	}
 
 	/***** END OF TEST *****/
 
-	public class ChartTreeNode extends DefaultMutableTreeNode {
-		ChartElement element;
+	public class ChartTreeNode extends DefaultMutableTreeNode
+	{
+		ChartElement2 element;
 		String no;
 		String descr;
 
-		public ChartTreeNode(ChartElement element)
+		public ChartTreeNode(ChartElement2 element)
 		{
 			this.element = element;
 		}
 
-		public ChartElement getElement()
+		public ChartElement2 getElement()
 		{
 			return element;
 		}
 
 		public String toString()
 		{
-			try {
+			try
+			{
 				return formatNode(element, NODE_DESCR_SPEC);
-			} catch (VLException vlx) {
+			} catch (VLException vlx)
+			{
 				return "<ERROR>";
 			}
 		}
