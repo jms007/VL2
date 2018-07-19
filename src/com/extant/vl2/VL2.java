@@ -207,6 +207,7 @@ public class VL2 extends JFrame implements ActionListener
 		// String workDir = vl2Config.getWorkingDirectory();
 		// VLUtil.showElementList(chart, workDir + "ElementList.txt");
 
+		// For Debugging - BuildDetailedStatusReport has been disabled
 		// Build Detailed Status Report & Show results
 		// VL2DetailedStatusReport vl2DetailedStatusReport = new
 		// VL2DetailedStatusReport();
