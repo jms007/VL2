@@ -161,7 +161,7 @@ public class VLUtil
 	public static void computeElementTotals(Chart chart)
 	{
 		// For debugging
-		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
 		Vector<ChartElement2> chartElements = chart.getChartElements();
 		logger.logDebug("maxLevel=" + chart.getMaxLevel());
@@ -242,7 +242,7 @@ public class VLUtil
 				logger.logDebug("Promoting these totals to update level " + (currentElementLevel - 1));
 				levelTotals[currentElementLevel - 1][0] += currentElement.beginBal;
 				levelTotals[currentElementLevel - 1][1] += currentElement.deltaBal;
-				logger.log("zeroing totals in level " + currentElementLevel);
+				logger.logDebug("zeroing totals in level " + currentElementLevel);
 				levelTotals[currentElementLevel][0] = 0L;
 				levelTotals[currentElementLevel][1] = 0L;
 			}

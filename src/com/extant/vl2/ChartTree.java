@@ -173,7 +173,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 		String nodeData = "";
 
 		// For Debugging
-		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
 		// logger.logDebug("Enter formatNode: nodeDescrSpec=" + nodeDescrSpec);
 
