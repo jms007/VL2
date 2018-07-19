@@ -32,12 +32,12 @@ public class Account
 						// E - Expense
 						// R - Retained Earnings/Net Worth
 	String title;
-	public long beginBal = 0L;
-	public long deltaBal = 0L;
+	int elementIndex;
+
 	Vector<GLEntry> glEntries = new Vector<GLEntry>(100, 100);
 	LogFile logger = VL2.logger;
 
-	public Account(String accountNo, String accountLevel, String accountType, String title)
+	public Account(String accountNo, String accountLevel, String accountType, String title, int elementIndex)
 	{
 		this.accountNo = accountNo;
 		if (this.accountNo == null)
@@ -45,6 +45,7 @@ public class Account
 		this.accountLevel = com.extant.utilities.Strings.parseInt(accountLevel);
 		this.accountType = accountType;
 		this.title = title;
+		this.elementIndex = elementIndex;
 	}
 
 	// public Account
@@ -84,6 +85,11 @@ public class Account
 	public String getAccountNo()
 	{
 		return accountNo;
+	}
+
+	public int getAccountElementIndex()
+	{
+		return elementIndex;
 	}
 
 	// public String getSubAccount()
@@ -126,55 +132,51 @@ public class Account
 		this.title = title;
 	}
 
-	public void zeroBalances()
-	{
-		beginBal = deltaBal = 0L;
-		// glEntries.removeAllElements();
-	}
-
+	// public void zeroBalances()
+	// {
+	// beginBal = deltaBal = 0L;
+	// // glEntries.removeAllElements();
+	// }
+	//
 	public void removeGLEntries()
 	{
 		glEntries.removeAllElements();
 	}
 
-	// 5-10-03 The next 3 methods (addToBal, addToBeginBal, and addToDeltaBal)
-	// are not currently used and have not been tested.
-	// 6- 3-18 These methods are now used by class ComputeAccountTotals
-
-	public void addToBal(GLEntry glEntry)
-	{
-		long value = glEntry.getSignedAmount();
-		if (glEntry.getField("JREF").equals("BALF"))
-			addToBeginBal(value);
-		else
-			addToDeltaBal(value);
-	}
-
-	public void addToBeginBal(long value)
-	{
-		beginBal += value;
-	}
-
-	public void addToDeltaBal(long value)
-	{
-		deltaBal += value;
-	}
-
-	public long getBeginBal()
-	{
-		return beginBal;
-	}
-
-	public long getDeltaBal()
-	{
-		return deltaBal;
-	}
-
-	public long getEndBal()
-	{
-		return beginBal + deltaBal;
-	}
-
+	// public void addToBal(GLEntry glEntry)
+	// {
+	// long amount = glEntry.getSignedAmount();
+	// if (glEntry.getField("JREF").equalsIgnoreCase("BALF"))
+	// addToBeginBal(amount);
+	// else
+	// addToDeltaBal(amount);
+	// }
+	//
+	// public void addToBeginBal(long value)
+	// {
+	// beginBal += value;
+	// }
+	//
+	// public void addToDeltaBal(long value)
+	// {
+	// deltaBal += value;
+	// }
+	//
+	// public long getBeginBal()
+	// {
+	// return beginBal;
+	// }
+	//
+	// public long getDeltaBal()
+	// {
+	// return deltaBal;
+	// }
+	//
+	// public long getEndBal()
+	// {
+	// return beginBal + deltaBal;
+	// }
+	//
 	public void addGLEntry(GLEntry glEntry)
 	{
 		glEntries.addElement(glEntry);
@@ -182,7 +184,6 @@ public class Account
 
 	public String toString()
 	{
-		return accountNo + " " + title + " begin=" + Strings.formatPennies(beginBal) + " delta="
-				+ Strings.formatPennies(deltaBal);
+		return accountNo + " " + title;
 	}
 }

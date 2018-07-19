@@ -1,23 +1,7 @@
 package com.extant.vl2;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import com.extant.utilities.XProperties;
-
-//EntityName=JMS
-//EntityLongName=JAN M. SMITH
-//CurrentYear=17
-//EntityRoot=accountingRoot\\JMS\\
-//WorkDir=GL17\\
-//ChartFile=CHART.XML
-//CustomerList=CUSTOMER.LST
-//VendorList=VENDOR.LST
-//ContactsList=CONTACTS.LST
-//GLFile=GL0010.DAT
-//CheckRegFile=GL0020.DAT
-//GSNFile=gsnNVFile.txt
-//CashAcctNo=0010
 
 public class VL2Config
 {
@@ -30,25 +14,23 @@ public class VL2Config
 
 	private final String accountingDataDir;
 	private final String entityName;
-	private final String currentYear;
+	String currentYear; // Set after user enters yy or confirms default
 	private XProperties props;
 	private String earliestDate;
 	private String latestDate;
+	private String nextGSN;
 
-	public VL2Config(String entityName, String currentYear) throws IOException
+	public VL2Config(String propFilename, String entityName) throws IOException
 	{
 		this.accountingDataDir = getAccountingDataDirectory();
 		this.entityName = entityName;
-		this.currentYear = currentYear;
-		String propFile = accountingDataDir + entityName + "\\" + entityName + ".properties";
-		try
-		{
-			VL2.logger.logDebug("Properties:46" + "Reading properties file: " + propFile);
-			props = new XProperties(propFile);
-		} catch (Exception x)
-		{
-			VL2.logger.logFatal("Unable to find " + entityName + "/" + currentYear);
-		}
+		VL2.logger.logDebug("Properties:46" + "Reading properties file: " + propFilename);
+		props = new XProperties(propFilename);
+	}
+
+	void setCurrentYear(String yy)
+	{
+		currentYear = yy;
 	}
 
 	public void listAllProperties()
@@ -148,6 +130,16 @@ public class VL2Config
 	public void setLatestDate(String latestDate)
 	{
 		this.latestDate = latestDate;
+	}
+
+	public void setNextGSN(String GSN)
+	{
+		this.setNextGSN(GSN);
+	}
+
+	public String getNextGSN()
+	{
+		return nextGSN;
 	}
 
 }

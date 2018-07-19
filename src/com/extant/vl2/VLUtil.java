@@ -8,18 +8,15 @@
 package com.extant.vl2;
 
 import com.extant.utilities.UsefulFile;
+//import com.lowagie.text.ElementListener; TODO REMOVE
 import com.extant.utilities.Julian;
-import com.extant.utilities.Strings;
 import com.extant.utilities.LogFile;
-import java.io.File;
+import com.extant.utilities.Strings;
+
 import java.io.IOException;
 import java.util.Vector;
-import java.util.Enumeration;
-import java.util.StringTokenizer;
-import java.sql.SQLException;
-import javax.swing.JComboBox;
-//import com.extant.dbTools.RemoteFileMan;
-//import com.extant.dbTools.DBException;
+//import java.util.Enumeration; TODO REMOVE
+//import java.util.Vector; TODO REMOVE
 
 /**
  *
@@ -29,276 +26,282 @@ public class VLUtil
 {
 	static LogFile logger = VL2.logger;
 
-	// Use VL2Config.getAccountingDataDirectory()
-	// public static String getAccountingRoot()
+	// /*
+	// * postToAccounts processes the GLFile to compute the beginning balance
+	// * (transactions in journal BALF) and the delta amount (the remaining
+	// * transactions up to and including the latest date) for each account. These
+	// * values are stored in the Account fields beginBal and deltaBal respectively.
+	// *
+	// * If a transaction in the GLFile refers to an account which is not in the
+	// * Chart, a VLException is thrown.
+	// *
+	// * This method does not compute total amounts.
+	// */
+	// public static void postToAccounts(String glFileName, Chart chart, LogFile
+	// logger) throws IOException, VLException
 	// {
-	// System.out.println("VLUtil.getAccountingRoot( ) is obsolete");
-	// System.exit(1);
+	// // For debugging:
+	// // logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 	//
-	// for (int i = 0; i < Strings.ALPHA_UPPER.length(); ++i)
-	// {
-	// String disk = Strings.ALPHA_UPPER.substring(i, i + 1);
-	// if (new File(disk + ":\\ACCOUNTING").exists())
-	// return disk + ":\\ACCOUNTING\\";
-	// }
-	// return null;
-	// }
-	//
-	// public static void postEntries
-	// ( Vector glEntries
-	// , String glFileName
-	// , RemoteFileMan remoteFileMan
-	// , Julian postTime
-	// )
-	// throws IOException, DBException, SQLException
-	// {
-	// // Build GL File images
-	// Vector images = new Vector( glEntries.size() );
-	// for (int i=0; i<glEntries.size(); ++i)
-	// images.addElement( ((GLEntry)glEntries.elementAt( i )).buildRecord() );
-	// // Add records to remote file first, in case it fails (4-30-06)
-	// if ( remoteFileMan != null )
-	// remoteFileMan.addRecords( glFileName, images, postTime );
-	// // THEN Add records to local file
-	// UsefulFile glFile = new UsefulFile( glFileName, "w+" );
-	// for (int i=0; i<images.size(); ++i)
-	// glFile.println( (String)images.elementAt( i ) );
-	// glFile.close();
-	// }
-
-	/*
-	 * fixDate returns a valid Julian date for the intentional invalid dates used in
-	 * GL files: for yy0100 fixDate returns 12/31/<yy-1> for yy1232 fixDate returns
-	 * 1/1/<yy+1> for valid dates, fixDate just returns the valid Julian
-	 *
-	 * Actually, we may not need this at all ... Julian seems to do this without
-	 * coaching.
-	 */
-	public static Julian fixDate(String sDate)
-	{
-		// LogFile logger = VL2.logger;
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-		logger.logDebug("fixDate: sDate=" + sDate);
-		if (Julian.isValid(sDate))
-			return new Julian(sDate);
-		Julian thisDate;
-		if (sDate.substring(4).equals("00"))
-		{ // Change xx0100 to (xx-1)1231
-			sDate = sDate.substring(0, 4) + "01";
-			thisDate = new Julian(sDate).addDays(-1L);
-			// Do the return here, because if you wait, you will get a big surprise
-			return thisDate;
-		} else if (sDate.substring(4).equals("32"))
-			;
-		{ // Change xx1232 to (xx+1)0101
-			sDate = sDate.substring(0, 4) + "31";
-			thisDate = new Julian(sDate).addDays(1L);
-			return thisDate;
-		}
-	}
-
-	/*
-	 * The glExtract methods return a vector of GLEntry objects which meet the
-	 * specified selection criteria, sorted by account, subAccount, date. For each
-	 * (cols,data) pair, the entry is selected if the gl record contains the String
-	 * data[i] starting in column cols[i].
-	 *
-	 * Except for glExtract( String glFileName, int cols[], String data[], Julian
-	 * begin, Julian end ) these routines have not been tested and are not currently
-	 * (11-29-02) used.
-	 */
-
-	// public static Vector glExtract( String glFileName, String fieldName, String
-	// equals )
-	// throws IOException
-	// {
-	// return glExtract( glFileName, fieldName, equals, null, null );
-	// }
-	//
-	// public static Vector glExtract( String glFileName, String fieldName, String
-	// equals, Julian begin, Julian end )
-	// throws IOException
-	// {
-	// return glExtract( glFileName,
-	// new int[] {GLEntry.pStart[GLEntry.getFieldIndex( fieldName )]},
-	// new String[] { equals },
-	// begin, end );
-	// }
-	//
-	// public static Vector glExtract( String glFileName, int cols[], String data[]
-	// )
-	// throws IOException
-	// {
-	// return glExtract( glFileName, cols, data, null, null );
-	// }
-	//
-	// public static Vector glExtract( String glFileName, int cols[], String data[],
-	// Julian begin, Julian end )
-	// throws IOException, VLException
-	// {
-	// Vector entries = new Vector( 100, 1000 );
-	// String image="";
-	// Julian date;
 	// GLEntry glEntry;
-	// int pDateStart = GLEntry.pStart[GLEntry.getFieldIndex( GLEntry.DATE )];
-	// int pDateStop = GLEntry.pEnd [GLEntry.getFieldIndex( GLEntry.DATE )];
-	// UsefulFile glFile = new UsefulFile( glFileName, "r" );
-	// while ( !glFile.EOF() )
-	// {
-	// image = glFile.readLine( UsefulFile.ALL_WHITE );
-	// if ( image.length() < 3 ) continue;
-	// boolean match = true;
-	// if ( cols != null )
-	// {
-	// for (int i=0; i<cols.length; ++i)
-	// {
-	// if ( image.substring( cols[i] ).startsWith( data[i] ) ) continue;
-	// match = false;
-	// break;
-	// }
-	// }
-	// if ( !match ) continue;
-	// // Now check the date
-	// date = fixDate( image.substring( pDateStart, pDateStop + 1 ) );
-	// if ( begin != null ) if ( date.isEarlierThan( begin ) ) continue;
-	// if ( end != null ) if ( date.isLaterThan( end ) ) continue;
-	// entries.addElement( new GLEntry( image ) );
-	// }
-	// glFile.close();
+	// Julian startDate = null;
+	// Julian endDate = null;
+	// Julian transDate;
+	// String type;
+	// boolean plType;
+	// String currentAcctNo = "";
+	// Account currentAccount = null;
+	// int currentElementIndex;
+	// ChartElement2 currentElement = null;
+	// long amount;
 	//
-	// // Now sort by ACCOUNT, SUBACCOUNT, DATE
-	// int fieldP[] = new int[6];
-	// fieldP[0] = GLEntry.pStart[GLEntry.getFieldIndex( GLEntry.ACCOUNT )];
-	// fieldP[1] = GLEntry.pEnd [GLEntry.getFieldIndex( GLEntry.ACCOUNT )];
-	// fieldP[2] = GLEntry.pStart[GLEntry.getFieldIndex( GLEntry.SUBACCOUNT )];
-	// fieldP[3] = GLEntry.pEnd [GLEntry.getFieldIndex( GLEntry.SUBACCOUNT )];
-	// fieldP[4] = GLEntry.pStart[GLEntry.getFieldIndex( GLEntry.DATE )];
-	// fieldP[5] = GLEntry.pEnd [GLEntry.getFieldIndex( GLEntry.DATE )];
-	// int sortP[] = Sorts.sort( entries, fieldP );
-	// Vector sortedEntries = new Vector( entries.size() );
-	// for (int i=0; i<entries.size(); ++i)
-	// sortedEntries.addElement( entries.elementAt( sortP[i] ) );
-	// return sortedEntries;
+	// // chart.clearAccountBalances();
+	// // chart.removeGLEntries(); // !! Are you sure ??
+	// Account plAccount = chart.getPLAccount();
+	// if (plAccount == null)
+	// logger.logFatal("VLUtil:170 plAccount is null!");
+	// int plIndex = plAccount.elementIndex;
+	// ChartElement2 plElement = chart.chartElements.elementAt(plIndex);
+	// UsefulFile glFile = new UsefulFile(glFileName, "r");
+	// String maxDescr = "";
+	// int maxDescrLength = 0;
+	// int lineNo = 0;
+	// while (!glFile.EOF())
+	// {
+	// glEntry = new GLEntry(glFile.readLine(UsefulFile.ALL_WHITE));
+	// ++lineNo;
+	// logger.log("VLUtil.PostToAccounts: Line " + lineNo + " GLEntry:" +
+	// glEntry.toString());
+	// transDate = new Julian(glEntry.getField("DATE"));
+	// if (glEntry.getField("JREF").equals("BALF"))
+	// if (startDate == null)
+	// startDate = transDate;
+	// else if (!transDate.isEqualTo(startDate))
+	// logger.logFatal("BALF transactions have varying dates");
+	// if (endDate == null)
+	// endDate = transDate;
+	// else if (transDate.isLaterThan(endDate))
+	// endDate = transDate;
+	// if (!glEntry.getAccountNo().equals(currentAcctNo))
+	// {
+	// currentAcctNo = glEntry.getAccountNo();
+	// currentAccount = chart.findAcctByNo(currentAcctNo);
+	// if (currentAccount == null)
+	// throw new VLException(VLException.ACCT_NOT_IN_CHART,
+	// "VLUtil.postToAccounts: " + currentAcctNo + " (GL Line " + lineNo + ")");
+	// currentElementIndex = currentAccount.elementIndex;
+	// currentElement = chart.chartElements.elementAt(currentElementIndex);
 	// }
+	//
+	// // Process this transaction
+	// amount = glEntry.getSignedAmount();
+	// type = currentAccount.getType();
+	// plType = type.equals("I") || type.equals("E");
+	//
+	// if (glEntry.getField("JREF").equals("BALF"))
+	// {
+	// // Add this transaction amount to the element beginBal
+	// currentElement.beginBal += amount;
+	//
+	// // Add Income & Expense items to P/L Element Begin balance
+	// if (plType)
+	// plElement.beginBal += amount;
+	// } else
+	// // Add this transaction amount to the element deltaBal
+	// plElement.deltaBal += amount;
+	//
+	// // Add Income & Expense items to P/L element Delta balance
+	// if (plType)
+	// plElement.deltaBal += amount;
+	//
+	// if (glEntry.getDescrLength() > maxDescrLength)
+	// {
+	// maxDescr = glEntry.getDescr();
+	// maxDescrLength = maxDescr.length();
+	// }
+	// } // End of GL transactions
+	// glFile.close();
+	// logger.logInfo("VLUtil.postToAccounts: last GLEntry processed");
+	//
+	// // // Transfer the computed Account balances to the matching elements
+	// // // Enumeration<Account> accounts;
+	// // logger.logInfo("starting transfer balances to elements");
+	// // Vector<Account> accounts = chart.accounts;
+	// // // while (accounts.hasMoreElements())
+	// // for (int i = 0; i < accounts.size(); ++i)
+	// // {
+	// // currentAccount = accounts.elementAt(i);
+	// // currentAcctNo = currentAccount.getAccountNo();
+	// // ChartElement2 chartElement = mapChartAccountToElement(chart,
+	// currentAcctNo);
+	// // logger.logInfo("transfering account " + currentAcctNo + " to element " +
+	// // chartElement.toString());
+	// // chartElement.setBeginBal(currentAccount.getBeginBal());
+	// // chartElement.setDeltaBal(currentAccount.getDeltaBal());
+	// // }
+	// // logger.logInfo("transfer complete; now handle pl account");
+	// // // Now add a fake closing transaction to Net Worth Account
+	// // // to make Statement show the correct ending balance in that Account
+	// // String s = Strings.formatPennies(-plAccount.getDeltaBal());
+	// // logger.logDebug("VLUtil.postToAccounts s=" + s);
+	// //
+	// // String plAccountNo = plAccount.getAccountNo();
+	// // GLEntry netIncome = new GLEntry("CLOS", " 0", "E", "C", "100",
+	// plAccountNo,
+	// // s, "Computed Net Income",
+	// // endDate.toString("yymmdd"));
+	// // plAccount.addGLEntry(netIncome);
+	// // ChartElement2 plElement = mapChartAccountToElement(chart, plAccountNo);
+	// //
+	// logger.logDebug("postToAccounts normal completion");
+	// }
+	//
+	// Compute totals in ElementList
 
-	/*
-	 * computeAccountBalances processes the GLFile to compute the beginning balance
-	 * (as of the begin date) and the delta amount (up to and including the end
-	 * date) for each account contained in the chart. These values are stored in
-	 * beginBal and deltaVal fields in the Account.
-	 * 
-	 * All transactions between begin date and end date are attached to the account.
-	 *
-	 * If a transaction is found in the GL for an account which is not in the chart,
-	 * a VLException is thrown.
-	 *
-	 * This method does not compute total amounts. If you need the total amounts,
-	 * follow this call with a call to OopStatement.ComputeTotals which will set the
-	 * totals in the appropriate ChartEntry's
-	 */
-	public static int computeAccountBalances(String glFileName, Chart chart, String begins, String ends, LogFile logger)
-			throws IOException, VLException
+	public static void computeElementTotals(Chart chart)
 	{
-		// For debugging:
+		// For debugging
 		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
-		logger.logDebug("enter computeAccountBalances: begin=" + "   end=");
-		Julian begin = new Julian(begins);
-		Julian end = new Julian(ends);
-		GLEntry glEntry;
-		String currentAcctNo = "";
-		Account currentAccount = null;
-		chart.clearAccountBalances();
-		chart.removeGLEntries(); // !! Are you sure ??
-		Account plAccount = chart.getPLAccount();
-		if (plAccount == null)
-			logger.log("VLUtil:189 plAccount is null!");
-		UsefulFile glFile = new UsefulFile(glFileName, "r");
-		int maxDescrLength = 0;
-		int lineNo = 0;
-		while (!glFile.EOF())
-		{
-			glEntry = new GLEntry(glFile.readLine(UsefulFile.ALL_WHITE));
-			++lineNo;
-			logger.logDebug("Line " + lineNo + " GLEntry:" + glEntry.toString());
-			if (!glEntry.getAccountNo().equals(currentAcctNo))
-			{
-				currentAcctNo = glEntry.getAccountNo();
-				currentAccount = chart.findAcctByNo(currentAcctNo);
-				if (currentAccount == null)
-					throw new VLException(VLException.ACCT_NOT_IN_CHART,
-							"[VLUtil.extractBalances] " + currentAcctNo + " (GL Line " + lineNo + ")");
-			}
-
-			if (glEntry.getFixedJulianDate().isEarlierThan(begin))
-			{
-				// Add these transactions to beginBal
-				currentAccount.addToBeginBal(glEntry.getSignedAmount());
-				// Add Income & Expense items to P/L Account Begin balance
-				if (currentAccount.getType().equals("I") || currentAccount.getType().equals("E"))
-					plAccount.addToBeginBal(glEntry.getSignedAmount());
-			} else if (!glEntry.getFixedJulianDate().isLaterThan(end))
-			{
-				// Add this transaction to the account deltaBal
-				currentAccount.addGLEntry(glEntry);
-				currentAccount.addToDeltaBal(glEntry.getSignedAmount());
-				// Add Income & Expense items to P/L Account Delta balance
-				if (currentAccount.getType().equals("I") || currentAccount.getType().equals("E"))
-				{
-					long pl = glEntry.getSignedAmount();
-					plAccount.addToDeltaBal(pl);
-					logger.logDebug("adding " + Strings.formatPennies(pl));
-				}
-				if (glEntry.getDescrLength() > maxDescrLength)
-					maxDescrLength = glEntry.getDescrLength();
-			}
-			// else the transaction date is after end date and thus has no effect
-		}
-		glFile.close();
-		// Now add a fake closing transaction to Net Worth Account
-		// to make Statement show the correct ending balance in that Account
-
-		String s = Strings.formatPennies(-plAccount.getDeltaBal());
-		logger.logDebug("VLUtil.computeAccountBalances: s=" + s);
-
-		GLEntry netIncome = new GLEntry("CLOS", "  0", "E", "C", "100", plAccount.getAccountNo(), s,
-				"Computed Net Income", end.toString("yymmdd"));
-		plAccount.addGLEntry(netIncome);
-		logger.logDebug("extractBalances normal completion");
-		return maxDescrLength;
-	}
-
-	public void computeTotals(Chart chart)
-	{
-		ChartElement2[] chartElements = chart.getChartElementList();
-		// int nElements = chartElements.length;
-		long[][] levelTotals = new long[chart.getMaxLevel()][2]; // [level][0]=begin [level][1]=delta
-		int currentLevel = 0;
+		Vector<ChartElement2> chartElements = chart.getChartElements();
+		logger.logDebug("maxLevel=" + chart.getMaxLevel());
+		long[][] levelTotals = new long[chart.getMaxLevel() + 1][2]; // [level][0]=begin [level][1]=delta
+		int maxLevel = chart.getMaxLevel();
+		logger.log("levelTotals dimensions=" + (maxLevel + 1) + " x 2  for begin & delta");
+		String[] levelTitles = new String[maxLevel + 1];
 		ChartElement2 currentElement;
-		Account currentAccount;
-		String name;
+		String currentElementName;
+		int currentElementLevel;
+		String currentElementTitle;
+		String currentGroupTitle = ""; // used in debugging
+		String currentAccountNo;
 
+		logger.logDebug("Entering computeElementTotals");
 		for (int i = 0; i < levelTotals.length; ++i)
 			for (int j = 0; j < 2; ++j)
 				levelTotals[i][j] = 0L;
-		for (int i = 0; i < chartElements.length; ++i)
+		for (int i = 0; i < chartElements.size(); ++i)
 		{
-			currentElement = chartElements[i];
-			name = currentElement.name;
-			currentLevel = currentElement.getLevel();
-			if (name.equals("group"))
-				++currentLevel;
-			else if (name.equals("account"))
+			currentElement = chartElements.elementAt(i);
+			currentElementName = currentElement.name;
+			currentElementLevel = currentElement.level;
+			currentElementTitle = currentElement.getAttribute("title");
+			logger.logDebug("element[" + i + "] level=" + currentElementLevel + " " + currentElementName + " "
+					+ currentElementTitle);
+
+			if (currentElementName.equals("chart"))
 			{
-				currentAccount = chart.getAccount(currentElement.accountIndex);
-				levelTotals[currentLevel][0] += currentAccount.getBeginBal();
-				levelTotals[currentLevel][1] += currentAccount.getDeltaBal();
-			} else if (name.equals("total"))
+				// currentElementLevel = currentElement.level; // should be zero
+				levelTitles[currentElementLevel] = currentElementTitle;
+
+			} else if (currentElementName.equals("section"))
 			{
-				levelTotals[currentLevel - 1][0] = levelTotals[currentLevel][0];
-				levelTotals[currentLevel - 1][1] = levelTotals[currentLevel][1];
-				--currentLevel;
+				// currentElementLevel = currentElement.level;
+				currentElementTitle = currentElement.getAttribute("title");
+				levelTitles[currentElementLevel] = currentElement.getAttribute("title");
+				levelTitles[currentElementLevel] = currentElementTitle;
+				// For Debugging
+				if (currentElementTitle.equals("INCOME STATEMENT"))
+					dumpElementTotals("start " + currentElementTitle, levelTotals, maxLevel, levelTitles);
+
+			} else if (currentElementName.equals("group"))
+			{
+				// currentElementLevel = currentElement.level;
+				// currentElementTitle = currentElement.getAttribute("title");
+				currentGroupTitle = currentElement.getAttribute("title");
+				levelTitles[currentElementLevel] = currentGroupTitle;
+				levelTotals[currentElementLevel][0] += currentElement.beginBal;
+				levelTotals[currentElementLevel][1] += currentElement.deltaBal;
+				logger.logDebug("updating balances in level " + currentElementLevel + ": "
+						+ Strings.formatPennies(levelTotals[currentElementLevel][0]) + " "
+						+ Strings.formatPennies(levelTotals[currentElementLevel][1]));
+				// // Zero balances for this level
+				// levelTotals[currentElementLevel][0] = 0L;
+				// levelTotals[currentElementLevel][1] = 0L;
+
+			} else if (currentElementName.equals("account"))
+			{
+				// No modification of levels
+				currentAccountNo = currentElement.getAttribute("no");
+				logger.logDebug("account " + currentAccountNo + " currentElementLevel=" + currentElementLevel);
+				levelTotals[currentElementLevel][0] += currentElement.beginBal;
+				levelTotals[currentElementLevel][1] += currentElement.deltaBal;
+
+			} else if (currentElementName.equals("total"))
+			{
+				levelTitles[currentElementLevel] = currentElement.getAttribute("title") + " currentLevel="
+						+ currentElementLevel;
+				logger.logDebug("totaling " + levelTitles[currentElementLevel] + ": "
+						+ Strings.formatPennies(levelTotals[currentElementLevel][0]) + " "
+						+ Strings.formatPennies(levelTotals[currentElementLevel][1]));
+				logger.logDebug("getting totals from level " + currentElementLevel + ":");
+				logger.logDebug(Strings.formatPennies(levelTotals[currentElementLevel][0]) + "   "
+						+ Strings.formatPennies(levelTotals[currentElementLevel][1]));
+				currentElement.beginBal = levelTotals[currentElementLevel][0];
+				currentElement.deltaBal = levelTotals[currentElementLevel][1];
+				logger.logDebug("Promoting these totals to update level " + (currentElementLevel - 1));
+				levelTotals[currentElementLevel - 1][0] += currentElement.beginBal;
+				levelTotals[currentElementLevel - 1][1] += currentElement.deltaBal;
+				logger.log("zeroing totals in level " + currentElementLevel);
+				levelTotals[currentElementLevel][0] = 0L;
+				levelTotals[currentElementLevel][1] = 0L;
 			}
+			// levelTitles[currentElementLevel] = currentGroupTitle;
+			// for (int j = 0; j < 2; ++j)
+			// levelTotals[currentElementLevel][j] = 0L;
+			// if (currentElement.beginBal != 0 || currentElement.deltaBal != 0)
+			// dumpElementTotals(levelTotals, chart.maxLevel + 1, levelTitles);
 		}
+		// For Debugging
+		dumpElementTotals("exit ComputeElementTotals", levelTotals, chart.maxLevel, levelTitles);
+		logger.logDebug("ComputeElementTotals normal completion");
+		logger.setLogLevel(LogFile.NORMAL_LOG_LEVEL);
+	}
+
+	// For debugging
+	public static void dumpElementTotals(String msg, long[][] levelTotals, int maxLevel, String[] levelTitles)
+	{
+		logger = VL2.logger;
+		if (logger.getLogLevel() >= LogFile.DEBUG_LOG_LEVEL)
+		{
+			logger.logDebug("dumpElementTotals " + msg + ":");
+			for (int i = 0; i < maxLevel; ++i)
+				logger.log("level " + i + " " + levelTitles[i] + " beginBal=" + Strings.formatPennies(levelTotals[i][0])
+						+ " deltaBal=" + Strings.formatPennies(levelTotals[i][1]));
+		}
+	}
+
+	// Connect an Account number to its corresponding Element
+	public static ChartElement2 mapChartAccountToElement(Chart chart, String accountNo)
+	{
+		Account account = chart.findAcctByNo(accountNo);
+		int elementIndex = account.getAccountElementIndex();
+		return chart.chartElements.get(elementIndex);
+	}
+
+	// method to test mapChartAccountToElement() using quito/17 cash account as
+	// example
+	// public static void test(Chart chart, String accountNo)
+	// {
+	// ChartElement2 element = mapChartAccountToElement(chart, accountNo);
+	// System.out.println("element: " + element.toString());
+	// }
+
+	// For debugging: display the current element list
+	public static void showChartElements(Chart chart, String OutFileName)
+	{
+		UsefulFile elementsOutFile = null;
+		try
+		{
+			elementsOutFile = new UsefulFile(OutFileName, "w");
+			elementsOutFile.appendLine("VLUtil.showElementsList " + new Julian().toString("mm-dd-yy hhmmss"));
+		} catch (IOException iox)
+		{
+			System.out.println("VLUtil.showElementList: cannot open " + OutFileName + " " + iox.getMessage());
+			System.exit(2);
+		}
+		for (int i = 0; i < chart.chartElements.size(); ++i)
+			elementsOutFile.println(chart.chartElements.elementAt(i).toString());
+		elementsOutFile.close();
 	}
 }

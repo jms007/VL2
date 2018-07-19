@@ -3,7 +3,6 @@ package com.extant.vl2;
 import com.extant.utilities.MsgBox;
 import com.extant.utilities.XProperties;
 import com.extant.utilities.Four11;
-//import com.extant.utilities.Strings;
 import com.extant.utilities.Julian;
 import com.extant.utilities.MyPanel;
 import com.extant.utilities.LogFile;
@@ -11,6 +10,7 @@ import com.extant.utilities.ViewFile;
 import com.extant.utilities.UtilitiesException;
 import com.extant.utilities.DisplayTree;
 import com.extant.utilities.TreeClimber;
+import com.extant.utilities.Strings;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JFrame;
@@ -56,9 +56,8 @@ public class VL2 extends JFrame implements ActionListener
 	static Chart chart = null;
 	static ChartTree chartTree = null;
 	static JTree chartJTree = null;
-	static GLCheck glCheck = null;
-	// static Julian EarliestDate;
-	// static Julian LatestDate;
+	static GLChecker glChecker = null;
+	static int maxGSN;
 	static String cashAcctNo;
 	static LogFile logger;
 
@@ -75,6 +74,8 @@ public class VL2 extends JFrame implements ActionListener
 	 */
 	public void VL2Init(String args[]) throws IOException
 	{
+		DisplayTree displayTree;
+
 		System.out.println("Enter VL2Init");
 
 		{ // Display Logo only on initial call
@@ -100,7 +101,7 @@ public class VL2 extends JFrame implements ActionListener
 			{
 				System.out.println("cannot display logo: " + x.getMessage());
 			}
-			System.out.println("finished with logo");
+			// System.out.println("finished with logo");
 		}
 
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -108,15 +109,14 @@ public class VL2 extends JFrame implements ActionListener
 		VL2MenuFrame.setPreferredSize(new Dimension(550, 450));
 		if (VL2MenuFrame == null)
 		{
-			System.out.println("Entering VL2Init: VL2MenuFrame is null");
+			System.out.println("VL2[106]: VL2MenuFrame is null");
 			System.exit(106);
 		}
 
 		String logFilename = VL2Config.getAccountingDataDirectory() + "VL2.log";
 		logger = new LogFile(logFilename, true);
 		logger.log("Log File " + logFilename + " opened");
-		String version = "06-12-18";
-		logger.log("***** STARTING VL2 version " + version + " " + new Julian().toString("") + " *****");
+		logger.log("***** STARTING VL2 [branch Post_06-12-18] " + new Julian().toString("") + " *****");
 
 		// For Debugging
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
@@ -126,45 +126,34 @@ public class VL2 extends JFrame implements ActionListener
 		if (msgBox.getCommand().equals("Cancel"))
 			logger.logFatal("User Cancel (Enter Entity Name)");
 		entityName = msgBox.getResponse().toUpperCase();
-		msgBox = new MsgBox(VL2MenuFrame, "Year", "Enter the year (yy)", "17", new String[] { "OK", "Cancel" });
+		String entityPropFilename = VL2Config.getAccountingDataDirectory() + entityName + "\\" + entityName
+				+ ".properties";
+		XProperties entityProps = new XProperties(entityPropFilename);
+		vl2Config = new VL2Config(entityPropFilename, entityName);
+
+		String defaultYear = entityProps.getProperty("CurrentYear");
+		msgBox = new MsgBox(VL2MenuFrame, "Year", "Enter the year (yy)", defaultYear, new String[] { "OK", "Cancel" });
 		if (msgBox.getCommand().equals("Cancel"))
 			logger.logFatal("User Cancel (Enter year)");
 		yy = msgBox.getResponse();
-
-		try
-		{
-			vl2Config = new VL2Config(entityName, yy);
-		} catch (IOException iox)
-		{
-			logger.logFatal("Unable to find " + entityName + "/" + yy);
-		}
-
-		// Make a progress report
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-		if (logger.getLogLevel() >= LogFile.DEBUG_LOG_LEVEL)
-			logger.whereAreWe(new Error());
-		VL2MenuFrame.setTitle(vl2Config.getEntityLongName());
-		workDir = vl2Config.getWorkingDirectory();
+		vl2Config.setCurrentYear(yy);
 
 		// Set Initial GSN
 		new GSNMan(vl2Config, logger);
 		logger.logInfo("GSN Initial Value: " + GSNMan.getGSN());
 
-		// Report
+		// Debug Report
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		logger.logDebug("entityName=" + entityName);
 		logger.logDebug("year=" + yy);
 		logger.logDebug("workDir=" + workDir);
-		// logger.logDebug("entityPropsFilename=" + entityPropsFilename);
+		logger.logDebug("entityPropsFilename=" + entityPropsFilename);
 
-		// For Testing:
-		ComputeAccountTotals computeAccountTotals = new ComputeAccountTotals();
+		logger.logInfo("Checking Files ...");
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
 		try
 		{
-			logger.logInfo("Checking Files ...");
-			// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-
 			// Check Chart file
 			chartFilename = vl2Config.getChartFile();
 			logger.logDebug("Checking Chart file: " + chartFilename);
@@ -181,48 +170,68 @@ public class VL2 extends JFrame implements ActionListener
 		}
 		logger.logInfo("Chart initialized without error");
 
-		// Build ChartTree (initially invisible, location & size not specified)
-		try
-		{
-			chartTree = new ChartTree(vl2Config, chart, logger);
-		} catch (ParserConfigurationException | SAXException | IOException | VLException x)
-		{
-			logger.logFatal("ChartTree build: " + x.getMessage());
-		}
-
-		// Position chart tree in display
-		// Point is (x,y)
-		// Dimension is (width, height)
-		Point location = this.getLocation();
-		location.x += (this.getWidth() + 375); // why 375? because it works.
-		// location.y is unchanged
-		Dimension size = new Dimension(500, 370);
-		chartJTree = chartTree.getJTree();
-		displayTree = new DisplayTree("Chart of Accounts", chartJTree, location, size);
-		displayTree.setVisible(true);
-
-		logger.logInfo("Chart tree initialization & display complete.");
+		// VLUtil.test(chart, "004"); // disabled test code
 
 		// Check GL file
 
 		// For Debugging:
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
-		String GLFile = vl2Config.getGLFile();
+		// Check transactions and post transactions to elements
+		String GLFilename = vl2Config.getGLFile();
 		int nErrors;
-		logger.logDebug("Checking GLFile " + GLFile);
-		if (!new File(GLFile).exists())
-			logger.logFatal("Unable to find " + GLFile);
-		glCheck = new GLCheck();
-		glCheck.glCheck(GLFile, chart, "token", vl2Config, logger);
-		nErrors = glCheck.getNErrors();
-		if (glCheck.getNErrors() > 0)
+		logger.logDebug("Checking GLFile " + GLFilename);
+		if (!new File(GLFilename).exists())
+			logger.logFatal("Unable to find " + GLFilename);
+		glChecker = new GLChecker();
+		glChecker.glCheck(chart, "token", vl2Config);
+		nErrors = glChecker.getNErrors();
+		if (nErrors > 0)
 		{
-			System.out.println("GL File Error Report (" + nErrors + "):");
-			System.out.print(glCheck.getReport());
-			// logger.logFatal("Error(s) in " + GLFile);
+			logger.logInfo("GL File Error Report (# of errors=" + nErrors + "):");
+			logger.logInfo(glChecker.getReport());
+			logger.logFatal(nErrors + " error(s) in " + GLFilename);
 		} else
-			logger.logInfo("No errors found in " + GLFile + " (" + glCheck.getNEntries() + " entries)");
+			logger.logInfo("No errors found in " + GLFilename + " (" + glChecker.getNEntries() + " entries)");
+
+		// Test for consistent GSN
+		if ((maxGSN + 1) != Strings.parseInt(GSNMan.getGSN()))
+			logger.logFatal("GSN mismatch: GSNMan=" + GSNMan.getGSN() + " maxGSN=" + maxGSN);
+		logger.logDebug("Next GSN=" + GSNMan.getGSN() + " verified");
+
+		// Compute Element totals
+		logger.log("VL2 203 calling VLUtil.computeElementTotals");
+		VLUtil.computeElementTotals(chart);
+
+		// Debugging tool to display the current element list
+		// String workDir = vl2Config.getWorkingDirectory();
+		// VLUtil.showElementList(chart, workDir + "ElementList.txt");
+
+		// Build Detailed Status Report & Show results
+		// VL2DetailedStatusReport vl2DetailedStatusReport = new
+		// VL2DetailedStatusReport();
+		// vl2DetailedStatusReport.initialize(vl2Config, logger);
+		// vl2DetailedStatusReport.run();
+		// vl2DetailedStatusReport.showReport();
+
+		try
+		{ // Build ChartTree from Elements
+			chartTree = new ChartTree(vl2Config, chart, logger);
+
+			// Position chart tree in display
+			// Point is (x,y) Dimension is (width, height)
+			Point location = this.getLocation();
+			location.x += (this.getWidth() + 375); // why 375? because it works.
+			// location.y is unchanged
+			Dimension size = new Dimension(500, 370);
+			chartJTree = chartTree.getJTree();
+			displayTree = new DisplayTree("Chart of Accounts", chartJTree, location, size);
+			displayTree.setVisible(true);
+			logger.logInfo("Chart tree initialization & display complete.");
+		} catch (ParserConfigurationException | SAXException | IOException | VLException x)
+		{
+			logger.logFatal("ChartTree build exception: " + x.getMessage());
+		}
 	}
 
 	public void VL2Start(String[] args)
@@ -340,8 +349,8 @@ public class VL2 extends JFrame implements ActionListener
 	}
 
 	// Process main menu clicks
-	JTree tree = null;
-	DisplayTree displayTree = null;
+	// JTree tree = null;
+	// DisplayTree displayTree = null;
 
 	@Override
 	public void actionPerformed(ActionEvent evt)
@@ -373,7 +382,7 @@ public class VL2 extends JFrame implements ActionListener
 
 		else if (command.equals("Test"))
 		{
-			new ComputeAccountTotals().initialize(chart, vl2Config);
+			logger.logFatal("Command Test is not implemented");
 		}
 
 		else if (command.equals("Exit"))
@@ -479,6 +488,7 @@ public class VL2 extends JFrame implements ActionListener
 	{
 		// For debugging
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+
 		String earliestDate = vl2Config.getEarliestDate();
 		String latestDate = vl2Config.getLatestDate();
 		logger.logDebug("startTextStmt");
@@ -487,18 +497,12 @@ public class VL2 extends JFrame implements ActionListener
 		logger.logDebug("workDir=" + workDir);
 		logger.logDebug("earliestDate=" + earliestDate);
 		logger.logDebug("latestDate=" + latestDate);
+		String outfileName = workDir + "Stmt.txt";
+
+		logger.logInfo("Statement is in " + outfileName);
 		try
 		{
-			String outfileName = workDir + "Stmt.txt";
-			StatementTXT statement = new StatementTXT(vl2Config, chart, 0, outfileName, VL2.logger);
-
-			logger.logInfo("Statement is in " + outfileName);
 			new ViewFile(outfileName, logger);
-		} catch (VLException vlx)
-		{
-			logger.log("Cannot initialize StatementTXT: " + vlx.getMessage());
-			vlx.printStackTrace();
-			return;
 		} catch (UtilitiesException ux)
 		{
 			logger.log("Cannot initialize ViewFile: " + ux.getMessage());
@@ -506,26 +510,26 @@ public class VL2 extends JFrame implements ActionListener
 		}
 	}
 
-	private void listProps(XProperties props)
-	{
-		if (props == null)
-			System.out.println("props is null!");
-		else
-			System.out.println("props is not null");
-
-		if (logger == null)
-			System.out.println("logger is null!");
-		else
-			System.out.println("logger is not null");
-
-		if (chart == null)
-			System.out.println("chart is null!");
-		else
-			System.out.println("chart is not null");
-
-		vl2Config.listAllProperties();
-	}
-
+	// private void listProps(XProperties props)
+	// {
+	// if (props == null)
+	// System.out.println("props is null!");
+	// else
+	// System.out.println("props is not null");
+	//
+	// if (logger == null)
+	// System.out.println("logger is null!");
+	// else
+	// System.out.println("logger is not null");
+	//
+	// if (chart == null)
+	// System.out.println("chart is null!");
+	// else
+	// System.out.println("chart is not null");
+	//
+	// vl2Config.listAllProperties();
+	// }
+	//
 	private void startPDFStmt()
 	{
 		try

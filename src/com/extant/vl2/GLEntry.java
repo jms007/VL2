@@ -13,8 +13,8 @@ package com.extant.vl2;
 import com.extant.utilities.Julian;
 import com.extant.utilities.Strings;
 import com.extant.utilities.LogFile;
-import java.util.StringTokenizer;
-import java.util.regex.Pattern;
+//import java.util.StringTokenizer;
+//import java.util.regex.Pattern;
 
 /**
  *
@@ -36,7 +36,7 @@ public class GLEntry
 			logger = new LogFile();
 		fields = image.split("\\|");
 		if (fields.length != nFields)
-			throw new VLException(VLException.INVALID_FIELD_LENGTH, String.valueOf(fields.length));
+			throw new VLException(VLException.INVALID_NO_FIELDS, String.valueOf(fields.length));
 		validate();
 	}
 
@@ -105,6 +105,7 @@ public class GLEntry
 	public String getAccountNo()
 	{ // returns <account> -or- <account>/<subAccount>
 		String na = Strings.trim(getField("account"), " ");
+		// logger.logDebug("GLEntry:accountNo=" + na);
 		return na;
 	}
 
@@ -163,18 +164,20 @@ public class GLEntry
 
 	public Julian getJulianDate()
 	{
+		String sdate = getField("DATE");
+		return new Julian(sdate);
 		// String yy = fields[9].substring( 0, 2 );
 		// String mm = fields[9].substring( 2, 4 );
 		// String dd = fields[9].substring( 4, 6 );
 		// return new Julian( mm + "-" + dd + "-" + yy );
-		return VLUtil.fixDate(getField("DATE"));
+		// return VLUtil.fixDate(getField("DATE"));
 	}
 
-	public Julian getFixedJulianDate()
-	{
-		return VLUtil.fixDate(getField("DATE"));
-	}
-
+	// public Julian getFixedJulianDate()
+	// {
+	// return VLUtil.fixDate(getField("DATE"));
+	// }
+	//
 	public void setDate(Julian jDate)
 	{
 		setField("DATE", jDate.toString("yymmdd"));
@@ -215,15 +218,12 @@ public class GLEntry
 		// throw new VLException( VLException.GL_ERRORS );
 		if (!getField("DRCR").equals("D") && !getField("DRCR").equals("C"))
 			throw new VLException(VLException.INVALID_DRCR, getField("DRCR"));
-		// if ( !Strings.isValidFloat( getField("Amount") ) )
-		// throw new VLException( VLException.INVALID_AMOUNT, getField("Amount") );
+		if (!Strings.isValidFloat(getField("Amount")))
+			throw new VLException(VLException.INVALID_AMOUNT, getField("Amount"));
 		if (getField("Amount").contains("-"))
 			throw new VLException(VLException.INVALID_AMOUNT, getField("Amount"));
 		if (getField("ACCOUNT").trim().contains(" "))
 			throw new VLException(VLException.SPACE_IN_ACCOUNT, getField("ACCOUNT"));
-		if (!getField("JREF").equals("BALF") && !getField("JREF").equals("CLOS"))
-			if (!Julian.isValid(getField("DATE")))
-				throw new VLException(VLException.INVALID_DATE, getField("DATE"));
 		return true;
 	}
 

@@ -9,34 +9,18 @@ package com.extant.vl2;
 import com.extant.utilities.*;
 import java.io.File;
 import java.io.IOException;
-//import java.util.StringTokenizer;
-import java.awt.Point;
-import java.awt.Dimension;
 import javax.swing.JTree;
 import javax.swing.tree.*;
+import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
-//import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-
 import javax.swing.event.EventListenerList;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-//import vl2.Account;
-//import vl2.Chart;
-//import vl2.ChartElement;
-//import vl2.ComputeTotals;
-//import vl2.GLCheck;
-//import vl2.GLEntry;
-//import vl2.ParseDocument;
-//import vl2.VL2Glob;
-//import vl2.VLException;
-//import vl2.VLUtil;
 
 /**
  *
@@ -52,17 +36,16 @@ import java.beans.PropertyChangeListener;
  * the tree.
  *
  * Classes that need to use the Chart Tree node selection functionality must
- * declare themselves to be listeners to node-selection events: (1) implements
+ * declare themselves to be listeners to node-selection events: (1) implement
  * TreeSelectionListener (2) put tree in parameter list (3)
- * tree.addSelectionListener(this); (4) add method
+ * tree.addSelectionListener(this); and (4) add method
  * valueChanged(TreeSelectionEvent e) to take desired action
  */
 
 public class ChartTree implements MouseListener // ,TreeSelectionListener
 {
-	static final String NODE_DESCR_SPEC = "no, title, type";
+	static final String NODE_DESCR_SPEC = "no, title, type, balances";
 	DefaultTreeModel treeModel;
-	ChartElement[] elementList;
 	static JTree tree;
 	ChartTreeNode root;
 	LogFile logger = VL2.logger;
@@ -80,16 +63,10 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 			System.exit(1);
 		}
 		// For debugging:
-		// this.logger.setLogLevel( LogFile.DEBUG_LOG_LEVEL );
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.logDebug("chart.chartElements size=" + chart.chartElements.size());
 
-		// if ( nodeDescrSpec.contains( "amount" ) )
-		// {
-		// String workDir = props.getString( "WorkDir" );
-		// String glFilename = props.getString( "GLFile" );
-		// logger.logDebug("ready to call extractBalances: "+glFilename);
-		// VLUtil.extractBalances( glFilename, chart, begin, end, logger );
-		// new ComputeTotals( props, chart, begin, end, 0, "", logger );
-		tree = buildTree(chart.elementList);
+		tree = buildTree(chart.chartElements);
 	}
 
 	// Helper method for getting the element list for a tree with no amounts
@@ -108,12 +85,12 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 	 * elementList; }
 	 */
 
-	private JTree buildTree(ChartElement2 elementList[]) throws VLException
+	private JTree buildTree(Vector<ChartElement2> chartElements) throws VLException
 	{
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-		root = new ChartTreeNode(elementList[0]);
+		root = new ChartTreeNode(chart.chartElements.elementAt(0));
 		treeModel = new DefaultTreeModel(root);
-		build(elementList, 1, root, 1);
+		build(chart.chartElements, 1, root, 1);
 		tree = new JTree(treeModel);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.addMouseListener(this);
@@ -127,29 +104,32 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 		return tree;
 	}
 
-	private int build(ChartElement2 elementList[], int index, ChartTreeNode parent, int level) throws VLException
+	private int build(Vector<ChartElement2> chartElements, int index, ChartTreeNode parent, int level)
+			throws VLException
 	{
 		logger.logDebug("entering build  index=" + index);
-		while (elementList[index].getLevel() == level)
+		while (chartElements.elementAt(index).getLevel() == level)
 		{
-			logger.logDebug("processing " + elementList[index].toString() + "  index=" + index + "  level=" + level);
-			if (isElement(elementList[index], new String[] { "chart", "section", "group" }))
+			logger.logDebug("processing " + chart.chartElements.elementAt(index).toString() + "  index=" + index
+					+ "  level=" + level);
+			if (isElement(chartElements.elementAt(index), new String[] { "chart", "section", "group" }))
 			{
-				logger.logDebug("adding expandable node to " + parent.toString() + ": " + elementList[index]);
-				ChartTreeNode x = new ChartTreeNode(elementList[index]);
+				logger.logDebug(
+						"adding expandable node to " + parent.toString() + ": " + chartElements.elementAt(index));
+				ChartTreeNode x = new ChartTreeNode(chartElements.elementAt(index));
 				parent.add(x);
-				index = build(elementList, index + 1, x, level + 1);
+				index = build(chartElements, index + 1, x, level + 1);
 				logger.logDebug("continuing build  index=" + index + "  level=" + level);
-				if (index >= elementList.length)
+				if (index >= chartElements.size())
 					return index;
 			} else
 			{ // Either an Account or a Total element
-				logger.logDebug("processing " + elementList[index].toString());
-				String title = elementList[index].getAttribute("title");
+				logger.logDebug("processing " + chartElements.elementAt(index).toString());
+				String title = chartElements.elementAt(index).getAttribute("title");
 				if (!title.startsWith("*****"))
-				{ // Bypass warnings
-					logger.logDebug("adding node to " + parent.toString() + ": " + elementList[index]);
-					ChartTreeNode accountNode = new ChartTreeNode(elementList[index]);
+				{ // Bypass warning
+					logger.logDebug("adding node to " + parent.toString() + ": " + chartElements.elementAt(index));
+					ChartTreeNode accountNode = new ChartTreeNode(chartElements.elementAt(index));
 					parent.add(accountNode);
 
 					/*****
@@ -170,66 +150,85 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 					 *****/
 
 				}
-				if (++index >= elementList.length)
+				if (++index >= chartElements.size())
 					return index;
 			}
 		}
-		logger.logDebug("returning from build  index=" + index + "  level=" + level);
+		logger.logDebug("returning from build:  index=" + index + "  level=" + level);
 		return index;
 	}
 
-	public ChartElement[] getElementList()
-	{
-		return elementList;
-	}
+	// public ChartElement2[] getElementList()
+	// {
+	// return chart.elementList;
+	// }
+	//
 
 	private String formatNode(ChartElement2 element, String nodeDescrSpec) throws VLException
 	{
+		long beginBal = 0L;
+		long deltaBal = 0L;
+		long totalBal = 0L;
+		String attributeValue;
 		String nodeData = "";
+
+		// For Debugging
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+
+		// logger.logDebug("Enter formatNode: nodeDescrSpec=" + nodeDescrSpec);
+
 		// There are no options for the text-only elements
 		if (element.getName().equals("chart") || element.getName().equals("section")
 				|| element.getName().equals("group"))
-			return element.getAttribute("title");
-
-		String attributeValue = null;
-		if (nodeDescrSpec.contains("no"))
 		{
-			attributeValue = element.getAttribute("no");
-			if (attributeValue != null)
-				nodeData += "[" + attributeValue + "] ";
-		}
-		if (nodeDescrSpec.contains("title"))
-		{
-			attributeValue = element.getAttribute("title");
-			if (attributeValue != null)
-				nodeData += attributeValue + " ";
-		}
-		if (nodeDescrSpec.contains("type"))
-		{
-			attributeValue = element.getAttribute("type");
-			if (attributeValue != null)
-				nodeData += "'" + attributeValue + "' ";
+			nodeData += element.getAttribute("title");
+			// logger.logDebug("after chart,section,group: returning " + nodeData);
+			return nodeData;
 		}
 
 		if (element.getName().equals("account") || element.getName().equals("total"))
 		{
-			// String formatAmount = "??1";
-			if (nodeDescrSpec.contains("amount"))
+			if (nodeDescrSpec.contains("no"))
 			{
-				long amount = 0L;
-				if (element.getName().equals("account"))
-					amount = chart.getAccount(element.getAccountIndex()).getEndBal();
-				else if (element.getName().equals("total"))
-					amount = element.getTotal();
+				attributeValue = element.getAttribute("no");
+				if (attributeValue != null)
+					nodeData += "[" + attributeValue + "] ";
+			}
+			if (nodeDescrSpec.contains("title"))
+			{
+				attributeValue = element.getAttribute("title");
+				if (attributeValue != null)
+					nodeData += attributeValue + " ";
+			}
+			if (nodeDescrSpec.contains("type"))
+			{
+				attributeValue = element.getAttribute("type");
+				if (attributeValue != null)
+					nodeData += "'" + attributeValue + "' ";
+			}
+
+			if (NODE_DESCR_SPEC.contains("balances")
+					&& (element.getName().equals("account") || element.getName().equals("total")))
+			{
+				beginBal = element.beginBal;
+				deltaBal = element.deltaBal;
+				totalBal = beginBal + deltaBal;
 				String type = element.getAttribute("type");
 				if (type.equals("L") || type.equals("I") || type.equals("R"))
-					amount = -amount;
-				nodeData += "$" + Strings.formatPennies(amount, chart.getDollarFormat());
+				{
+					beginBal = -beginBal;
+					deltaBal = -deltaBal;
+					totalBal = -totalBal;
+				}
+				nodeData += " begin=$" + Strings.formatPennies(beginBal, chart.getDollarFormat());
+				nodeData += " delta=$" + Strings.formatPennies(deltaBal, chart.getDollarFormat());
+				nodeData += " total=$" + Strings.formatPennies(totalBal, chart.getDollarFormat());
 			}
-			logger.logDebug("nodeData='" + nodeData + "'");
-			return nodeData;
+			logger.logDebug("after " + NODE_DESCR_SPEC + ": nodeData=" + nodeData);
 		}
-		return element.toString();
+		logger.logDebug("after account,total: nodeData='" + nodeData + "'");
+		logger.logDebug("returning nodeData=" + nodeData);
+		return nodeData;
 	}
 
 	// From TreeSelectionListener:
@@ -366,7 +365,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 			LogFile logger = new LogFile();
 			logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 			String workDir = clip.getParam("d");
-			XProperties props = new XProperties(clip.getParam("p"));
+			// XProperties props = new XProperties(clip.getParam("p"));
 			if (!workDir.endsWith(File.separator))
 				workDir += File.separator;
 			String chartFile = workDir + "CHART.XML";
@@ -381,10 +380,10 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 			// ( XProperties props, String chartFilename, Julian begin, Julian end, LogFile
 			// logger )
 			// ChartTree chartTree = new ChartTree(props, chart, logger);
-			ChartElement2 elements[] = chart.getElementList();
+			// ChartElement2 elements[] = chart.getElementList();
 			// new DisplayTree( "Chart of Accounts", tree, new Point(200,200), new
 			// Dimension(400, 1000) );
-			ViewTree viewTree = new ViewTree("View Chart Tree", tree);
+			// ViewTree viewTree = new ViewTree("View Chart Tree", tree);
 		} catch (Throwable x)
 		{
 			x.printStackTrace();

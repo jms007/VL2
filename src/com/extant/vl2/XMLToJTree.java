@@ -2,19 +2,19 @@ package com.extant.vl2;
 
 import com.extant.utilities.Console;
 import com.extant.utilities.LogFile;
-//import com.extant.utilities.Strings;
+import com.extant.utilities.Strings;
 import com.extant.utilities.XProperties;
 import static com.extant.vl2.ChartTree.isElement;
-import static com.extant.vl2.ChartTree.tree;
+//import static com.extant.vl2.ChartTree.tree;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+//import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import javax.swing.JTree;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
+//import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -120,8 +120,8 @@ public class XMLToJTree
 			{ // Either an Account or a Total element
 				logger.logDebug("processing " + elementList[index].toString());
 				String title = elementList[index].getAttribute("title");
-				if (!title.startsWith("*****"))
-				{ // Bypass warnings
+				if (!title.startsWith("*****")) // Bypass warnings
+				{
 					logger.logDebug("adding node to " + parent.toString() + ": " + elementList[index]);
 					ChartTreeNode accountNode = new ChartTreeNode(elementList[index]);
 					parent.add(accountNode);
@@ -131,7 +131,7 @@ public class XMLToJTree
 					 * use the node just created (accountNode) as parent // and add the items in
 					 * GLEntries from that account as new DefaultMutableTreeNode's // formatted with
 					 * simple String's // This block (marked with / 5 stars: ***** ) can be removed
-					 * if you do not want this feature if ( isElement( elementList[index], new
+					 * if you do not want this feature. if ( isElement( elementList[index], new
 					 * String[] { "account" } ) ) { Account account = chart.getAccount(
 					 * elementList[index].getAccountIndex() ); for (int i=0;
 					 * i<account.glEntries.size(); ++i) { GLEntry glEntry =
@@ -257,7 +257,7 @@ public class XMLToJTree
 	XProperties props;
 	LogFile logger;
 	String chartXMLFilename;
-	static final String nodeDescrSpec = "no, title, type";
+	static final String nodeDescrSpec = "no, title, type, beginBal, deltaBal";
 	int index;
 	ChartElement2[] elementList;
 	JTree jTree;
@@ -301,7 +301,6 @@ public class XMLToJTree
 
 			if (element.getName().equals("account") || element.getName().equals("total"))
 			{
-				String formatAmount = "??1";
 				// if ( nodeDescrSpec.contains( "amount" ) )
 				// {
 				// long amount=0L;
@@ -321,6 +320,10 @@ public class XMLToJTree
 					nodeData += element.getAttribute("title");
 				if (nodeDescrSpec.contains("type"))
 					nodeData += " '" + element.getAttribute("title") + "'";
+				if (nodeDescrSpec.contains("beginBal"))
+					nodeData += "begin=" + Strings.formatPennies(element.beginBal);
+				if (nodeDescrSpec.contains("deltaBal"))
+					nodeData += "delta=" + Strings.formatPennies(element.deltaBal);
 
 				// StringTokenizer st = new StringTokenizer( nodeDescrSpec, "," );
 				// while ( st.hasMoreElements() )

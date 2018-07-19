@@ -4,11 +4,10 @@ package com.extant.vl2;
  * ChartElement2.java
  *
  * These are the elements resulting from a parse of the XML chart.
- * All elements have a 'name' and a 'level'.  Elements which
- * represent real accounts have an index to the Account in class Chart.
- * Elements which represent totals have a total field.
- * Other properties can be [added/retrieved] using methods
- *  	[putAttribute(name,value)/getAttribute(name)]
+ * All elements have a 'name', 'level', and an 'index'.
+ * Elements which represent totals have total fields (begin & delta).
+ * Other properties can be added or retrieved using the methods
+ *  	putAttribute(name,value) or getAttribute(name)
  *
  * Created on September 10, 2006, 8:23 AM
  */
@@ -23,16 +22,19 @@ import java.util.Enumeration;
  */
 public class ChartElement2
 {
-	public ChartElement2(String eName, int level, int accountIndex)
+	public ChartElement2(String eName, int level, int index)
 	{
 		name = eName;
 		this.level = level;
-		this.accountIndex = accountIndex;
+		this.index = index;
 		props = new Properties();
 	}
 
 	public void putAttribute(String attrName, String attrValue)
 	{
+		if (attrName.equals("beginBal"))
+			VL2.logger.whereAreWe(4, new Error());
+
 		props.put(attrName, attrValue);
 	}
 
@@ -46,39 +48,36 @@ public class ChartElement2
 		return name;
 	}
 
-	public int getAccountIndex() throws VLException
+	public int getIndex()
 	{
-		if (name.equals("account"))
-			return accountIndex;
-		else
-			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT,
-					"getAccountIndex from " + name + " " + getAttribute("no"));
+		return index;
 	}
 
-	public void setBegin(long beginBal) throws VLException
+	public void setBeginBal(long bal) throws VLException
 	{
-		if (name.equals("total"))
-			this.setBegin(beginBal);
+		if (name.equals("total") || name.equals("account"))
+			beginBal = bal;
 		else
 			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "setTotal in " + name + " " + getAttribute("no"));
 	}
 
-	public void setDelta(long deltaBal) throws VLException
+	public void setDeltaBal(long bal) throws VLException
 	{
-		if (name.equals("total"))
-			this.setDelta(deltaBal);
+		if (name.equals("total") || name.equals("account"))
+			deltaBal = bal;
 		else
 			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "setTotal in " + name + " " + getAttribute("no"));
 	}
 
-	public long getTotal() throws VLException
-	{
-		if (name.equals("account") || name.equals("total"))
-			return beginBal + deltaBal;
-		else
-			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "getTotal from " + name + " " + getAttribute("no"));
-	}
-
+	// public long getTotal() throws VLException
+	// {
+	// if (name.equals("account") || name.equals("total"))
+	// return props.getProperty("beginBal").beginBal + deltaBal;
+	// else
+	// throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "getTotal from " +
+	// name + " " + getAttribute("no"));
+	// }
+	//
 	public int getLevel()
 	{
 		return level;
@@ -93,12 +92,15 @@ public class ChartElement2
 	// name;level;accountIndex;key=value | key=value ...;
 	public String toString()
 	{
-		String answer = name + ";" + Strings.format(level, "00") + ";" + Strings.format(accountIndex, "00") + ";";
+		String answer = name + ";" + Strings.format(level, "00") + ";" + Strings.format(index, "00") + ";" + "beginBal="
+				+ Strings.formatPennies(beginBal) + ";" + "deltaBal=" + Strings.formatPennies(deltaBal);
 		Enumeration en = props.propertyNames();
 		boolean first = true;
 		while (en.hasMoreElements())
 		{
 			String key = (String) en.nextElement();
+			if (key.contains("bal"))
+				continue; // the balances should not be in these props
 			String value = props.getProperty(key);
 			if (!first)
 				answer += "|";
@@ -111,7 +113,7 @@ public class ChartElement2
 	public String name;
 	Properties props;
 	int level;
-	int accountIndex;
+	int index;
 	long beginBal;
 	long deltaBal;
 }

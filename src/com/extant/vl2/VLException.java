@@ -27,7 +27,7 @@ public class VLException extends java.lang.Exception
 			"Unable to create directory ", "Directory is not empty ", "Database contains tables for year ",
 			"Incorrect number of fields: ", "Transaction not balanced ", "No Account selected ", "logger is null" };
 	public static final int UNKNOWN = 0;
-	public static final int INVALID_FIELD_LENGTH = 1;
+	public static final int INVALID_NO_FIELDS = 1;
 	public static final int INVALID_DRCR = 2;
 	public static final int INVALID_AMOUNT = 3;
 	public static final int SPACE_IN_ACCOUNT = 4;
