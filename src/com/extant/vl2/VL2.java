@@ -116,7 +116,7 @@ public class VL2 extends JFrame implements ActionListener
 		String logFilename = VL2Config.getAccountingDataDirectory() + "VL2.log";
 		logger = new LogFile(logFilename, true);
 		logger.log("Log File " + logFilename + " opened");
-		logger.log("***** STARTING VL2 [branch Post_06-12-18] " + new Julian().toString("") + " *****");
+		logger.log("***** STARTING VL2 [branch Post_7-19-18] " + new Julian().toString("") + " *****");
 
 		// For Debugging
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
@@ -179,20 +179,11 @@ public class VL2 extends JFrame implements ActionListener
 
 		// Check transactions and post transactions to elements
 		String GLFilename = vl2Config.getGLFile();
-		int nErrors;
 		logger.logDebug("Checking GLFile " + GLFilename);
 		if (!new File(GLFilename).exists())
 			logger.logFatal("Unable to find " + GLFilename);
 		glChecker = new GLChecker();
 		glChecker.glCheck(chart, "token", vl2Config);
-		nErrors = glChecker.getNErrors();
-		if (nErrors > 0)
-		{
-			logger.logInfo("GL File Error Report (# of errors=" + nErrors + "):");
-			logger.logInfo(glChecker.getReport());
-			logger.logFatal(nErrors + " error(s) in " + GLFilename);
-		} else
-			logger.logInfo("No errors found in " + GLFilename + " (" + glChecker.getNEntries() + " entries)");
 
 		// Test for consistent GSN
 		if ((maxGSN + 1) != Strings.parseInt(GSNMan.getGSN()))
@@ -200,7 +191,6 @@ public class VL2 extends JFrame implements ActionListener
 		logger.logDebug("Next GSN=" + GSNMan.getGSN() + " verified");
 
 		// Compute Element totals
-		logger.log("VL2 203 calling VLUtil.computeElementTotals");
 		VLUtil.computeElementTotals(chart);
 
 		// Debugging tool to display the current element list

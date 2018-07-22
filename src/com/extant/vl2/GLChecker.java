@@ -35,29 +35,24 @@ public class GLChecker
 		this.logger = VL2.logger;
 
 		// For debugging:
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		// logger.setLogAll(true);
 
 		currentYear = Integer.parseInt(props.getCurrentYear());
-		report = "";
+		infoReport = "";
 		nErrors = 0;
 		lineNo = 0;
+		logger.logDebug("fileType=" + fileType);
 		if (fileType.equals("fixed"))
 			checkFixedFile(glFilename);
 		else if (fileType.equals("token"))
-			try
-			{
-				checkTokenFile(glFilename);
-			} catch (VLException vlx)
-			{
-				System.out.println("Exception in token file: " + vlx.getMessage());
-			}
+			checkTokenFile(glFilename);
 		else
 			logger.logFatal("GLCheck: Invalid File Type: " + fileType);
 		return nErrors;
 	}
 
-	public void checkTokenFile(String glFilename) throws VLException
+	public void checkTokenFile(String glFilename)
 	{
 		UsefulFile f;
 		String image = "";
@@ -93,10 +88,14 @@ public class GLChecker
 					errorMsg += "currentYear=" + currentYear + " transactionDate="
 							+ glEntry.getJulianDate().toString("yymmdd");
 					reportError(errorMsg);
-					logger.logFatal("date is not in current year");
 				}
 				String accountNo = glEntry.getAccountNo();
 				Account account = chart.findAcctByNo(accountNo);
+				if (account == null)
+				{
+					reportError("Invalid AccountNo='" + accountNo + "'");
+					continue;
+				}
 				int elementIndex;
 				ChartElement2 element;
 				if (account != null)
@@ -107,13 +106,13 @@ public class GLChecker
 						element = chart.chartElements.elementAt(elementIndex);
 						if (glEntry.getField("JREF").equals("BALF"))
 						{
-							logger.logDebug("executing glEntry BALF");
+							logger.logDebug("processing glEntry BALF");
 							if (BALFdate == null)
 							{
 								BALFdate = glEntry.getJulianDate();
 							} else if (!glEntry.getJulianDate().isEqualTo(BALFdate))
 							{
-								reportError("Line " + lineNo + "BALF has multiple dates");
+								reportError("BALF has multiple dates");
 								continue;
 							}
 							logger.logDebug(glEntry.toString());
@@ -123,12 +122,8 @@ public class GLChecker
 							logger.logDebug("result element=" + element.toString());
 						} else
 							element.deltaBal += glEntry.getSignedAmount();
+						updateJournalBal(glEntry);
 						glBal += glEntry.getSignedAmount();
-
-					} else
-					{
-						reportError("Line " + lineNo + " Account not in chart:" + glEntry.getAccountNo());
-						continue;
 					}
 				if (earliestDate == null)
 					earliestDate = glEntry.getJulianDate();
@@ -138,7 +133,6 @@ public class GLChecker
 					latestDate = glEntry.getJulianDate();
 				else if (glEntry.getJulianDate().isLaterThan(latestDate))
 					latestDate = glEntry.getJulianDate();
-				calcJournalBal(glEntry);
 			} // end of transaction processing
 			f.close();
 
@@ -148,17 +142,15 @@ public class GLChecker
 			reportInfo("LatestDate=" + latestDate.toString("yymmdd"));
 			props.setLatestDate(latestDate.toString("yymmdd"));
 			if (earliestDate.isEarlierThan(BALFdate))
-				logger.logFatal("One or more transactions pre-date BALF date");
-			if (glBal != 0)
-				reportError("File " + glFilename + " is out of balance by " + glBal);
-			finish(); // throws VLException
+				reportError("One or more transactions pre-date BALF");
+			finish();
 		} // end of try Processing Tokenized File
-		catch (VLException vlx)
+		catch (IOException iox)
 		{
-			reportError("VLException Line " + lineNo + ": '" + image + "' " + vlx.getMessage());
-		} catch (IOException iox)
+			reportError("IOException: " + iox.getMessage());
+		} catch (VLException vlx)
 		{
-			System.out.println("IOException Line " + lineNo + ": " + iox.getMessage());
+			reportError("VLExeption: " + vlx.getMessage());
 		}
 	}
 
@@ -166,6 +158,9 @@ public class GLChecker
 	{
 		try
 		{
+			// logger.log("WARNING GLChecker.checkTokenFile() HAS NOT BEEN TESTED!");
+			logger.logFatal("GLChecker.checkTokenFile() HAS NOT BEEN TESTED!");
+
 			String image;
 			logger.logDebug("Processing Fixed File " + glFile + ": ");
 			UsefulFile f = new UsefulFile(glFile, "r");
@@ -175,14 +170,14 @@ public class GLChecker
 				++lineNo;
 				if (image.length() != 78)
 				{
-					reportError("Line " + lineNo + ": wrong length (" + image.length() + ")");
+					reportError(": wrong length (" + image.length() + ")");
 					continue;
 				}
 				glEntry = new GLEntry(image);
 				glEntry.validate();
 				if (chart != null)
 					if (!chart.isValidAccount(glEntry.getNormalizedAccountNo()))
-						reportError("Line " + lineNo + " Account not in chart:" + glEntry.getNormalizedAccountNo());
+						reportError("Account not in chart:" + glEntry.getNormalizedAccountNo());
 				if (earliestDate == null)
 					earliestDate = glEntry.getJulianDate();
 				else if (glEntry.getJulianDate().isEarlierThan(earliestDate))
@@ -191,7 +186,7 @@ public class GLChecker
 					latestDate = glEntry.getJulianDate();
 				else if (glEntry.getJulianDate().isLaterThan(latestDate))
 					latestDate = glEntry.getJulianDate();
-				calcJournalBal(glEntry);
+				updateJournalBal(glEntry);
 				glBal += glEntry.getSignedAmount();
 			}
 			f.close();
@@ -208,20 +203,22 @@ public class GLChecker
 		return lineNo;
 	}
 
-	private void calcJournalBal(GLEntry glEntry)
+	private void updateJournalBal(GLEntry glEntry)
 	{
 		for (int i = 0; i < nJournals; ++i)
 			if (journals[i].equals(glEntry.getField("jRef")))
 			{
+				logger.logDebug("adding " + glEntry.getSignedAmount() + " to " + journals[i]);
 				journalBals[i] += glEntry.getSignedAmount();
 				return;
 			}
+		logger.logDebug("adding journal " + glEntry.getField("jref"));
 		journals[nJournals] = glEntry.getField("jRef");
 		journalBals[nJournals] = glEntry.getSignedAmount();
 		++nJournals;
 	}
 
-	private void reportJournalBal() // throws VLException
+	private void reportJournalBal()
 	{
 		for (int i = 0; i < nJournals; ++i)
 			if (journalBals[i] != 0L)
@@ -231,25 +228,30 @@ public class GLChecker
 
 	private void reportInfo(String msg)
 	{
-		report += msg + "\n";
+		infoReport += msg + "\n";
 	}
 
 	private void reportError(String msg)
 	{
-		report += msg + "\n";
+		errorReport += "Line " + lineNo + " " + msg + "\n";
 		++nErrors;
 	}
 
-	public String getReport()
+	public String getInfoReport()
 	{
-		return report;
+		return infoReport;
 	}
 
-	public int getNLines()
+	public String getErrorReport()
 	{
-		return lineNo;
+		return errorReport;
 	}
 
+	// public int getNLines()
+	// {
+	// return lineNo;
+	// }
+	//
 	public int getNJournals()
 	{
 		return nJournals;
@@ -270,32 +272,31 @@ public class GLChecker
 		return latestDate;
 	}
 
-	public void finish() throws VLException
+	public void finish()
 	{
+		// Check that begin and end dates have been set
+		logger.logDebug("GLChecker Finish");
 		if (earliestDate != null && latestDate != null)
 		{
-			report += lineNo + " entries, " + nJournals + " Journals.\n" + "Covering dates "
-					+ earliestDate.toString("mm-dd-yyyy") + " to " + latestDate.toString("mm-dd-yyyy") + "\n";
-			// props.setProperty("EarliestDate", earliestDate.toString("yymmdd"));
-			// props.setProperty("LatestDate", latestDate.toString("yymmdd"));
+			reportInfo(nJournals + " Journals.\n" + "Covering dates " + earliestDate.toString("mm-dd-yyyy") + " to "
+					+ latestDate.toString("mm-dd-yyyy") + "\n");
 		} else
-		{
-			reportError("Earliest Date or Latest Date (or both) are not set");
-		}
-		// report += lineNo + " records, " +
-		// nJournals + " Journals.\n";
-		reportJournalBal();
+			reportError("Earliest Date and/or Latest Date not set");
+		// Calculate & check the journal balances
+		reportJournalBal(); // Adds any errors to errorReport
+		// Check that GL is balanced
 		if (glBal != 0L)
 			reportError("General Ledger is out of balance by " + Strings.formatPennies(glBal, ","));
-		reportInfo(Strings.plurals("Error", nErrors) + " found.\n");
-		System.out.print("GLChecker report:\n" + report);
-		if (nErrors > 0)
-			throw new VLException(VLException.GL_ERRORS);
-		logger.log("GLChecker normal completion");
+		// Now publish the reports
+		logger.log(getInfoReport());
+		if (nErrors == 0)
+			logger.log("GLChecker normal completion");
+		else
+			logger.logFatal(
+					"GLChecker error report contains " + Strings.plurals("Error", nErrors) + ":\n" + errorReport);
 		return;
 	}
 
-	// Global variables
 	VL2Config props;
 	int currentYear;
 	GLChecker glCheck;
@@ -309,7 +310,8 @@ public class GLChecker
 	Julian earliestDate = null;
 	Julian latestDate = null;
 	long glBal = 0L;
-	String report = "";
+	String infoReport = "";
+	String errorReport = "";
 	String journals[] = new String[100];
 	long journalBals[] = new long[100];
 	int nJournals = 0;
