@@ -35,7 +35,7 @@ public class GLChecker
 		this.logger = VL2.logger;
 
 		// For debugging:
-		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		// logger.setLogAll(true);
 
 		currentYear = Integer.parseInt(props.getCurrentYear());
