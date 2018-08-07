@@ -89,7 +89,7 @@ public class ChartElement2
 	}
 
 	// toString returns a String of the form:
-	// name;level;accountIndex;key=value | key=value ...;
+	// name;level;accountIndex;key=value (| key=value)...;
 	public String toString()
 	{
 		String answer = name + ";" + Strings.format(level, "00") + ";" + Strings.format(index, "00") + ";" + "beginBal="
@@ -100,7 +100,10 @@ public class ChartElement2
 		{
 			String key = (String) en.nextElement();
 			if (key.contains("bal"))
-				continue; // the balances should not be in these props
+			{ // balances should not be in these props
+				VL2.logger.log("element props contains " + key);
+				continue;
+			}
 			String value = props.getProperty(key);
 			if (!first)
 				answer += "|";
