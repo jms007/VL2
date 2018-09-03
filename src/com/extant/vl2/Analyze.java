@@ -303,8 +303,12 @@ public class Analyze extends JDialog implements TreeSelectionListener
 		try
 		{
 			UsefulFile glFile = new UsefulFile(vl2Config.getGLFile(), "r");
+			String image;
 			while (!glFile.EOF())
 			{
+				image = glFile.readLine(UsefulFile.ALL_WHITE);
+				if (image.length() < 3)
+					continue; // ignore blank lines
 				glEntry = new GLEntry(glFile.readLine(UsefulFile.ALL_WHITE));
 				if (chart.match(acctNo, glEntry, startDate, endDate))
 					entries.addElement(glEntry);
