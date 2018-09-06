@@ -144,10 +144,17 @@ public class VL2Config
 		return nextGSN;
 	}
 
-	public void setPrintOrientation(String orientation)
+	public String setPrintOrientation(String orientation)
 	{
 		// 'protrait' or 'landscape'
-		printOrientation = orientation;
+		if (orientation.equalsIgnoreCase("portrait") || orientation.equalsIgnoreCase("landscape"))
+		{
+			printOrientation = orientation;
+			VL2.logger.logDebug("printOrientation set to " + orientation);
+			return orientation;
+		}
+		VL2.logger.log("setPrintOrientation to '" + orientation + "' failed.");
+		return null;
 	}
 
 	public String getPrintOrientation()
