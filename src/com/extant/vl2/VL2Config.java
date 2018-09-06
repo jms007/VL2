@@ -19,6 +19,7 @@ public class VL2Config
 	private String earliestDate;
 	private String latestDate;
 	private String nextGSN;
+	private String printOrientation; // Defaults to 'portrait' can be set to 'landscape'
 
 	public VL2Config(String propFilename, String entityName) throws IOException
 	{
@@ -50,6 +51,7 @@ public class VL2Config
 		System.out.println("WorkingDirectory=" + getWorkingDirectory());
 		System.out.println("earliestDate=" + getEarliestDate());
 		System.out.println("latestDate=" + getLatestDate());
+		System.out.println("printOrientation=" + getPrintOrientation());
 	}
 
 	public String getEntityName()
@@ -142,4 +144,14 @@ public class VL2Config
 		return nextGSN;
 	}
 
+	public void setPrintOrientation(String orientation)
+	{
+		// 'protrait' or 'landscape'
+		printOrientation = orientation;
+	}
+
+	public String getPrintOrientation()
+	{
+		return printOrientation;
+	}
 }
