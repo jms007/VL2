@@ -20,6 +20,8 @@ public class VL2Config
 	private String latestDate;
 	private String nextGSN;
 	private String printOrientation; // Defaults to 'portrait' can be set to 'landscape'
+	private static final int portraitWidth = 84;
+	private static final int landscapeWidth = 108;
 
 	public VL2Config(String propFilename, String entityName) throws IOException
 	{
@@ -52,6 +54,8 @@ public class VL2Config
 		System.out.println("earliestDate=" + getEarliestDate());
 		System.out.println("latestDate=" + getLatestDate());
 		System.out.println("printOrientation=" + getPrintOrientation());
+		System.out.println("portraitWidth=" + portraitWidth);
+		System.out.println("landscapeWidth=" + landscapeWidth);
 	}
 
 	public String getEntityName()
@@ -160,5 +164,15 @@ public class VL2Config
 	public String getPrintOrientation()
 	{
 		return printOrientation;
+	}
+
+	public int getPortraitWidth()
+	{
+		return portraitWidth;
+	}
+
+	public int getLandscapeWidth()
+	{
+		return landscapeWidth;
 	}
 }
