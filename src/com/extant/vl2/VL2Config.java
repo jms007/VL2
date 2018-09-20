@@ -1,6 +1,8 @@
 package com.extant.vl2;
 
 import java.io.IOException;
+
+import com.extant.utilities.Strings;
 import com.extant.utilities.XProperties;
 
 public class VL2Config
@@ -20,8 +22,10 @@ public class VL2Config
 	private String latestDate;
 	private String nextGSN;
 	private String printOrientation; // Defaults to 'portrait' can be set to 'landscape'
-	private static final int portraitWidth = 84;
-	private static final int landscapeWidth = 108;
+	public static final int portraitWidth = 84;
+	public static final int landscapeWidth = 108;
+	public static final long MAX_DOLLAR_AMOUNT = -999999999L; // $9,999,999.99
+	public static final int MAX_AMOUNT_LENGTH = Strings.formatPennies(MAX_DOLLAR_AMOUNT).length();
 
 	public VL2Config(String propFilename, String entityName) throws IOException
 	{
@@ -150,7 +154,7 @@ public class VL2Config
 
 	public String setPrintOrientation(String orientation)
 	{
-		// 'protrait' or 'landscape'
+		// orientation = 'protrait' or 'landscape'
 		if (orientation.equalsIgnoreCase("portrait") || orientation.equalsIgnoreCase("landscape"))
 		{
 			printOrientation = orientation;
@@ -164,6 +168,14 @@ public class VL2Config
 	public String getPrintOrientation()
 	{
 		return printOrientation;
+	}
+
+	public int getPaperWidth()
+	{
+		if (printOrientation.equalsIgnoreCase("portrait"))
+			return portraitWidth;
+		else
+			return landscapeWidth;
 	}
 
 	public int getPortraitWidth()

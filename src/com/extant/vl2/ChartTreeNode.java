@@ -5,17 +5,17 @@ import com.extant.utilities.Strings;
 
 public class ChartTreeNode extends DefaultMutableTreeNode
 {
-	ChartElement2 element;
+	ChartElement element;
 	String no;
 	String descr;
 	static final String nodeDescrSpec = "no, title, type, beginBal, deltaBal";
 
-	public ChartTreeNode(ChartElement2 element)
+	public ChartTreeNode(ChartElement element)
 	{
 		this.element = element;
 	}
 
-	public ChartElement2 getElement()
+	public ChartElement getElement()
 	{
 		return element;
 	}
@@ -31,7 +31,7 @@ public class ChartTreeNode extends DefaultMutableTreeNode
 		}
 	}
 
-	private String formatNode(ChartElement2 element, String nodeDescrSpec) throws VLException
+	private String formatNode(ChartElement element, String nodeDescrSpec) throws VLException
 	{ // There are no options for the text-only elements
 		if (element.getName().equals("chart") || element.getName().equals("section")
 				|| element.getName().equals("group"))

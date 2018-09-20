@@ -14,7 +14,7 @@ public abstract class ProcessElements
 		// Enumeration<ChartElement> chartElements = chart.chartElements();
 		// nElements = 0;
 		// while (chartElements.hasMoreElements())
-		ChartElement2 element;
+		ChartElement element;
 		for (int i = 0; i < chart.chartElements.size(); ++i)
 		{
 			element = chart.chartElements.elementAt(i);
@@ -23,7 +23,7 @@ public abstract class ProcessElements
 		}
 	}
 
-	abstract void processElement(ChartElement2 element);
+	abstract void processElement(ChartElement element);
 
 	Chart chart;
 	LogFile logger = VL2.logger;

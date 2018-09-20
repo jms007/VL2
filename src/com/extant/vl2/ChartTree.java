@@ -85,7 +85,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 	 * elementList; }
 	 */
 
-	private JTree buildTree(Vector<ChartElement2> chartElements) throws VLException
+	private JTree buildTree(Vector<ChartElement> chartElements) throws VLException
 	{
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		root = new ChartTreeNode(chart.chartElements.elementAt(0));
@@ -104,8 +104,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 		return tree;
 	}
 
-	private int build(Vector<ChartElement2> chartElements, int index, ChartTreeNode parent, int level)
-			throws VLException
+	private int build(Vector<ChartElement> chartElements, int index, ChartTreeNode parent, int level) throws VLException
 	{
 		logger.logDebug("entering build  index=" + index);
 		while (chartElements.elementAt(index).getLevel() == level)
@@ -158,13 +157,13 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 		return index;
 	}
 
-	// public ChartElement2[] getElementList()
+	// public ChartElement[] getElementList()
 	// {
 	// return chart.elementList;
 	// }
 	//
 
-	private String formatNode(ChartElement2 element, String nodeDescrSpec) throws VLException
+	private String formatNode(ChartElement element, String nodeDescrSpec) throws VLException
 	{
 		long beginBal = 0L;
 		long deltaBal = 0L;
@@ -333,7 +332,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 		listenerList.remove(PropertyChangeListener.class, listener);
 	}
 
-	public static boolean isElement(ChartElement2 element, String[] elementNames)
+	public static boolean isElement(ChartElement element, String[] elementNames)
 	{
 		for (int i = 0; i < elementNames.length; ++i)
 			if (element.name.equals(elementNames[i]))
@@ -380,7 +379,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 			// ( XProperties props, String chartFilename, Julian begin, Julian end, LogFile
 			// logger )
 			// ChartTree chartTree = new ChartTree(props, chart, logger);
-			// ChartElement2 elements[] = chart.getElementList();
+			// ChartElement elements[] = chart.getElementList();
 			// new DisplayTree( "Chart of Accounts", tree, new Point(200,200), new
 			// Dimension(400, 1000) );
 			// ViewTree viewTree = new ViewTree("View Chart Tree", tree);
@@ -394,16 +393,16 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 
 	public class ChartTreeNode extends DefaultMutableTreeNode
 	{
-		ChartElement2 element;
+		ChartElement element;
 		String no;
 		String descr;
 
-		public ChartTreeNode(ChartElement2 element)
+		public ChartTreeNode(ChartElement element)
 		{
 			this.element = element;
 		}
 
-		public ChartElement2 getElement()
+		public ChartElement getElement()
 		{
 			return element;
 		}

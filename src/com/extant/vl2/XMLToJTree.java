@@ -81,7 +81,7 @@ public class XMLToJTree
 	// return elementList;
 	// }
 
-	public JTree buildTree(ChartElement2 elementList[]) throws VLException
+	public JTree buildTree(ChartElement elementList[]) throws VLException
 	{
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode(elementList[0]);
@@ -100,7 +100,7 @@ public class XMLToJTree
 		return jTree;
 	}
 
-	private int build(ChartElement2 elementList[], int startIndex, ChartTreeNode parent, int level) throws VLException
+	private int build(ChartElement elementList[], int startIndex, ChartTreeNode parent, int level) throws VLException
 	{
 		int index = startIndex;
 		logger.logDebug("entering build  index=" + index);
@@ -259,7 +259,7 @@ public class XMLToJTree
 	String chartXMLFilename;
 	static final String nodeDescrSpec = "no, title, type, beginBal, deltaBal";
 	int index;
-	ChartElement2[] elementList;
+	ChartElement[] elementList;
 	JTree jTree;
 	DefaultTreeModel treeModel;
 	ChartTreeNode selectedNode = null;
@@ -268,16 +268,16 @@ public class XMLToJTree
 	/* EMBEDDED CLASS */
 	public class ChartTreeNode extends DefaultMutableTreeNode
 	{
-		ChartElement2 element;
+		ChartElement element;
 		String no;
 		String descr;
 
-		public ChartTreeNode(ChartElement2 element)
+		public ChartTreeNode(ChartElement element)
 		{
 			this.element = element;
 		}
 
-		public ChartElement2 getElement()
+		public ChartElement getElement()
 		{
 			return element;
 		}
@@ -293,7 +293,7 @@ public class XMLToJTree
 			}
 		}
 
-		private String formatNode(ChartElement2 element, String nodeDescrSpec) throws VLException
+		private String formatNode(ChartElement element, String nodeDescrSpec) throws VLException
 		{ // There are no options for the text-only elements
 			if (element.getName().equals("chart") || element.getName().equals("section")
 					|| element.getName().equals("group"))

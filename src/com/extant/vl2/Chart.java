@@ -4,28 +4,34 @@
  *
  * Created on September 4, 2006, 8:34 PM
  * 10-19-06 Added errors for (a) no P/L account and (b) multiple P/L accounts
- * 07-13-18 Removed ChartElement2[] elementList, replaced by <Vector> chartElements
+ * 07-13-18 Removed ChartElement[] elementList, replaced by <Vector> chartElements
  */
 package com.extant.vl2;
 
-//import org.xml.sax.*;
 import com.extant.utilities.Sorts;
 import com.extant.utilities.Julian;
 import com.extant.utilities.Strings;
 import com.extant.utilities.LogFile;
-//import com.extant.utilities.Clip;
-//import com.extant.utilities.UtilitiesException;
+import java.util.Vector;
+import java.util.StringTokenizer;
+
 import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 
 import java.io.*;
-import java.util.Vector;
-//import java.util.Enumeration;
-import java.util.StringTokenizer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+//import javax.xml.namespace.NamespaceContext;
+//import javax.xml.parsers.DocumentBuilder;
+//import javax.xml.parsers.DocumentBuilderFactory;
+//import javax.xml.parsers.ParserConfigurationException;
+//import javax.xml.xpath.XPath;
+//import javax.xml.xpath.XPathConstants;
+//import javax.xml.xpath.XPathExpressionException;
+//import javax.xml.xpath.XPathFactory;
 
 /**
  *
@@ -38,8 +44,9 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 	}
 
 	/*
-	 * init method creates a Chart with all accounts as specified in the given
-	 * chart.xml input file. No 'amount' information is calculated.
+	 * The init method creates a Chart with all accounts as specified in the given
+	 * chart.xml input file and specifies a format for financial statements and
+	 * Chart of Accounts listings. No 'amount' information is calculated.
 	 */
 	public void init(String chartFilename, LogFile logger) throws IOException, VLException
 	{
@@ -56,10 +63,13 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 				throw new IOException("Input file is not of type XML");
 			this.chartFilename = chartFilename;
 			accounts = new Vector<Account>(500, 100);
-			chartElements = new Vector<ChartElement2>(500, 100);
-			maxLevel = 0;
+			chartElements = new Vector<ChartElement>(500, 100);
 			elementCount = 0;
 			level = 0;
+			maxLevel = 0;
+
+			// To learn about Document and XPATH see:
+			// https://www.tutorialspoint.com/java_xml/java_xpath_query_document.htm/
 
 			// Use the validating parser
 			SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -78,18 +88,12 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 			}
 			Vector<String> descrs = buildAcctsByDescr();
 			acctsByDescrP = Sorts.sort(descrs);
-			acctsByChartP = new int[nAccounts];
-			for (int i = 0; i < nAccounts; ++i)
-				acctsByChartP[i] = i;
-			allElementsP = new int[chartElements.size()];
-			for (int i = 0; i < chartElements.size(); ++i)
-				allElementsP[i] = i;
 
-			// Check for account descriptions beginning with a digit
+			// Check for account titles beginning with a digit
 			boolean titleError = false;
 			for (int i = 0; i < acctsByDescrP.length; ++i)
 			{
-				Account account = (Account) accounts.elementAt(i);
+				account = (Account) accounts.elementAt(i);
 				String title = account.getTitle();
 				if (Strings.isNumeric(title.charAt(0)))
 				{
@@ -100,13 +104,15 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 			}
 			if (titleError)
 				throw new VLException(VLException.CHART_FORMAT_ERROR, "");
+
+			// Verify there is a defined P&L account
 			if (plAccount == null)
 			{
 				reportError("No P&L Account Defined in this chart");
 				throw new VLException(VLException.CHART_FORMAT_ERROR, "No P/L Account");
 			}
-			acctNumbers = null; // basura
-			descrs = null; // basura
+			// acctNumbers = null; // basura
+			// descrs = null; // basura
 			return;
 		} catch (ParserConfigurationException | SAXException xl)
 		{
@@ -129,7 +135,7 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 
 		// Create this chart element and its attributes
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-		ChartElement2 chartElement = new ChartElement2(eName, level, elementCount);
+		ChartElement chartElement = new ChartElement(eName, level, elementCount);
 		logger.logDebug("start element[" + elementCount + "]: " + eName);
 		for (int i = 0; i < attrs.getLength(); ++i)
 		{
@@ -139,84 +145,99 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		}
 
 		// Now process the individual element types
-
+		// Note that chart & section titles are always centered, so their max values
+		// are not needed.
 		if (eName.equals("chart"))
 		{ // START CHART
+			// Set default values
+			indent = 4;
+			dollarFormat = "(,";
+			longDateFormat = "mmmm dd, yyyy";
+			shortDateFormat = "mm-dd-yy";
+
 			conum = attrs.getValue("conum");
 			coname = attrs.getValue("title");
-			showacct = attrs.getValue("showacct").equalsIgnoreCase("Y");
 			indent = Integer.parseInt(attrs.getValue("indent"));
-			dollarFormat = attrs.getValue("edit");
-			dateFormat = attrs.getValue("date");
+			if (attrs.getValue("indent") != null)
+				indent = new Integer(attrs.getValue("indent"));
+			if (attrs.getValue("dollarFormat") != null)
+				dollarFormat = attrs.getValue("dollarFormat");
+			if (attrs.getValue("longDateFormat") != null)
+				longDateFormat = attrs.getValue("longDateFormat");
+			if (attrs.getValue("shortDateFormat") != null)
+				shortDateFormat = attrs.getValue("shortDate");
+			logger.logDebug("Chart Element: longDateFormat=" + longDateFormat);
+			logger.logDebug("Chart Element: shortDateFormat=" + shortDateFormat);
 			chartVersion = attrs.getValue("version");
-			// chartElements.addElement(chartElement);
 			++level;
 			logger.logDebug("   incrementing level to " + level);
 		} else if (eName.equals("section"))
 		{ // START SECTION
-			String title;
-			title = attrs.getValue("title");
-			if (title.length() > maxSectionTitleLength)
-			{
-				maxSectionTitle = title;
-				maxSectionTitleLength = title.length();
-				++level;
-				logger.logDebug("   incrementing level to " + level);
-			}
+			++level;
+			logger.logDebug("   Chart Element: incrementing level to " + level);
 
 		} else if (eName.equals("group"))
 		{ // START GROUP
 			String title = attrs.getValue("title");
-			// currentGroupTitle = title;
-			if (title.length() > maxGroupTitleLength)
+			// maxTitleCalc (group)
+			if (title.length() > maxTitleLength)
 			{
-				maxGroupTitle = title;
-				maxGroupTitleLength = title.length();
+				maxTitle = title;
+				maxTitleLength = title.length();
 			}
 			++level;
-			logger.logDebug("   incrementing level to " + level);
+			logger.logDebug("   Group Element: incrementing level to " + level);
 
 		} else if (eName.equals("account"))
 		{ // START ACCOUNT
 			logger.logDebug("Creating Account: " + attrs.getValue("no") + " '" + attrs.getValue("title") + "'");
-			if (findAcctByNo(attrs.getValue("no")) != null)
-				; // !! This is a duplicate account number, but
-					// we can't throw an exception here
-			Account account = new Account(attrs.getValue("no"), Strings.format(level, "00"), attrs.getValue("type"),
+			// if (findAcctByNo(attrs.getValue("no")) != null)
+			// ; !! This is a duplicate account number, but
+			// we can't throw an exception here
+			account = new Account(attrs.getValue("no"), Strings.format(level, "00"), attrs.getValue("type"),
 					attrs.getValue("title"), elementCount);
-			// 'type' should be renamed 'class'
+			// TODO 'type' should be renamed 'class'
+			if (account == null)
+				System.out.println("chart.186 account is null!"); // TOTO remove
 			accounts.addElement(account);
-			// chartElements.addElement(chartElement);
+			if (account.accountType.equals("R"))
+			{
+				plAccount = account;
+				logger.log("plAccount=" + plAccount.toString()); // TODO remove
+			}
+			String accountNo = account.accountNo;
+			// maxAccountNoCalc (account)
+			if (accountNo.length() > maxAccountNoLength)
+			{
+				maxAccountNo = accountNo;
+				maxAccountNoLength = maxAccountNo.length();
+			}
 			String title = attrs.getValue("title");
-			if (title.length() > maxAccountTitleLength)
+			// maxTitleCalc (account)
+			if (title.length() > maxTitleLength)
 			{
-				maxAccountTitle = title;
-				maxAccountTitleLength = title.length();
+				maxTitle = title;
+				maxTitleLength = maxTitle.length();
 			}
-			String no = attrs.getValue("no");
-			if (no.length() > maxAccountNoLength)
-			{
-				maxAccountNo = no;
-				maxAccountNoLength = no.length();
-			}
-
 			if (level > maxLevel)
 				maxLevel = level;
+
 			if (attrs.getValue("type").equals("R"))
 			{
-				if (plAccount == null)
-					plAccount = account;
+				if (plAccount != null)
+					reportError("Multiple P/L Accounts are defined: " + plAccount.accountNo + " " + account.accountNo);
 				else
-					reportError("Multiple P/L Accounts are defined.");
+					plAccount = account;
 			}
 
 		} else if (eName.equals("total"))
 		{ // START TOTAL
 			String title = attrs.getValue("title");
-			if (title.length() > maxTotalTitleLength)
+			// maxTitleCalc (total)
+			if (title.length() > maxTitleLength)
 			{
-				maxTotalTitle = title;
-				maxTotalTitleLength = title.length();
+				maxTitle = title;
+				maxTitleLength = title.length();
 			}
 
 		} else
@@ -225,8 +246,9 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 			return;
 		}
 
-		// Finally add this element to the list
+		// Set plElement and add this element to the element list
 		logger.logDebug("Chart: Adding to chartElements: " + chartElement.toString());
+		plElement = chartElement;
 		chartElements.addElement(chartElement);
 		++elementCount;
 	}
@@ -246,25 +268,21 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		} else if (qName.trim().equals("chart"))
 		{ // END CHART
 			logger.log("Chart parsing is complete.");
-			// elementList = new ChartElement2[chartElements.size()];
 			// Show the last element (if debug)
 			logger.logDebug("lastElement: [" + chartElements.size() + "]=" + chartElements.lastElement().toString());
 			// Copy all ChartElement's from chartElements to elementList
 			if (chartElements == null)
-				logger.logFatal("Chart:253: chartElements is null!");
-			// if (elementList == null)
-			// logger.logFatal("Chart:255: elementList is null!");
-			// for (int i = 0; i < chartElements.size(); i++)
-			// elementList[i] = chartElements.get(i);
+				logger.logFatal("Chart:249: chartElements is null!");
 			--level;
 			logger.logDebug("   decrementing level to " + level);
 			logger.logDebug(chartElements.size() + " ChartElements created");
 			if (level != 0)
 				logger.logFatal("Chart: Final Level is " + level);
+			nAccounts = accounts.size();
 		}
 	}
 
-	public Vector<ChartElement2> getChartElements()
+	public Vector<ChartElement> getChartElements()
 	{
 		return chartElements;
 	}
@@ -305,7 +323,8 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 
 	public String match(String partial)
 	{
-		// !! This won't properly locate an account for which the description begins
+		logger.log("Chart.match: nAccounts=" + nAccounts);
+		// !! This won't correctly locate an account for which the description begins
 		// with a decimal digit ( like '429 Burnett' ).
 		String trial;
 		int p;
@@ -364,21 +383,22 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		return match;
 	}
 
-	// public void clearAccountBalances()
-	// {
-	// for (int i = 0; i < accounts.size(); ++i)
-	// {
-	// Account account = (Account) accounts.elementAt(i);
-	// account.zeroBalances();
-	// }
-	// // // Added 1-13-04 to zero balances in 'S' and 'T' entries:
-	// // for (int i=0; i<stmtTemplate.size(); ++i)
-	// // {
-	// // Account acct = (Account)stmtTemplate.elementAt( i );
-	// // acct.zeroBalances();
-	// // }
-	// }
-	//
+	public void clearElementBalances()
+	{
+		for (int i = 0; i < chartElements.size(); ++i)
+		{
+			ChartElement element = (ChartElement) chartElements.elementAt(i);
+			element.beginBal = 0L;
+			element.deltaBal = 0L;
+		}
+		// // Added 1-13-04 to zero balances in 'S' and 'T' entries:
+		// for (int i=0; i<stmtTemplate.size(); ++i)
+		// {
+		// Account acct = (Account)stmtTemplate.elementAt( i );
+		// acct.zeroBalances();
+		// }
+	}
+
 	// public void removeGLEntries()
 	// {
 	// for (int i = 0; i < accounts.size(); ++i)
@@ -391,11 +411,12 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 	private Vector<String> buildAcctsByNumber()
 	{
 		Vector<String> numbers = new Vector<String>(accounts.size());
+		String accountNo;
+
 		for (int i = 0; i < accounts.size(); ++i)
 		{
-			StringTokenizer st = new StringTokenizer(((Account) accounts.elementAt(i)).getAccountNo(), "[]");
-			if (st.hasMoreElements())
-				numbers.addElement((String) st.nextElement());
+			accountNo = accounts.elementAt(i).getAccountNo();
+			numbers.addElement(accountNo);
 		}
 		return numbers;
 	}
@@ -408,17 +429,14 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		return descrs;
 	}
 
-	// public Vector<ChartElements> getChartElements()
-	// {
-	// ChartElement2 elementList[] = new ChartElement2[chartElements.size()];
-	// for (int i = 0; i < elementList.length; ++i)
-	// elementList[i] = (ChartElement2) chartElements.elementAt(i);
-	// return elementList;
-	// }
-	//
 	public Account getPLAccount()
 	{
 		return plAccount;
+	}
+
+	public ChartElement getPLElement()
+	{
+		return plElement;
 	}
 
 	public String getVersion()
@@ -436,18 +454,6 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		return coname;
 	}
 
-	public boolean setShowacct(boolean showacct)
-	{
-		boolean old = this.showacct;
-		this.showacct = showacct;
-		return old;
-	}
-
-	public boolean getShowacct()
-	{
-		return showacct;
-	}
-
 	public int getIndent()
 	{
 		return indent;
@@ -463,9 +469,9 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		return dollarFormat;
 	}
 
-	public String getDateFormat()
+	public String getLongDateFormat()
 	{
-		return dateFormat;
+		return longDateFormat;
 	}
 
 	public String getShortDateFormat()
@@ -483,19 +489,25 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		return nAccounts;
 	}
 
-	public int getMaxDescrLength()
-	{
-		return maxAccountTitle.length();
-	}
-
+	// max get methods
 	public String getMaxDescr()
 	{
-		return maxAccountTitle;
+		return maxTitle;
 	}
 
-	public int getMaxAccountTitleLength()
+	public String getMaxTitle()
 	{
-		return maxAccountTitle.length();
+		return maxTitle;
+	}
+
+	public int getMaxDescrLength()
+	{
+		return maxTitleLength;
+	}
+
+	public int getMaxTitleLength()
+	{
+		return maxTitleLength;
 	}
 
 	public int getMaxLevel()
@@ -503,24 +515,24 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		return maxLevel;
 	}
 
-	public int getMaxAcctNoLength()
-	{
-		return maxAccountNo.length();
-	}
-
 	public String getMaxAcctNo()
 	{
 		return maxAccountNo;
 	}
 
-	public String getMaxGroupTitle()
+	public int getMaxAccountNoLength()
 	{
-		return maxGroupTitle;
+		return maxAccountNoLength;
 	}
 
 	public String getFileName()
 	{
 		return chartFilename;
+	}
+
+	public int getElementCount()
+	{
+		return elementCount;
 	}
 
 	// public Enumeration acctsByChart()
@@ -532,13 +544,13 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 	// return (Enumeration) this;
 	// }
 	//
-	// public Enumeration acctsByNumber()
+	// public Enumeration <Account> acctsByNumber()
 	// {
 	// enumP = acctsByNumberP;
 	// enumerationIndex = 0;
 	// enumeratingAccounts = true;
 	// enumeratingElements = false;
-	// return (Enumeration) this;
+	// return (Enumeration <Account>) acctsByNumber.elementAt;
 	// }
 	//
 	// public Enumeration acctsByDescr()
@@ -564,18 +576,39 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		return enumerationIndex < enumP.length;
 	}
 
-	// public String nextElement()
-	// {
-	// if (enumerationIndex >= enumP.length)
-	// throw new NoSuchElementException();
-	// if (enumeratingAccounts)
-	// return accounts.elementAt(enumP[enumerationIndex++]);
-	// else if (enumeratingElements)
-	// return chartElements.elementAt(enumerationIndex++);
-	// else
-	// return null;
-	// }
-	//
+	public Account nextAccountElement()
+	{
+		if (enumerationIndex >= enumP.length)
+			return null;
+		return accounts.elementAt(enumP[enumerationIndex++]);
+	}
+
+	// Find the element that has 'tag' attributes which contain the substring tag
+	// (an inefficient but simple xPath, assumes tags are unique)
+	public ChartElement findTagElement(String tag)
+	{
+		ChartElement element;
+		ChartElement answer = null;
+		String tagValue;
+		logger.logDebug("searching for tag '" + tag + "'");
+		for (int i = 0; i < chartElements.size(); ++i)
+		{
+			element = chartElements.elementAt(i);
+			tagValue = element.getAttribute("tag");
+			logger.logDebug("element[" + i + "] tagValue=" + tagValue);
+			if (tagValue != null)
+			{
+				if (tagValue.contains(tag))
+				{
+					answer = element;
+					logger.logDebug("findTagElements found " + element.toString());
+					break;
+				}
+			}
+		}
+		return answer;
+	}
+
 	private void reportDupAccounts(Vector<Account> accounts, int p[])
 	{
 		for (int i = 0; i < accounts.size() - 1; ++i)
@@ -591,11 +624,6 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		}
 	}
 
-	// private void reportInfo(String msg)
-	// {
-	// errorReport += msg + "\n";
-	// }
-	//
 	private void reportError(String msg)
 	{
 		++nErrors;
@@ -609,117 +637,38 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 
 	public String getErrorReport()
 	{
-		return errorReport + "No. of errors = " + nErrors + "\n";
+		return "No. of errors = " + nErrors + "\n" + errorReport;
 	}
-
-	public void addToBeginBal(long amount)
-	{
-		beginBal += amount;
-		logger.logDebug("Chart adding " + amount + " to beginBal resulting in " + beginBal);
-	}
-
-	public void addToDeltaBal(long amount)
-	{
-		deltaBal += amount;
-		logger.logDebug("Chart adding " + amount + " to deltaBal resulting in " + deltaBal);
-	}
-
-	public long getBeginBal()
-	{
-		return beginBal;
-	}
-
-	public long getDeltaBal()
-	{
-		return deltaBal;
-	}
-
-	public long getTotalBal()
-	{
-		return beginBal + deltaBal;
-	}
-
-	/*****
-	 * FOR TESTING ***** public static void main(String[] args) { Chart chart =
-	 * null; try { Clip clip = new Clip(args, new String[] {
-	 * "in=G:\\ACCOUNTING\\JMS\\ARCHIVES\\GL06\\CHART.XML" }); LogFile logger = new
-	 * LogFile(); // For debugging: logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-	 * chart = new Chart(); chart.init(clip.getParam("in"), logger);
-	 * 
-	 * Enumeration<Account> accounts;
-	 * com.extant.utilities.Console.println("*****ACCOUNTS BY ACCOUNT NUMBER*****");
-	 * accounts = chart.acctsByNumber(); while (accounts.hasMoreElements())
-	 * com.extant.utilities.Console.println(((Account)
-	 * accounts.nextElement()).toString());
-	 * 
-	 * com.extant.utilities.Console.println("*****ACCOUNTS BY DESCRIPTION*****");
-	 * accounts = chart.acctsByDescr(); while (accounts.hasMoreElements())
-	 * com.extant.utilities.Console.println(((Account)
-	 * accounts.nextElement()).toString());
-	 * 
-	 * com.extant.utilities.Console.println("*****STATEMENT ELEMENTS*****"); //
-	 * Enumeration ChartElement2 elements = chart.chartElements(); // ChartElement2
-	 * element; // while (elements.hasMoreElements()) { // element = (ChartElement)
-	 * elements.nextElement(); //
-	 * com.extant.utilities.Console.println(element.toString()); }
-	 * com.extant.utilities.Console.println("maxLevel=" + chart.getMaxLevel());
-	 * com.extant.utilities.Console .println("maxAcctNoLength=" +
-	 * chart.getMaxAcctNoLength() + " '" + chart.getMaxAcctNo() + "'");
-	 * com.extant.utilities.Console .println("maxDescr=" + chart.getMaxDescrLength()
-	 * + " '" + chart.getMaxDescr() + "'");
-	 * 
-	 * com.extant.utilities.Console.println("Chart initialization complete - no
-	 * errors found"); } catch (UtilitiesException ux) {
-	 * com.extant.utilities.Console.println(ux.getMessage()); } catch (Throwable x)
-	 * { if (chart != null)
-	 * com.extant.utilities.Console.println(chart.getErrorReport()); //
-	 * x.printStackTrace(); com.extant.utilities.Console.println(x.getMessage()); }
-	 * }
-	 * 
-	 * /***** END OF TEST
-	 *****/
 
 	String chartFilename;
 	LogFile logger;
 	int nErrors;
 	String errorReport = "";
 	int level;
-	// ChartElement2[] elementList;
-	Vector<ChartElement2> chartElements; // Replaces ChartElement2[]
+	Vector<ChartElement> chartElements; // Replaces ChartElement[]
 	private int elementCount;
-	Vector<Account> accounts;
-	private int nAccounts;
-	private int acctsByChartP[];
-	private int acctsByNumberP[];
-	private int acctsByDescrP[];
-	private int allElementsP[];
+	Vector<Account> accounts; // All accounts in chart order
+	public int nAccounts;
+	public int acctsByNumberP[]; // index of accounts in account number order
+	public int acctsByDescrP[]; // index of accounts in descr (title) order
 	private int enumP[];
-	// private boolean enumeratingAccounts;
-	// private boolean enumeratingElements;
-	// private String currentGroupTitle;
 	private String conum;
 	private String coname;
-	private boolean showacct;
 	private int indent;
 	private String dollarFormat = ",)"; // Default
-	private String dateFormat = "mmmm dd, yyyy"; // Default
-	private String shortDateFormat = "mm/mm/dddd";
-	private String chartVersion = "3.1"; // Default
-	private Account plAccount = null;
+	private String longDateFormat;
+	private String shortDateFormat;
+	private String chartVersion = "3.2"; // Default
+	private Account account;
+	public Account plAccount = null;
+	public ChartElement plElement;
 	private int enumerationIndex;
 	int maxLevel = 0;
 
-	String maxSectionTitle = "";
-	String maxGroupTitle = "";
 	String maxAccountNo = "";
-	String maxAccountTitle = "";
-	String maxTotalTitle = "";
-
-	int maxSectionTitleLength = 0;
-	int maxGroupTitleLength = 0;
 	int maxAccountNoLength = 0;
-	int maxAccountTitleLength = 0;
-	int maxTotalTitleLength = 0;
+	String maxTitle = "";
+	int maxTitleLength = 0;
 
 	long beginBal = 0L;
 	long deltaBal = 0L;

@@ -297,7 +297,7 @@ public class Analyze extends JDialog implements TreeSelectionListener
 		String acctNo = acctEntry.getAccountNo();
 		StringBuffer results = new StringBuffer();
 		GLEntry glEntry;
-		Vector entries = new Vector(100, 100);
+		Vector<GLEntry> entries = new Vector<GLEntry>(100, 100);
 		String dateFormat = "mm-dd-yyyy";
 		int dateSpace = dateFormat.length() + 1;
 		try
@@ -309,7 +309,7 @@ public class Analyze extends JDialog implements TreeSelectionListener
 				image = glFile.readLine(UsefulFile.ALL_WHITE);
 				if (image.length() < 3)
 					continue; // ignore blank lines
-				glEntry = new GLEntry(glFile.readLine(UsefulFile.ALL_WHITE));
+				glEntry = new GLEntry(image);
 				if (chart.match(acctNo, glEntry, startDate, endDate))
 					entries.addElement(glEntry);
 			}

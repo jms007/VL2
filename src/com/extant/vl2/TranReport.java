@@ -16,10 +16,10 @@ import com.extant.utilities.*;
 //import com.extant.utilities.VLException;
 import javax.swing.*;
 import java.io.*;
-import java.util.Enumeration;
+//import java.util.Enumeration;
 
 /**
- * Produces the GL Summary and GL Detail Transaction Reports
+ * Methods to Produce GL Summary and GL Detail Transaction Reports
  * 
  * @author jms
  */
@@ -40,7 +40,8 @@ public class TranReport extends JDialog
 		// String image;
 		// GLEntry glEntry;
 		// For Debugging:
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.logDebug("entering TranReport.setup");
 
 		workDir = vl2FileMan.getWorkingDirectory();
 		if (reportType == DETAIL)
@@ -51,20 +52,22 @@ public class TranReport extends JDialog
 			new File(outFilename).delete();
 		glFileName = vl2FileMan.getGLFile();
 
-		titleWidth = chart.getMaxAccountTitleLength();
+		titleWidth = chart.getMaxTitleLength();
 		dateFormat = "mm-dd-yyyy";
 		// Default is to include all transactions
 		begin = new Julian(vl2FileMan.getEarliestDate());
 		end = new Julian(vl2FileMan.getLatestDate());
 		sBegin = begin.toString("mm-dd-yyyy");
 		sEnd = end.toString("mm-dd-yyyy");
-		logger.logDebug("TranReport|setup: " + sBegin + " " + sEnd);
+		logger.logDebug("TranReport setup: " + sBegin + " " + sEnd);
 	}
 
 	public void makeReport() throws IOException, VLException
 	{
 		// For debugging:
 		// logger.setLogLevel((LogFile.DEBUG_LOG_LEVEL));
+		logger.logDebug("entering makeReport");
+
 		long beginTotal = 0L; // SUMMARY - total of all accounts at beginDate
 		long transTotal = 0L; // SUMMARY - net transactions in period for all accounts
 		long endTotal = 0L; // both - total of all accounts at endDate
@@ -75,8 +78,9 @@ public class TranReport extends JDialog
 		outfile = new UsefulFile(outFilename, "w");
 		printTitle(outfile, reportType, begin.toString(dateFormat), end.toString(dateFormat), vl2FileMan);
 		// Compute balances and add GL transactions to the accounts
-		logger.logDebug("calling computeAccountBalances begin=" + begin + "   end=" + end);
-		VLUtil.computeAccountBalances(vl2FileMan.getGLFile(), chart, begin, end, logger);
+		logger.logDebug("calling VLUtil.postToAccounts begin=" + begin + "   end=" + end);
+
+		VLUtil.postToAccounts(vl2FileMan.getGLFile(), chart);
 
 		// Console.println( "[TranReport.makeReport] plTrans:\n" +
 		// chart.getPLAccount().glEntries.elementAt( 0 ).toString() );
@@ -84,27 +88,30 @@ public class TranReport extends JDialog
 		// " delta=" + chart.getPLAccount().getDeltaBal() + " end=" +
 		// chart.getPLAccount().getEndBal() );
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-		Enumeration accounts = chart.acctsByNumber();
-		while (accounts.hasMoreElements())
+		for (int i = 0; i < chart.accounts.size(); ++i)
 		{
-			Account account = (Account) accounts.nextElement();
-			logger.logDebug(account.accountNo);
-			if (account.glEntries.isEmpty() && account.getBeginBal() == 0L)
+			Account account = (Account) chart.accounts.get(chart.acctsByNumberP[i]);
+			logger.logDebug("Account: " + account.accountNo);
+			ChartElement element = chart.chartElements.get(account.elementIndex);
+			logger.logDebug(
+					"Account " + account.accountNo + " begin=" + element.beginBal + " delta=" + element.deltaBal);
+			if (account.glEntries.isEmpty() && element.beginBal == 0L)
 				continue; // no beginning balance or transactions in this account
-			beginTotal += account.getBeginBal();
-			transTotal += account.getDeltaBal();
-			endTotal += account.getEndBal();
+			transTotal += element.deltaBal;
+			endTotal += element.beginBal + element.deltaBal;
 			report(acctHeaderLine(reportType, account));
-			report(acctBeginLine(reportType, account, account.getBeginBal()));
+			report(acctBeginLine(reportType, account, element.beginBal));
 			// Sort the GLEntries by date here (for detail report)
 			String dateList[] = new String[account.glEntries.size()];
-			for (int i = 0; i < dateList.length; ++i)
-				dateList[i] = ((GLEntry) account.glEntries.elementAt(i)).getJulianDate().toString("yymmdd");
+			for (int j = 0; j < dateList.length; ++j)
+				dateList[j] = ((GLEntry) account.glEntries.elementAt(j)).getJulianDate().toString("yymmdd");
 			int sortedEntries[] = Sorts.sort(dateList);
-			for (int i = 0; i < sortedEntries.length; ++i)
-				report(detailLine(reportType, (GLEntry) account.glEntries.elementAt(sortedEntries[i])));
-			report(acctTotalLine(reportType, account, account.getBeginBal(), account.getDeltaBal(),
-					account.getEndBal()));
+			for (int j = 0; j < sortedEntries.length; ++j)
+			{
+				report(detailLine(reportType, (GLEntry) account.glEntries.elementAt(sortedEntries[j]),
+						element.deltaBal));
+			}
+			report(acctTotalLine(reportType, account, element));
 		}
 		report(reportTotalsLine(reportType, beginTotal, transTotal, endTotal));
 		outfile.close();
@@ -152,28 +159,33 @@ public class TranReport extends JDialog
 		return image;
 	}
 
-	private String detailLine(int reportType, GLEntry glEntry)
+	private String detailLine(int reportType, GLEntry glEntry, long accountTransTotal)
 	{
 		String image;
-		if (reportType == DETAIL)
-			image = "      " + glEntry.getFixedJulianDate().toString(dateFormat) + " " + glEntry.getField("JRef") + " "
+		long amount;
+		if (reportType == DETAIL && !glEntry.getField("JREF").equals("BALF"))
+		{
+			amount = glEntry.getSignedAmount();
+			image = "      " + glEntry.getJulianDate().toString(dateFormat) + " " + glEntry.getField("JRef") + " "
 					+ Strings.leftJustify(glEntry.getField("DESCR"), 30)
-					+ Strings.rightJustify(Strings.formatPennies(glEntry.getSignedAmount(), dollarFormat), 15);
-		else
+					+ Strings.rightJustify(Strings.formatPennies(amount, dollarFormat), 15);
+			accountTransTotal += amount;
+		} else
 			image = "";
 		return image;
 	}
 
-	private String acctTotalLine(int reportType, Account account, long beginBal, long transTotal, long acctTotal)
+	private String acctTotalLine(int reportType, Account account, ChartElement element)
 	{
 		String image;
+		long acctTotal = element.beginBal + element.deltaBal;
 		if (reportType == DETAIL)
 			image = "      " + sEnd + "      Ending Balance                                 "
 					+ Strings.rightJustify(Strings.formatPennies(acctTotal, dollarFormat), 15) + "\n";
 		else
 			image = Strings.leftJustify(account.getAccountNo(), 22) + Strings.leftJustify(account.getTitle(), 30) + " "
-					+ Strings.rightJustify(Strings.formatPennies(beginBal, dollarFormat), 15)
-					+ Strings.rightJustify(Strings.formatPennies(transTotal, dollarFormat), 15)
+					+ Strings.rightJustify(Strings.formatPennies(element.beginBal, dollarFormat), 15)
+					+ Strings.rightJustify(Strings.formatPennies(element.deltaBal, dollarFormat), 15)
 					+ Strings.rightJustify(Strings.formatPennies(acctTotal, dollarFormat), 15);
 		// Console.println( "[TranReport.acctTotalLine] image.length()=" +
 		// image.length() );

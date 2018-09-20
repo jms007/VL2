@@ -16,7 +16,6 @@ import com.extant.utilities.Julian;
 import com.extant.utilities.Strings;
 import com.extant.utilities.UsefulFile;
 import com.extant.utilities.LogFile;
-import java.lang.Integer;
 import java.io.IOException;
 
 /**
@@ -31,7 +30,6 @@ public class GLChecker
 	{
 		glFilename = props.getGLFile();
 		this.chart = chart;
-		this.props = props;
 		this.logger = VL2.logger;
 
 		// For debugging:
@@ -74,7 +72,11 @@ public class GLChecker
 				image = f.readLine();
 				++lineNo;
 				if (image.length() < 3)
+				{
+					logger.log("GLChecker: line " + lineNo + " is blank");
 					continue; // Ignore (but count) short lines
+					// TODO DELETE SHORT LINES
+				}
 				glEntry = new GLEntry(image);
 				logger.logDebug("Line " + lineNo + ": " + image);
 				logger.logDebug("GLEntry: " + glEntry.toString());
@@ -97,7 +99,7 @@ public class GLChecker
 					continue;
 				}
 				int elementIndex;
-				ChartElement2 element;
+				ChartElement element;
 				if (account != null)
 					if (chart.isValidAccount(accountNo))
 					{
@@ -138,9 +140,9 @@ public class GLChecker
 
 			reportInfo("BALFdate=" + BALFdate.toString("yymmdd"));
 			reportInfo("EarliestDate=" + earliestDate.toString("yymmdd"));
-			props.setEarliestDate(earliestDate.toString("yymmdd"));
+			vl2Config.setEarliestDate(earliestDate.toString("yymmdd"));
 			reportInfo("LatestDate=" + latestDate.toString("yymmdd"));
-			props.setLatestDate(latestDate.toString("yymmdd"));
+			vl2Config.setLatestDate(latestDate.toString("yymmdd"));
 			if (earliestDate.isEarlierThan(BALFdate))
 				reportError("One or more transactions pre-date BALF");
 			finish();
@@ -168,6 +170,8 @@ public class GLChecker
 			{
 				image = f.readLine();
 				++lineNo;
+				if (image.length() < 3)
+					continue; // ignore short lines
 				if (image.length() != 78)
 				{
 					reportError(": wrong length (" + image.length() + ")");
@@ -278,7 +282,7 @@ public class GLChecker
 		logger.logDebug("GLChecker Finish");
 		if (earliestDate != null && latestDate != null)
 		{
-			reportInfo(nJournals + " Journals.\n" + "Covering dates " + earliestDate.toString("mm-dd-yyyy") + " to "
+			reportInfo(nJournals + " Journals  " + "Covering dates " + earliestDate.toString("mm-dd-yyyy") + " to "
 					+ latestDate.toString("mm-dd-yyyy") + "\n");
 		} else
 			reportError("Earliest Date and/or Latest Date not set");
@@ -297,7 +301,8 @@ public class GLChecker
 		return;
 	}
 
-	VL2Config props;
+	VL2Config vl2Config = VL2.vl2Config;
+
 	int currentYear;
 	GLChecker glCheck;
 	String glFilename;

@@ -11,6 +11,7 @@ import com.extant.utilities.UtilitiesException;
 import com.extant.utilities.DisplayTree;
 import com.extant.utilities.TreeClimber;
 import com.extant.utilities.Strings;
+import com.extant.utilities.UsefulFile;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JFrame;
@@ -43,9 +44,10 @@ public class VL2 extends JFrame implements ActionListener
 	{
 	}
 
-	private static VL2Config vl2Config;
+	public static VL2Config vl2Config;
 
 	// Global variables
+	static final String BRANCH = "Post_07-23-18";
 	static String ACCOUNTING_DIR;
 	static String entityName = null;
 	static String entityLongName = null;
@@ -57,6 +59,8 @@ public class VL2 extends JFrame implements ActionListener
 	static ChartTree chartTree = null;
 	static JTree chartJTree = null;
 	static GLChecker glChecker = null;
+	static Julian earliestDate;
+	static Julian latestDate;
 	static int maxGSN;
 	static String cashAcctNo;
 	static LogFile logger;
@@ -66,7 +70,7 @@ public class VL2 extends JFrame implements ActionListener
 	JFrame VL2MenuFrame = this;
 
 	/**
-	 * Main Method for application VL2.
+	 * Main Method for application VL2
 	 * 
 	 * @param args
 	 *            Currently not used
@@ -104,6 +108,8 @@ public class VL2 extends JFrame implements ActionListener
 			// System.out.println("finished with logo");
 		}
 
+		Strings.printVersion();
+
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		VL2MenuFrame.setLocation((((int) screenSize.getWidth() - 550) / 2), (((int) screenSize.getHeight() - 450) / 2));
 		VL2MenuFrame.setPreferredSize(new Dimension(550, 450));
@@ -116,7 +122,7 @@ public class VL2 extends JFrame implements ActionListener
 		String logFilename = VL2Config.getAccountingDataDirectory() + "VL2.log";
 		logger = new LogFile(logFilename, true);
 		logger.log("Log File " + logFilename + " opened");
-		logger.log("***** STARTING VL2 [branch Post_7-19-18] " + new Julian().toString("") + " *****");
+		logger.log("***** STARTING VL2 [branch " + BRANCH + "] " + new Julian().toString("") + " *****");
 
 		// For Debugging
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
@@ -138,6 +144,9 @@ public class VL2 extends JFrame implements ActionListener
 		yy = msgBox.getResponse();
 		vl2Config.setCurrentYear(yy);
 
+		// Set printOrientation
+		vl2Config.setPrintOrientation("portrait");
+
 		// Set Initial GSN
 		new GSNMan(vl2Config, logger);
 		logger.logInfo("GSN Initial Value: " + GSNMan.getGSN());
@@ -148,6 +157,7 @@ public class VL2 extends JFrame implements ActionListener
 		logger.logDebug("year=" + yy);
 		logger.logDebug("workDir=" + workDir);
 		logger.logDebug("entityPropsFilename=" + entityPropsFilename);
+		logger.logDebug("printOrientation=" + vl2Config.getPrintOrientation());
 
 		logger.logInfo("Checking Files ...");
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
@@ -170,20 +180,20 @@ public class VL2 extends JFrame implements ActionListener
 		}
 		logger.logInfo("Chart initialized without error");
 
-		// VLUtil.test(chart, "004"); // disabled test code
-
 		// Check GL file
 
 		// For Debugging:
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
-		// Check transactions and post transactions to elements
+		// Check transactions and post transactions to chart elements
 		String GLFilename = vl2Config.getGLFile();
 		logger.logDebug("Checking GLFile " + GLFilename);
 		if (!new File(GLFilename).exists())
 			logger.logFatal("Unable to find " + GLFilename);
 		glChecker = new GLChecker();
 		glChecker.glCheck(chart, "token", vl2Config);
+		earliestDate = glChecker.getEarliestDate();
+		latestDate = glChecker.getLatestDate();
 
 		// Test for consistent GSN
 		if ((maxGSN + 1) != Strings.parseInt(GSNMan.getGSN()))
@@ -192,6 +202,13 @@ public class VL2 extends JFrame implements ActionListener
 
 		// Compute Element totals
 		VLUtil.computeElementTotals(chart);
+
+		// Set retained earnings balances
+		// plElement is the element for the (unique) type 'R' account
+		// ChartElement plElement = chart.getPLElement();
+		// the beginBal value should be set by GLChecker (see lines 109 ff)
+		// the deltaBal value should be set by chart ...
+		logger.log("VL2 206:  plElement=" + chart.getPLElement().toString());
 
 		// Debugging tool to display the current element list
 		// String workDir = vl2Config.getWorkingDirectory();
@@ -373,12 +390,23 @@ public class VL2 extends JFrame implements ActionListener
 
 		else if (command.equals("Test"))
 		{
-			logger.logFatal("Command Test is not implemented");
+			// logger.logFatal("Command Test is not implemented");
+			logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+			logger.log("PLElement: " + chart.getPLElement().toString());
+			logger.log("TLNW: " + chart.findTagElement("TLNW"));
+			logger.setLogLevel(LogFile.NORMAL_LOG_LEVEL);
 		}
 
 		else if (command.equals("Exit"))
 		{
 			VL2MenuFrame.dispose();
+			// Close the log file
+			if (logger != null)
+			{
+				logger.log("Closing VL2.log file");
+				UsefulFile logFile = logger.getLogFile();
+				logFile.close();
+			}
 			System.exit(0);
 		}
 
@@ -462,100 +490,80 @@ public class VL2 extends JFrame implements ActionListener
 		// Reports
 		else if (command.equals("Text Statement"))
 			startTextStmt();
-		else if (command.equals("PDF Statement"))
-			startPDFStmt();
+		// else if (command.equals("Print Chart"))
+		// startTextStmt(vl2Config.getWorkingDirectory() + "chart.txt",
+		// vl2Config.getPrintOrientation(), true, false);
+		// else if (command.equals("PDF Statement"))
+		// startPDFStmt();
 		else if (command.equals("Transaction Summary"))
 			startTranReport(TranReport.SUMMARY, vl2Config, logger);
 		else if (command.equals("Transaction Details"))
 			startTranReport(TranReport.DETAIL, vl2Config, logger);
-		else if (command.equals("Print Chart"))
-			startPrintChart();
 
 		else
 			System.out.println("This command (" + command + ") is not implemented");
 	}
 
+	// showAccount (means show account numbers in output) is not set in chart XML
+	// it should always be true for chart listings and be optional for statements
+	// showAmount (means show dollar amounts in output) is not set in chart XML
+	// it should be false for chart listings and always true for statements
 	private void startTextStmt()
 	{
 		// For debugging
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-
-		String earliestDate = vl2Config.getEarliestDate();
-		String latestDate = vl2Config.getLatestDate();
-		logger.logDebug("startTextStmt");
-		logger.logDebug("GLFile=" + vl2Config.getGLFile());
-		logger.logDebug("Entity: " + vl2Config.getEntityLongName());
-		logger.logDebug("workDir=" + workDir);
-		logger.logDebug("earliestDate=" + earliestDate);
-		logger.logDebug("latestDate=" + latestDate);
-		String outfileName = workDir + "Stmt.txt";
-
-		logger.logInfo("Statement is in " + outfileName);
-		try
-		{
-			new ViewFile(outfileName, logger);
-		} catch (UtilitiesException ux)
-		{
-			logger.log("Cannot initialize ViewFile: " + ux.getMessage());
-			return;
-		}
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.logDebug("starting new StatementTXT");
+		StatementTXT statementTXT = new StatementTXT();
+		logger.logDebug("starting statementTXT.setup");
+		statementTXT.setup();
+		logger.logDebug("starting statementTXT.initialize");
+		statementTXT.initialize();
+		logger.logDebug("starting statementTXT.makeReport");
+		statementTXT.makeReport();
+		logger.logDebug("makeReport completed");
 	}
 
-	// private void listProps(XProperties props)
+	// private void startPDFStmt()
 	// {
-	// if (props == null)
-	// System.out.println("props is null!");
-	// else
-	// System.out.println("props is not null");
+	// try
+	// {
+	// // For Debugging:
+	// // logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+	// logger.logDebug("Starting PDFStmt");
+	// logger.logDebug("GLFile=" + vl2Config.getGLFile());
+	// String outFilename = workDir + "StmtPDF.pdf";
+	// new StatementPDF(vl2Config, VL2.chart, new
+	// Julian(vl2Config.getEarliestDate()),
+	// new Julian(vl2Config.getLatestDate()), 0 // report level
+	// , outFilename // outfile name
+	// , VL2.logger);
+	// // statement.makeStatement();
 	//
-	// if (logger == null)
-	// System.out.println("logger is null!");
-	// else
-	// System.out.println("logger is not null");
-	//
-	// if (chart == null)
-	// System.out.println("chart is null!");
-	// else
-	// System.out.println("chart is not null");
-	//
-	// vl2Config.listAllProperties();
+	// logger.logDebug("Statement is in file " + outFilename);
+	// new ViewFile(outFilename, logger);
+	// } catch (VLException vlx)
+	// {
+	// logger.log("Failure in StatementPDF: " + vlx.getMessage());
+	// } catch (UtilitiesException ux)
+	// {
+	// logger.log("Cannot initialize ViewFile: " + ux.getMessage());
+	// }
 	// }
 	//
-	private void startPDFStmt()
-	{
-		try
-		{
-			// For Debugging:
-			// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-			logger.logDebug("Starting PDFStmt");
-			logger.logDebug("GLFile=" + vl2Config.getGLFile());
-			String outFilename = workDir + "StmtPDF.pdf";
-			StatementPDF statement = new StatementPDF(vl2Config, VL2.chart, new Julian(vl2Config.getEarliestDate()),
-					new Julian(vl2Config.getLatestDate()), 0 // report level
-					, outFilename // outfile name
-					, VL2.logger);
-			statement.makeStatement();
-
-			logger.logDebug("Statement is in file " + outFilename);
-			new ViewFile(outFilename, logger);
-		} catch (VLException vlx)
-		{
-			logger.log("Failure in StatementPDF: " + vlx.getMessage());
-		} catch (UtilitiesException ux)
-		{
-			logger.log("Cannot initialize ViewFile: " + ux.getMessage());
-		}
-	}
-
 	private void startTranReport(int reportType, VL2Config vl2Config, LogFile logger)
 	{
+		// For debugging
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.logDebug("starting startTranReport");
 		String outFilename = null;
 		try
 		{
+			workDir = vl2Config.getWorkingDirectory();
 			if (reportType == TranReport.DETAIL)
 				outFilename = workDir + "DetailTranReport.txt";
 			else // if (reportType == TranReport.SUMMARY)
 				outFilename = workDir + "SummaryTranReport.txt";
+			logger.logDebug("calling new TranReport reportType=" + reportType);
 			new TranReport(reportType, chart, vl2Config, logger);
 			logger.logDebug("startTranReport: outFilename=" + outFilename);
 		} catch (IOException iox)
@@ -576,20 +584,20 @@ public class VL2 extends JFrame implements ActionListener
 		}
 	}
 
-	public void startPrintChart()
-	{
-		// This method will print the Chart in .txt format
-		logger.logDebug("enter startPrintChart");
-		try
-		{
-			PrintChartTxt printChartTxt = new PrintChartTxt();
-			printChartTxt.initialize(workDir + "Chart.txt", chart, logger);
-		} catch (IOException iox)
-		{
-			logger.logFatal("Unable to create Chart outFile");
-		}
-	}
-
+	// public void startPrintChart()
+	// {
+	// // This method will print the Chart in .txt format
+	// logger.logDebug("enter startPrintChart");
+	// try
+	// {
+	// PrintChartTxt printChartTxt = new PrintChartTxt();
+	// printChartTxt.initialize(workDir + "Chart.txt", chart, logger);
+	// } catch (IOException iox)
+	// {
+	// logger.logFatal("Unable to create Chart outFile");
+	// }
+	// }
+	//
 	public static void main(String[] args) throws IOException
 	{
 		VL2 vl2 = new VL2();

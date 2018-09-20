@@ -26,11 +26,11 @@
 
 package com.extant.vl2;
 
-import com.extant.utilities.Sorts;
+//import com.extant.utilities.Sorts;
 import com.extant.utilities.Strings;
 import com.extant.utilities.LogFile;
 //import java.io.IOException;
-import java.util.Enumeration;
+//import java.util.Enumeration;
 import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.event.TreeSelectionListener;
@@ -47,72 +47,97 @@ public class AccountFinder implements TreeSelectionListener
 	LogFile logger;
 	Chart chart;
 	ChartTree tree;
-	JComboBox comboBox;
+	JComboBox<Account> comboBox;
 	StringBuffer buffer;
 
-	public AccountFinder(Chart chart, ChartTree tree, LogFile logger, JComboBox comboBox)
+	public AccountFinder(Chart chart, ChartTree tree, JComboBox<Account> comboBox, LogFile logger)
 	{
 		this.chart = chart;
 		this.tree = tree;
-		this.logger = logger;
 		this.comboBox = comboBox;
+		this.logger = logger;
 		// For debugging:
-		// this.logger.setLogLevel( LogFile.DEBUG_LOG_LEVEL );
+		// this.logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		setup();
 	}
 
 	void setup()
 	{
-		buffer = new StringBuffer(1000);
+		buffer = new StringBuffer(100);
 		initializeComboBox();
 		// tree.addTreeSelectionListener(this);
 	}
 
+	// @SuppressWarnings("unchecked")
 	public void initializeComboBox()
 	{
+		// Initialize comboBox to contain all accounts ordered by account number
+		logger.logDebug("AccountFinder.initializeComboBox()");
+		// comboBox = new JComboBox<Account>();
 		comboBox.removeAllItems();
-		Enumeration accounts = chart.acctsByNumber();
-		while (accounts.hasMoreElements())
-			comboBox.addItem((Account) accounts.nextElement());
+		for (int i = 0; i < chart.accounts.size(); ++i)
+		{
+			comboBox.addItem(chart.accounts.elementAt(chart.acctsByNumberP[i]));
+			logger.logDebug("AccountFinder 80: adding " + chart.accounts.elementAt(chart.acctsByNumberP[i]));
+		}
+		logger.logDebug("comboBox loaded: " + comboBox.getItemCount() + " items");
 		comboBox.setSelectedIndex(-1);
 	}
 
 	public Account[] find(String clue)
 	{
-		logger.logDebug("AccountFinder.find( " + clue + " )");
-		Enumeration accounts = chart.acctsByNumber();
+		logger.logDebug("AccountFinder.find( '" + clue + "')");
+		// Enumeration <Account> accounts = chart.acctsByNumber();
 		Vector<Account> answerV = new Vector<Account>(10, 10);
-		while (accounts.hasMoreElements())
+		logger.logDebug("NAccounts=" + chart.getNAccounts());
+		for (int i = 0; i < chart.getNAccounts(); ++i)
+		// while (accounts.hasMoreElements())
 		{
-			Account account = (Account) accounts.nextElement();
 			if (Strings.isDecimalDigit(clue.charAt(0)))
-			{ // Look for matching account numbers
+			{ // Look for matching account number
+				Account account = chart.accounts.elementAt(chart.acctsByNumberP[i]);
+				logger.logDebug("testing " + account.getAccountNo());
 				if (Strings.match(clue + "*", account.getAccountNo()))
+				{
 					answerV.addElement(account);
-				else
-				// Accounts are in order, so if we stopped finding matches, we must be done
+					logger.logDebug("adding " + account.toString());
+				} else
+				// Accounts are in order by account number, so if we stop finding matches, we
+				// must be done
 				if (answerV.size() > 0)
+					// We didn't find any matches on account number
 					break;
 			} else
 			{ // Look for matching account descriptions
+				Account account = chart.accounts.elementAt(chart.acctsByDescrP[i]);
 				if (Strings.match(clue + "*", account.getTitle()))
+				{
 					answerV.addElement(account);
+					logger.logDebug("adding " + account.toString());
+				} else if (answerV.size() > 0)
+					// We didn't find any matches on descr
+					break;
 			}
 		}
-		// Order the output list either by account number or description, depending on
-		// first char of clue
-		int ip[];
-		if (Strings.isAlpha(clue.charAt(0)))
-		{
-			String descrs[] = new String[answerV.size()];
-			for (int i = 0; i < descrs.length; ++i)
-				descrs[i] = ((Account) answerV.elementAt(i)).getTitle();
-			ip = Sorts.sort(descrs);
-		} else
-			ip = Sorts.sort(answerV); // uses the toString method in Account
+		// // Order the output list either by account number or description, depending
+		// on
+		// // first char of clue
+		// int ip[];
+		// if (Strings.isAlpha(clue.charAt(0)))
+		// {
+		// String descrs[] = new String[answerV.size()];
+		// for (int i = 0; i < descrs.length; ++i)
+		// descrs[i] = ((Account) answerV.elementAt(i)).getTitle();
+		// ip = Sorts.sort(descrs);
+		// } else
+		// ip = Sorts.sort(answerV); // uses the toString method in Account
 		Account answer[] = new Account[answerV.size()];
 		for (int i = 0; i < answerV.size(); ++i)
-			answer[i] = (Account) answerV.elementAt(ip[i]);
+		{
+			answer[i] = (Account) answerV.elementAt(i);
+			logger.logDebug("AccountFinder.find returns " + answer[i].toString());
+		}
+
 		return answer;
 	}
 
@@ -130,13 +155,12 @@ public class AccountFinder implements TreeSelectionListener
 				buffer.deleteCharAt(buffer.length() - 1);
 		} else if (evt.getKeyChar() == java.awt.event.KeyEvent.VK_ESCAPE)
 		{
-			buffer.setLength(0);
-			initializeComboBox();
+			reset();
+			// buffer.setLength(0);
+			// initializeComboBox();
 			return;
 		} else
 			buffer.append(evt.getKeyChar());
-		// Console.println( "AccountFinder.processKeyEvent( " + evt.getKeyChar() + " )
-		// buffer=" + buffer.toString() );
 
 		if (buffer.length() == 0)
 			initializeComboBox();

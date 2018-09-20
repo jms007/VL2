@@ -1,18 +1,13 @@
-
 package com.extant.vl2;
 
-//import com.extant.utilities.XProperties;
 import com.extant.utilities.UsefulFile;
 import com.extant.utilities.Strings;
 import com.extant.utilities.Julian;
 import com.extant.utilities.LogFile;
 
-import java.awt.Frame;
-//import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.swing.JFrame;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
@@ -31,16 +26,15 @@ public class EnterJournalTransaction extends javax.swing.JPanel
 		this.logger = logger;
 		initComponents();
 		// For debugging:
-		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
 		this.vl2Config = vl2Config;
-		// GSNMan gsnMan = new GSNMan();
 		txtDate.setInputVerifier(new DateVerifier());
 		txtDebitAmount.setInputVerifier(new AmountVerifier());
 		txtCreditAmount.setInputVerifier(new AmountVerifier());
 		lblEntityName.setText(vl2Config.getEntityLongName());
-		debitAccountFinder = new AccountFinder(chart, tree, logger, comboDebitAccount);
-		creditAccountFinder = new AccountFinder(chart, tree, logger, comboCreditAccount);
+		debitAccountFinder = new AccountFinder(chart, tree, comboDebitAccount, logger);
+		creditAccountFinder = new AccountFinder(chart, tree, comboCreditAccount, logger);
 		imbalanceAmount = 0;
 		clearForm();
 		manageStatusBar();
@@ -58,8 +52,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel
 		lblEntityName = new javax.swing.JLabel();
 		jLabel1 = new javax.swing.JLabel();
 		txtDate = new javax.swing.JTextField();
-		comboCreditAccount = new javax.swing.JComboBox<>();
-		comboDebitAccount = new javax.swing.JComboBox<>();
+		comboCreditAccount = new javax.swing.JComboBox<Account>();
+		comboDebitAccount = new javax.swing.JComboBox<Account>();
 		txtDescr = new javax.swing.JTextField();
 		View = new javax.swing.JButton();
 		Clear = new javax.swing.JButton();
@@ -284,11 +278,11 @@ public class EnterJournalTransaction extends javax.swing.JPanel
 			unpostedEntries.clear();
 			imbalanceAmount = 0;
 			clearForm();
-			this.setVisible(false);
+			// this.setVisible(false);
 		} catch (Exception x)
 		{ // Undo everything, inform user, and get out leaving GSN unchanged
 			int nUnposted = unpostedEntries.size();
-			logger.log("Failed to move " + nUnposted + " entries to GL0010");
+			logger.log("Failed to move " + nUnposted + " entries to GLFile");
 			logger.logFatal(x.getMessage());
 			System.exit(2); // Get out
 		}
@@ -440,9 +434,10 @@ public class EnterJournalTransaction extends javax.swing.JPanel
 	String descr;
 	AccountFinder debitAccountFinder;
 	AccountFinder creditAccountFinder;
+	UsefulFile GLFile;
 	List<GLEntry> unpostedEntries = new ArrayList<GLEntry>();
 	long imbalanceAmount;
-	UsefulFile GL0010;
+	// UsefulFile GL0010;
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
 	private javax.swing.JButton Close;
@@ -451,8 +446,8 @@ public class EnterJournalTransaction extends javax.swing.JPanel
 	private javax.swing.JLabel Status;
 	private javax.swing.JButton View;
 	private javax.swing.JButton Clear;
-	private javax.swing.JComboBox<String> comboCreditAccount;
-	private javax.swing.JComboBox<String> comboDebitAccount;
+	private javax.swing.JComboBox<Account> comboCreditAccount;
+	private javax.swing.JComboBox<Account> comboDebitAccount;
 	private String debitAccountNo;
 	private String creditAccountNo;
 	private javax.swing.JLabel jLabel1;

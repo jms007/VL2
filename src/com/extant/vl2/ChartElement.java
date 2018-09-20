@@ -1,13 +1,13 @@
 package com.extant.vl2;
 
 /*
- * ChartElement2.java
+ * ChartElement.java
  *
  * These are the elements resulting from a parse of the XML chart.
- * All elements have a 'name', 'level', and an 'index'.
- * Elements which represent totals have total fields (begin & delta).
- * Other properties can be added or retrieved using the methods
- *  	putAttribute(name,value) or getAttribute(name)
+ * All elements have 'name', 'level', 'beginBal', 'deltaBal', 'index' and
+ * 		a set of properties.
+ * Properties are added or retrieved using the methods
+ *  	putAttribute(String name, String value) or getAttribute(String name)
  *
  * Created on September 10, 2006, 8:23 AM
  */
@@ -20,9 +20,19 @@ import java.util.Enumeration;
  *
  * @author jms
  */
-public class ChartElement2
+public class ChartElement
 {
-	public ChartElement2(String eName, int level, int index)
+	// Class variables:
+	String name;
+	int level;
+	int index;
+	long beginBal;
+	long deltaBal;
+	// Normal Attributes:
+	Properties props;
+	// type, no, title, id
+
+	public ChartElement(String eName, int level, int index)
 	{
 		name = eName;
 		this.level = level;
@@ -32,9 +42,8 @@ public class ChartElement2
 
 	public void putAttribute(String attrName, String attrValue)
 	{
-		if (attrName.equals("beginBal"))
+		if (attrName.equalsIgnoreCase("beginBal") || attrName.equalsIgnoreCase("deltaBal"))
 			VL2.logger.whereAreWe(4, new Error());
-
 		props.put(attrName, attrValue);
 	}
 
@@ -112,11 +121,4 @@ public class ChartElement2
 		}
 		return answer + ";";
 	}
-
-	public String name;
-	Properties props;
-	int level;
-	int index;
-	long beginBal;
-	long deltaBal;
 }
