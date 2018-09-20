@@ -1,40 +1,40 @@
 package com.extant.vl2;
 
 /*
- * ChartElement.java
+ * ChartElement2.java
  *
  * These are the elements resulting from a parse of the XML chart.
- * All elements have a 'name' and a 'level'.  Elements which
- * represent real accounts have an index to the Account in class Chart.
- * Elements which represent accounts or totals have total fields.
- * Other properties can be added using method putAttribute(name,value)
- *     and accessed using getAttribute(name)
+ * All elements have a 'name', 'level', and an 'index'.
+ * Elements which represent totals have total fields (begin & delta).
+ * Other properties can be added or retrieved using the methods
+ *  	putAttribute(name,value) or getAttribute(name)
  *
  * Created on September 10, 2006, 8:23 AM
  */
 
-//import java.io.IOException;
-//import java.io.FileNotFoundException;
+import com.extant.utilities.Strings;
 import java.util.Properties;
 import java.util.Enumeration;
-import com.extant.utilities.*;
 
 /**
  *
  * @author jms
  */
-public class ChartElement
+public class ChartElement2
 {
-	public ChartElement(String eName, int level, int accountIndex)
+	public ChartElement2(String eName, int level, int index)
 	{
 		name = eName;
 		this.level = level;
-		this.accountIndex = accountIndex;
+		this.index = index;
 		props = new Properties();
 	}
 
 	public void putAttribute(String attrName, String attrValue)
 	{
+		if (attrName.equals("beginBal"))
+			VL2.logger.whereAreWe(4, new Error());
+
 		props.put(attrName, attrValue);
 	}
 
@@ -48,33 +48,36 @@ public class ChartElement
 		return name;
 	}
 
-	public int getAccountIndex() throws VLException
+	public int getIndex()
 	{
-		if (name.equals("account"))
-			return accountIndex;
+		return index;
+	}
+
+	public void setBeginBal(long bal) throws VLException
+	{
+		if (name.equals("total") || name.equals("account"))
+			beginBal = bal;
 		else
-			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT,
-					"getAccountIndex from " + name + " " + getAttribute("no"));
+			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "setTotal in " + name + " " + getAttribute("no"));
 	}
 
-	public void setTotal(long total)
-	// throws VLException
+	public void setDeltaBal(long bal) throws VLException
 	{
-		if (name.equals("total"))
-			this.total = total;
-		// else throw new VLException
-		// (VLException.INCOMPATIBLE_ACCOUNT, "setTotal in " + name + " " +
-		// getAttribute( "no" ) );
-	}
-
-	public long getTotal() throws VLException
-	{
-		if (name.equals("total"))
-			return total;
+		if (name.equals("total") || name.equals("account"))
+			deltaBal = bal;
 		else
-			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "getTotal from " + name + " " + getAttribute("no"));
+			throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "setTotal in " + name + " " + getAttribute("no"));
 	}
 
+	// public long getTotal() throws VLException
+	// {
+	// if (name.equals("account") || name.equals("total"))
+	// return props.getProperty("beginBal").beginBal + deltaBal;
+	// else
+	// throw new VLException(VLException.INCOMPATIBLE_ACCOUNT, "getTotal from " +
+	// name + " " + getAttribute("no"));
+	// }
+	//
 	public int getLevel()
 	{
 		return level;
@@ -86,15 +89,21 @@ public class ChartElement
 	}
 
 	// toString returns a String of the form:
-	// name;level;accountIndex;key=value | key=value ...;
+	// name;level;accountIndex;key=value (| key=value)...;
 	public String toString()
 	{
-		String answer = name + ";" + Strings.format(level, "00") + ";" + Strings.format(accountIndex, "00") + ";";
+		String answer = name + ";" + Strings.format(level, "00") + ";" + Strings.format(index, "00") + ";" + "beginBal="
+				+ Strings.formatPennies(beginBal) + ";" + "deltaBal=" + Strings.formatPennies(deltaBal);
 		Enumeration en = props.propertyNames();
 		boolean first = true;
 		while (en.hasMoreElements())
 		{
 			String key = (String) en.nextElement();
+			if (key.contains("bal"))
+			{ // balances should not be in these props
+				VL2.logger.log("element props contains " + key);
+				continue;
+			}
 			String value = props.getProperty(key);
 			if (!first)
 				answer += "|";
@@ -107,8 +116,7 @@ public class ChartElement
 	public String name;
 	Properties props;
 	int level;
-	int accountIndex;
-	long beginTotal;
-	long deltaTotal;
-	long total;
+	int index;
+	long beginBal;
+	long deltaBal;
 }
