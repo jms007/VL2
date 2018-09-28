@@ -25,9 +25,10 @@ public abstract class AbstractStatement
 	String shortDateFormat;
 	Julian earliestDate, latestDate;
 	int reportLevel;
-	int maxLevel;
+	static int maxLevel; // used by PrintChartTxt
 	String glFilename;
 	int nElements = chart.chartElements.size();
+	ChartElement plElement;
 	String maxAccountNo = chart.getMaxAcctNo();
 	int maxAccountNoLength = chart.maxAccountNo.length();
 	String maxTitle = chart.getMaxTitle();
@@ -36,41 +37,43 @@ public abstract class AbstractStatement
 	UsefulFile outfile;
 	String printOrientation;
 	int paperWidth;
-	int indentPerLevel;
+	static int indentPerLevel; // used by PrintChartTxt
 	int maxIndentLength;
 	boolean showAccount;
 	boolean showAmount;
+	String image;
 
 	public void setup()
 	{
 		// Set the variables we know
-		chart = VL2.chart;
-		vl2Config = VL2.vl2Config;
 		logger = VL2.logger;
+		vl2Config = VL2.vl2Config;
+		earliestDate = VL2.earliestDate;
+		latestDate = VL2.latestDate;
 		workDir = vl2Config.getWorkingDirectory();
+		glFilename = vl2Config.getGLFile();
+		chart = VL2.chart;
 		dollarFormat = chart.getDollarFormat();
 		maxLevel = chart.maxLevel;
 		longDateFormat = chart.getLongDateFormat();
 		shortDateFormat = chart.getShortDateFormat();
-		earliestDate = VL2.earliestDate;
-		latestDate = VL2.latestDate;
 		maxLevel = chart.getMaxLevel();
-		glFilename = vl2Config.getGLFile();
 		nElements = chart.chartElements.size();
+		plElement = chart.getPLElement();
+		indentPerLevel = chart.getIndent();
+		maxIndentLength = maxLevel * indentPerLevel;
 		maxAccountNo = chart.getMaxAcctNo();
 		maxAccountNoLength = chart.maxAccountNo.length();
 		maxTitle = chart.getMaxTitle();
 		maxTitleLength = chart.maxTitle.length();
-		showAccount = true;
-		showAmount = true;
 
 		// and set default values for the rest
 		reportLevel = 0;
 		outfileName = workDir + "stmt.txt";
 		vl2Config.setPrintOrientation("portrait");
 		paperWidth = vl2Config.getPaperWidth();
-		indentPerLevel = chart.getIndent();
-		maxIndentLength = maxLevel * indentPerLevel;
+		showAccount = true;
+		showAmount = true;
 
 		// For debugging:
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
@@ -86,10 +89,12 @@ public abstract class AbstractStatement
 	public String makeReport()
 	{
 		// For Debugging
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		logger.logDebug("AbstractStatement:makeReport()");
+		logger.logDebug("reportLevel=" + reportLevel);
 		for (int i = 0; i < chart.chartElements.size(); ++i)
 		{
+			image = "";
 			ChartElement element = (ChartElement) chart.chartElements.get(i);
 			processElement(element);
 		}
@@ -101,17 +106,25 @@ public abstract class AbstractStatement
 	{
 		try
 		{
-			String elementName = element.name;
+			logger.logDebug("processing element: " + element.toString());
+			String elementName = element.name.toLowerCase();
 			if (elementName.equals("chart") || elementName.equals("section") || elementName.equals("group"))
 				printTextLine(element);
-			else if (elementName.equals("account") && element.getLevel() <= reportLevel)
+			else if (elementName.equals("account"))
 			{
-				if (element.getAttribute("type").equals("R"))
+				if (element.getAttribute("type").toUpperCase().equals("R"))
+				{
+					// This is the profit/loss element (plElement) which triggers printing
+					// of RetainedEarnings (or NetWorth)
+					plElement = element;
 					printRetainedEarnings(element);
-				else
+					return;
+				} else if (element.getLevel() <= reportLevel)
 					printAmountLine(element);
-			} else if (elementName.equals("total") && element.getLevel() <= reportLevel)
+			} else if (elementName.equals("total"))
+			{
 				printAmountLine(element);
+			}
 		} catch (VLException vlx)
 		{
 			logger.logFatal(vlx.getMessage());
@@ -125,6 +138,4 @@ public abstract class AbstractStatement
 	abstract void printAmountLine(ChartElement element) throws VLException;
 
 	abstract void printRetainedEarnings(ChartElement element);
-
-	// abstract void close() throws VLException;
 }

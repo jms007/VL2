@@ -198,13 +198,13 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 					attrs.getValue("title"), elementCount);
 			// TODO 'type' should be renamed 'class'
 			if (account == null)
-				System.out.println("chart.186 account is null!"); // TOTO remove
+				System.out.println("chart.200 account is null!");
 			accounts.addElement(account);
-			if (account.accountType.equals("R"))
-			{
-				plAccount = account;
-				logger.log("plAccount=" + plAccount.toString()); // TODO remove
-			}
+			// if (account.accountType.equals("R"))
+			// {
+			// plAccount = account;
+			// logger.logDebug("plAccount=" + plAccount.toString());
+			// }
 			String accountNo = account.accountNo;
 			// maxAccountNoCalc (account)
 			if (accountNo.length() > maxAccountNoLength)
@@ -225,15 +225,21 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 			if (attrs.getValue("type").equals("R"))
 			{
 				if (plAccount != null)
+				{
 					reportError("Multiple P/L Accounts are defined: " + plAccount.accountNo + " " + account.accountNo);
-				else
+					return;
+				} else
+				{
 					plAccount = account;
+					plElement = chartElement;
+					logger.log("plAccount=" + plAccount.toString());
+					logger.log("plElement=" + plElement.toString());
+				}
 			}
 
 		} else if (eName.equals("total"))
-		{ // START TOTAL
+		{
 			String title = attrs.getValue("title");
-			// maxTitleCalc (total)
 			if (title.length() > maxTitleLength)
 			{
 				maxTitle = title;
@@ -246,9 +252,8 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 			return;
 		}
 
-		// Set plElement and add this element to the element list
+		// Add this element to the element list
 		logger.logDebug("Chart: Adding to chartElements: " + chartElement.toString());
-		plElement = chartElement;
 		chartElements.addElement(chartElement);
 		++elementCount;
 	}
@@ -391,12 +396,6 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 			element.beginBal = 0L;
 			element.deltaBal = 0L;
 		}
-		// // Added 1-13-04 to zero balances in 'S' and 'T' entries:
-		// for (int i=0; i<stmtTemplate.size(); ++i)
-		// {
-		// Account acct = (Account)stmtTemplate.elementAt( i );
-		// acct.zeroBalances();
-		// }
 	}
 
 	// public void removeGLEntries()

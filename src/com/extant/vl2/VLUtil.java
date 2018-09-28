@@ -11,7 +11,6 @@ import com.extant.utilities.UsefulFile;
 import com.extant.utilities.Julian;
 import com.extant.utilities.LogFile;
 import com.extant.utilities.Strings;
-
 import java.io.IOException;
 import java.util.Vector;
 
@@ -34,7 +33,9 @@ public class VLUtil
 	 * If a transaction in the GLFile refers to an account which is not in the
 	 * Chart, a VLException is thrown.
 	 *
-	 * NOTE This method does not compute total amounts.
+	 * This method does not compute total amounts.
+	 * 
+	 * This method is obsolete and not used in VL2 9-26-18
 	 */
 	public static void postToAccounts(String glFileName, Chart chart) throws IOException, VLException
 	{
@@ -62,9 +63,10 @@ public class VLUtil
 			logger.logFatal("VLUtil.postToAccounts: plAccount is null!");
 		int plIndex = plAccount.elementIndex;
 		ChartElement plElement = chart.chartElements.elementAt(plIndex);
+		if (plElement == null)
+			logger.logFatal("VLUtil.postToAccounts: plElement is null!");
+		logger.logInfo("Posting to Accounts ...");
 		UsefulFile glFile = new UsefulFile(glFileName, "r");
-		// String maxDescr = ""; Use the values calculated in chart
-		// int maxDescrLength = 0;
 		int lineNo = 0;
 
 		while (!glFile.EOF())
@@ -104,36 +106,32 @@ public class VLUtil
 			{
 				// Add this transaction amount to the element beginBal
 				currentElement.beginBal += amount;
-				logger.logDebug("element.beginBal updated to " + currentElement.beginBal);
+				// logger.logDebug("element.beginBal updated to " + currentElement.beginBal);
 
 				// Add Income & Expense items to P/L Element Begin balance
+				// TODO Probably unnecessary
 				if (plType)
 					plElement.beginBal += amount;
 			} else
 			{
-				if (plType)
-					// Add this transaction amount to plElement deltaBal
-					plElement.deltaBal += amount;
-
 				// Add this transaction amount to the element deltaBal
 				currentElement.deltaBal += amount;
 				logger.logDebug("element.deltaBal updated to " + currentElement.deltaBal);
+
+				if (plType)
+					// Add this transaction amount to plElement deltaBal
+					plElement.deltaBal += amount;
 			}
 
 			// Add Income & Expense items to P/L element Delta balance
 			if (plType)
 				plElement.deltaBal += amount;
-
 			logger.logDebug("element=" + currentElement.toString());
-			// Use the values computed in chart
-			// if (glEntry.getDescrLength() > maxDescrLength)
-			// {
-			// maxDescr = glEntry.getDescr();
-			// maxDescrLength = maxDescr.length();
-			// }
 		} // End of GL transactions
+
 		glFile.close();
 		logger.logInfo("VLUtil.postToAccounts: last GLEntry processed");
+		logger.logInfo("plElement=" + plElement.toString());
 
 		// // Transfer the computed Account balances to the matching elements
 		// // Enumeration<Account> accounts;
@@ -188,9 +186,6 @@ public class VLUtil
 		String currentGroupTitle = ""; // used in debugging
 		String currentAccountNo;
 
-		for (int i = 0; i < levelTotals.length; ++i)
-			for (int j = 0; j < 2; ++j)
-				levelTotals[i][j] = 0L;
 		for (int i = 0; i < chartElements.size(); ++i)
 		{
 			currentElement = chartElements.elementAt(i);
@@ -202,15 +197,16 @@ public class VLUtil
 
 			if (currentElementName.equals("chart"))
 			{
-				// currentElementLevel = currentElement.level; // should be zero
 				levelTitles[currentElementLevel] = currentElementTitle;
 
 			} else if (currentElementName.equals("section"))
 			{
-				// currentElementLevel = currentElement.level;
 				currentElementTitle = currentElement.getAttribute("title");
-				levelTitles[currentElementLevel] = currentElement.getAttribute("title");
 				levelTitles[currentElementLevel] = currentElementTitle;
+				// Added 9-27-18:
+				zeroLevelTotals(levelTotals);
+				levelTotals[currentElementLevel][0] = 0L;
+				levelTotals[currentElementLevel][1] = 0L;
 
 			} else if (currentElementName.equals("group"))
 			{
@@ -254,19 +250,27 @@ public class VLUtil
 				levelTotals[currentElementLevel][0] = 0L;
 				levelTotals[currentElementLevel][1] = 0L;
 
-				String tag = currentElement.getAttribute("tag");
-				if (tag.contains("PL"))
-				{
-					if (tag.contains("Balance"))
-					{
-						ChartElement plElement = chart.getPLElement();
-						plElement.deltaBal = -currentElement.deltaBal;
-					}
-					logger.log("(VLUtil.computeElementTotals: tag=" + tag + " " + currentElement.beginBal + " "
-							+ currentElement.deltaBal);
-				}
+				// String tag = currentElement.getAttribute("tag");
+				// if (tag.contains("PL"))
+				// {
+				// if (tag.contains("Balance"))
+				// {
+				// ChartElement plElement = chart.getPLElement();
+				// plElement.deltaBal = -currentElement.deltaBal;
+				// }
+				// logger.log("(VLUtil.computeElementTotals: tag=" + tag + " " +
+				// currentElement.beginBal + " "
+				// + currentElement.deltaBal);
+				// }
 			}
 		}
+	}
+
+	private static void zeroLevelTotals(long[][] levelTotals)
+	{
+		for (int i = 0; i < levelTotals.length; ++i)
+			for (int j = 0; j < 2; ++j)
+				levelTotals[i][j] = 0L;
 	}
 
 	// For debugging

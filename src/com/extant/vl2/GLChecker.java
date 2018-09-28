@@ -55,6 +55,7 @@ public class GLChecker
 		UsefulFile f;
 		String image = "";
 		Julian BALFdate = null;
+		ChartElement plElement;
 
 		logger.logDebug("Processing Tokenized File " + glFilename);
 		try
@@ -67,6 +68,7 @@ public class GLChecker
 				reportError("GL0010 is empty");
 				finish();
 			}
+			plElement = chart.plElement;
 			while (!f.EOF())
 			{
 				image = f.readLine();
@@ -104,6 +106,8 @@ public class GLChecker
 					if (chart.isValidAccount(accountNo))
 					{
 						account = chart.findAcctByNo(accountNo);
+						String accountType = account.getType().toUpperCase();
+						boolean plType = accountType.equals("I") || accountType.equals("E");
 						elementIndex = account.elementIndex;
 						element = chart.chartElements.elementAt(elementIndex);
 						if (glEntry.getField("JREF").equals("BALF"))
@@ -123,7 +127,11 @@ public class GLChecker
 							logger.logDebug("result element.beginBal=" + element.beginBal);
 							logger.logDebug("result element=" + element.toString());
 						} else
+						{
 							element.deltaBal += glEntry.getSignedAmount();
+							if (plType)
+								plElement.deltaBal += glEntry.getSignedAmount();
+						}
 						updateJournalBal(glEntry);
 						glBal += glEntry.getSignedAmount();
 					}

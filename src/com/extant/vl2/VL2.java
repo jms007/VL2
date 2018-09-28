@@ -164,7 +164,7 @@ public class VL2 extends JFrame implements ActionListener
 
 		try
 		{
-			// Check Chart file
+			// Check the Chart file
 			chartFilename = vl2Config.getChartFile();
 			logger.logDebug("Checking Chart file: " + chartFilename);
 			if (!new File(chartFilename).exists())
@@ -180,12 +180,10 @@ public class VL2 extends JFrame implements ActionListener
 		}
 		logger.logInfo("Chart initialized without error");
 
-		// Check GL file
-
 		// For Debugging:
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
-		// Check transactions and post transactions to chart elements
+		// Check GL entries and post transactions to chart elements
 		String GLFilename = vl2Config.getGLFile();
 		logger.logDebug("Checking GLFile " + GLFilename);
 		if (!new File(GLFilename).exists())
@@ -195,20 +193,31 @@ public class VL2 extends JFrame implements ActionListener
 		earliestDate = glChecker.getEarliestDate();
 		latestDate = glChecker.getLatestDate();
 
+		// Compute Element totals
+		VLUtil.computeElementTotals(chart);
+
 		// Test for consistent GSN
 		if ((maxGSN + 1) != Strings.parseInt(GSNMan.getGSN()))
 			logger.logFatal("GSN mismatch: GSNMan=" + GSNMan.getGSN() + " maxGSN=" + maxGSN);
 		logger.logDebug("Next GSN=" + GSNMan.getGSN() + " verified");
 
-		// Compute Element totals
-		VLUtil.computeElementTotals(chart);
-
 		// Set retained earnings balances
 		// plElement is the element for the (unique) type 'R' account
 		// ChartElement plElement = chart.getPLElement();
 		// the beginBal value should be set by GLChecker (see lines 109 ff)
-		// the deltaBal value should be set by chart ...
-		logger.log("VL2 206:  plElement=" + chart.getPLElement().toString());
+		// the deltaBal value should be set by chart ... (really?)
+		if (chart.getPLElement() == null)
+			logger.logFatal("VL2 212:  plElement is null!");
+		else
+			logger.log("VL2 214:  plElement=" + chart.getPLElement().toString());
+		// The print above shows the correct balances for plElement
+
+		// Now update the Total Liabilities & Retained Earnings element
+		// necessary because the retained earnings element did not have
+		// the correct data at the time that the element totals were computed
+		ChartElement TLREElement = chart.findTagElement("TLRE");
+
+		TLREElement.deltaBal += chart.plElement.deltaBal;
 
 		// Debugging tool to display the current element list
 		// String workDir = vl2Config.getWorkingDirectory();
@@ -393,7 +402,7 @@ public class VL2 extends JFrame implements ActionListener
 			// logger.logFatal("Command Test is not implemented");
 			logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 			logger.log("PLElement: " + chart.getPLElement().toString());
-			logger.log("TLNW: " + chart.findTagElement("TLNW"));
+			logger.log("TLNW: " + chart.findTagElement("TLNE"));
 			logger.setLogLevel(LogFile.NORMAL_LOG_LEVEL);
 		}
 
@@ -499,6 +508,13 @@ public class VL2 extends JFrame implements ActionListener
 			startTranReport(TranReport.SUMMARY, vl2Config, logger);
 		else if (command.equals("Transaction Details"))
 			startTranReport(TranReport.DETAIL, vl2Config, logger);
+		else if (command.equals("Print Chart"))
+		{
+			PrintChartTxt printChartTxt = new PrintChartTxt();
+			printChartTxt.setup();
+			printChartTxt.initialize();
+			printChartTxt.makeReport();
+		}
 
 		else
 			System.out.println("This command (" + command + ") is not implemented");
@@ -519,8 +535,28 @@ public class VL2 extends JFrame implements ActionListener
 		logger.logDebug("starting statementTXT.initialize");
 		statementTXT.initialize();
 		logger.logDebug("starting statementTXT.makeReport");
-		statementTXT.makeReport();
+		String outfileName = statementTXT.makeReport();
 		logger.logDebug("makeReport completed");
+		logger.log("Statement is in file " + outfileName);
+
+		try
+		{
+			new ViewFile(outfileName, logger);
+		} catch (Exception x)
+		{
+			logger.log("Unable to access " + outfileName + ": " + x.getMessage());
+		}
+
+		// logger.logDebug("Statement is in file " + outFilename);
+		// new ViewFile(outFilename, logger);
+		// } catch (VLException vlx)
+		// {
+		// logger.log("Failure in StatementPDF: " + vlx.getMessage());
+		// } catch (UtilitiesException ux)
+		// {
+		// logger.log("Cannot initialize ViewFile: " + ux.getMessage());
+		// }
+
 	}
 
 	// private void startPDFStmt()

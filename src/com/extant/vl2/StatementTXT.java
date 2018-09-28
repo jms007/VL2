@@ -15,33 +15,13 @@ import java.io.*;
 
 public class StatementTXT extends AbstractStatement
 {
-	// String workDir;
-	// String outfileName;
-	// UsefulFile outfile;
-	// String printOrientation;
-	// int paperWidth;
-	// boolean showAmount;
-	// boolean showAccount;
-	// int reportLevel;
-	// int maxLevel;
-	// int indentPerLevel;
-	// String glFilename;
-	// String dollarFormat;
-	// String longDateFormat;
-	// String shortDateFormat;
-	// Julian begin;
-	// Julian end;
-	// int maxIndentLength;
-	// String maxAccountNo;
-	// int maxAccountNoLength;
-	// String maxTitle;
-	// int maxTitleLength;
-	// int MAX_AMOUNT_LENGTH;
-
 	void initialize()
 	{
 		// For debugging:
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.log("debugging message entry StatementTXT.initialize()");
+		logger.log("plElement: " + chart.plElement.toString());
+
 		try
 		{
 			outfile = new UsefulFile(outfileName, "w");
@@ -92,7 +72,7 @@ public class StatementTXT extends AbstractStatement
 		}
 	}
 
-	// Methods to set values to overrride defaults
+	// Methods to set values which overrride defaults
 	void setOutfileName(String name)
 	{
 		outfileName = name;
@@ -116,9 +96,9 @@ public class StatementTXT extends AbstractStatement
 
 	@Override // implements abstract method from AbstractStatement
 	void printTextLine(ChartElement element)
-	{ // Print lines that contain only text (titles)
+	{ // Print a line for an element that contain only text (titles)
 		logger.logDebug("printTextLine element=" + element.toString());
-		String image = "";
+		image = "";
 		String format = element.getAttribute("format");
 		if (format.contains("newpage"))
 			image += "\f";
@@ -147,22 +127,24 @@ public class StatementTXT extends AbstractStatement
 
 	@Override
 	// implements abstract method from AbstractStatement
-	// prints a line which contains an amount (except for PL lines)
 	void printAmountLine(ChartElement element)
-	{
-		String image = "";
+	{ // Print a line for an element which defines an amount
+		image = "";
+		String elementName = element.name.toLowerCase();
 		String amountPortion;
 		String title = element.getAttribute("title").trim();
 		String accountNo = element.getAttribute("no").trim();
 		long amount = element.beginBal + element.deltaBal;
 		if (fixSign(element))
 			amount = -amount;
-		// Do not print lines containing "PL" tag
-		if (element.getAttribute("tag").contains("PL"))
+		// Do not print any line containing "noPrint" tag
+		if (element.getAttribute("tag").equalsIgnoreCase("noPrint"))
+		{
+			logger.logDebug("StatementTXT.printAmountLine: bypass printing of element: " + element.toString());
 			return;
-		logger.logDebug("StatementTXT.printAmountLine DollarFormat='" + chart.getDollarFormat() + "'");
+		}
 
-		if (element.name.equalsIgnoreCase("account"))
+		if (elementName.equals("account"))
 		{
 			logger.logDebug("printAmountLine: title=" + title + " accountNo=" + accountNo);
 			if (showAccount)
@@ -170,8 +152,8 @@ public class StatementTXT extends AbstractStatement
 			image += indent(element);
 			image += Strings.leftJustify(title, chart.maxTitleLength);
 			if (showAmount)
-				image += Strings.rightJustify(amountPrint(amount, dollarFormat), VL2Config.MAX_AMOUNT_LENGTH);
-		} else if (element.name.equalsIgnoreCase("total"))
+				image += Strings.rightJustify(formatAmount(amount, dollarFormat), VL2Config.MAX_AMOUNT_LENGTH);
+		} else if (elementName.equals("total"))
 		{
 			title = element.getAttribute("title");
 			if (showAccount)
@@ -180,10 +162,10 @@ public class StatementTXT extends AbstractStatement
 			image += Strings.leftJustify(title, chart.maxTitleLength);
 			if (showAmount)
 			{
-				amountPortion = Strings.rightJustify(amountPrint(amount, dollarFormat), VL2Config.MAX_AMOUNT_LENGTH);
+				amountPortion = Strings.rightJustify(formatAmount(amount, dollarFormat), VL2Config.MAX_AMOUNT_LENGTH);
 				logger.log("printAmountLine total amountPortion='" + amountPortion + "'");
 				logger.logDebug("amountPortion length=" + amountPortion.length());
-				logger.logDebug("MAX_AMOUNT_LENGTH=" + VL2Config.MAX_AMOUNT_LENGTH);
+				// logger.logDebug("MAX_AMOUNT_LENGTH=" + VL2Config.MAX_AMOUNT_LENGTH);
 				image += Strings.rightJustify(amountPortion, VL2Config.MAX_AMOUNT_LENGTH);
 			}
 			if (element.getAttribute("format").contains("skip"))
@@ -191,122 +173,87 @@ public class StatementTXT extends AbstractStatement
 		}
 		outfile.println(image);
 		logger.logDebug("printed: '" + image + "'");
-		// if (image.length() > maxAmountLineLength)
-		// {
-		// maxAmountLine = image;
-		// maxAmountLineLength = image.length();
-		// }
 		return;
 	}
 
-	// Print retained earnings
-	void printAmountLine(ChartElement element, long amount)
+	// Print an amount line with specific values (not obtained from an element)
+	private void printAmountLine(String acctNo, int indent, String title, long amount)
 	{
-		String image = "";
-		String title = element.getAttribute("title").trim();
-		String accountNo = element.getAttribute("no").trim();
-		// Print parameter 'amount' instead of beginBal + deltaBal;
-		if (fixSign(element))
-			amount = -amount;
-
-		if (element.name.equalsIgnoreCase("account"))
-		{
-			logger.logDebug("printAmountLine: title=" + title + " accountNo=" + accountNo);
-			if (showAccount)
-				image += Strings.leftJustify(accountNo, chart.maxAccountNoLength);
-			image += indent(element);
-			image += Strings.leftJustify(title, chart.maxTitleLength);
-			if (showAmount)
-				image += Strings.rightJustify(amountPrint(amount, dollarFormat), VL2Config.MAX_AMOUNT_LENGTH + 1);
-		} else if (element.name.equalsIgnoreCase("total"))
-		{
-			title = element.getAttribute("title");
-			if (showAccount)
-				image += Strings.leftJustify(" ", chart.maxAccountNoLength);
-			image += indent(element);
-			image += Strings.leftJustify(title, chart.maxTitleLength);
-			if (showAmount)
-			{
-				image += Strings.rightJustify(amountPrint(amount, dollarFormat), VL2Config.MAX_AMOUNT_LENGTH + 1);
-			}
-			if (element.getAttribute("format").contains("skip"))
-				image += "\r\n";
-		}
+		image = "";
+		if (showAccount)
+			image += Strings.leftJustify(acctNo, chart.maxAccountNoLength);
+		image += Strings.leftJustify("", indent);
+		image += Strings.leftJustify(title, chart.maxTitleLength);
+		image += formatAmount(amount, dollarFormat);
 		outfile.println(image);
-		// if (image.length() > maxAmountLineLength)
-		// {
-		// maxAmountLine = image;
-		// maxAmountLineLength = image.length();
-		// }
-		logger.logDebug("printed: '" + image + "'");
-		return;
-	}
-
-	private String amountPrint(long amount, String dollarFormat)
-	{
-		String ans = Strings.trimRight(Strings.formatPennies(amount, dollarFormat));
-		if (amount >= 0)
-			ans += " ";
-		logger.log("amountPrint returns '" + ans + "'");
-		return ans;
 	}
 
 	@Override
 	// Implements abstract method from AbstractStatement
-	// expects the retained earnings account element
+	// expects the retained earnings account element (plElement)
 	void printRetainedEarnings(ChartElement element)
 	{
-		ChartElement TLNWelement;
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		logger.logDebug("printRetainedEarnings: " + element.toString());
+		if (element != plElement)
+			logger.logFatal("plElement mismatch in printRetainedEarnings");
 		String beginDate = new Julian(vl2Config.getEarliestDate()).toString(chart.getShortDateFormat());
 		String endDate = new Julian(vl2Config.getLatestDate()).toString(chart.getShortDateFormat());
-		ChartElement plElement = chart.getPLElement();
-		logger.logDebug("plElement: " + plElement.toString());
+		logger.logDebug("plElement: " + plElement.toString()); // -110,854.29 -398.80 -111,253.09
 
 		// Print R/E at begin
-		plElement.putAttribute("title", "R/E " + beginDate);
-		logger.logDebug("print plElement-begin=" + plElement.beginBal);
-		// long amount = plElement.beginBal;
-		printAmountLine(plElement, plElement.beginBal);
+		String acctNo = element.getAttribute("AccountNo");
+		int indent = element.level * indentPerLevel;
+		printAmountLine(acctNo, indent, "R/E " + beginDate, element.beginBal); // correct -110,854.29
 
 		// Print R/E change during period
-		plElement.putAttribute("title", "Profit (Loss) during period");
-		logger.logDebug("print plElement-delta" + plElement.deltaBal);
-		printAmountLine(plElement, plElement.deltaBal);
+		printAmountLine(acctNo, indent, "Profit (Loss) during period", -element.deltaBal); // correct -398.80
 
 		// Print R/E at end
-		plElement.putAttribute("title", "R/E " + endDate);
-		printAmountLine(plElement, plElement.beginBal + plElement.deltaBal);
+		// plElement.putAttribute("title", "R/E " + endDate);
+		// long REEnd = plElement.beginBal + plElement.deltaBal;
+		// printAmountLine(plElement, REEnd);
+		printAmountLine(acctNo, indent, "R/E " + endDate, -(element.beginBal + element.deltaBal));
+		// correct -111,253.09
 
-		// TODO The total retained earnings (at end) must be manually added to
+		// Find total liabilities, equity, and retained earnings (tag "TLRE")
+		// and add the retained earnings (REEnd) to the deltaBal
+
+		// TODO The total retained earnings (at end of period) must be manually added to
 		// 'Total Liabilities & Retained Earnings', because the retained earnings
 		// total was not available at the time the totals were computed
 		// (by VLUtil.computeElementTotals).
 		// Possibly, VLUtil.computeElementTotals could be modified to accomplish the
-		// same thing, but this approach appears to be much more difficult & risky.
+		// same thing, but that approach appears to be much more difficult & risky.
 		//
-		// Solution: (a) add tag="TLNW" to the total element titled
+		// Solution Plan A: Plan A does not work!
+		// (a) add tag="TLRE" to the total element titled
 		// 'Total Liabilities & Retained Earnings' (b) add code here
-		// use Chart.findTagElements("TLNW") to find the TLNW element and apply
+		// use Chart.findTagElements("TLRE") to find the TLRE element and apply
 		// deltaBal += (plElement.beginBal + plElement.deltaBal);
-		// and (c) call printAmountLine(TNLWElement);
-		TLNWelement = null;
-		TLNWelement = chart.findTagElement("TLNW");
-		if (TLNWelement == null)
-			logger.logFatal("Cannot find TLNWelement");
-		TLNWelement.deltaBal += (plElement.beginBal + plElement.deltaBal);
-		logger.log("adjusted TLNWelement: " + TLNWelement.toString());
-		printAmountLine(TLNWelement);
+		// (c) call printAmountLine(TNLWElement); and (d) in AbstractStatement
+		// add code to suppress printing of elements with tag="TLRE" or tag="noPrint".
+		//
+		// Solution Plan B:
+		// Modify VLUtil.computeElementTotals
 	}
 
-	private String indent(ChartElement element)
+	private String formatAmount(long amount, String dollarFormat)
 	{
-		int maxLevel = chart.getMaxLevel();
-		int indentPerLevel = chart.getIndent();
+		String ans = Strings.rightJustify(Strings.formatPennies(amount, dollarFormat), VL2Config.MAX_AMOUNT_LENGTH);
+		ans = Strings.trimRight(ans);
+		if (amount >= 0)
+			ans += " ";
+		// logger.log("formatAmount returns '" + ans + "'");
+		return ans;
+	}
+
+	public static String indent(ChartElement element)
+	{
+		String elementName = element.name.toLowerCase();
 		int level = element.level;
-		if (element.name.equals("total"))
+		if (elementName.equals("total"))
 			--level;
-		int x = (maxLevel - level) * indentPerLevel;
+		int x = level * indentPerLevel;
 		return Strings.leftJustify("", x);
 	}
 

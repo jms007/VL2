@@ -108,11 +108,11 @@ public class ChartElement
 		while (en.hasMoreElements())
 		{
 			String key = (String) en.nextElement();
-			if (key.contains("bal"))
-			{ // balances should not be in these props
-				VL2.logger.log("element props contains " + key);
-				continue;
-			}
+			// if (key.contains("bal"))
+			// { // balances should not be in these props
+			// VL2.logger.log("element props contains " + key);
+			// continue;
+			// }
 			String value = props.getProperty(key);
 			if (!first)
 				answer += "|";
