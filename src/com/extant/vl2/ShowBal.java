@@ -50,6 +50,7 @@ import java.awt.event.KeyEvent;
  *
  * @author jms
  */
+@SuppressWarnings("serial")
 public class ShowBal extends javax.swing.JFrame implements TreeSelectionListener
 {
 	public ShowBal(Chart chart, ChartTree tree, VL2Config vl2FileMan)
