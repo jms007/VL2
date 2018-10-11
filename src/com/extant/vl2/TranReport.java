@@ -23,6 +23,7 @@ import java.io.*;
  * 
  * @author jms
  */
+@SuppressWarnings("serial")
 public class TranReport extends JDialog
 {
 	public TranReport(int reportType, Chart chart, VL2Config vl2FileMan, LogFile logger) throws IOException, VLException
