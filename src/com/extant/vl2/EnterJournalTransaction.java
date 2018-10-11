@@ -16,6 +16,7 @@ import javax.swing.JTextField;
  *
  * @author jms
  */
+@SuppressWarnings("serial")
 public class EnterJournalTransaction extends javax.swing.JPanel
 {
 	/**
