@@ -20,6 +20,7 @@ import javax.swing.JRadioButton;
  *
  * @author jms
  */
+@SuppressWarnings("serial")
 public class Search extends javax.swing.JFrame
 {
 	public Search(VL2Config vl2Config)
@@ -29,7 +30,6 @@ public class Search extends javax.swing.JFrame
 		glFilename = vl2Config.getGLFile();
 		this.vl2Config = vl2Config;
 		report = new StringBuffer(1000);
-		TextDialog textDialog = new TextDialog(this, true);
 		super.setVisible(true);
 		setup();
 	}
