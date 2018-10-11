@@ -38,6 +38,7 @@ import java.awt.MediaTracker;
  *
  * @author jms
  */
+@SuppressWarnings("serial")
 public class VL2 extends JFrame implements ActionListener
 {
 	public VL2()
