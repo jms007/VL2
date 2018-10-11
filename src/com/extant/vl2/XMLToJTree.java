@@ -266,6 +266,7 @@ public class XMLToJTree
 	EventListenerList listenerList = new EventListenerList();
 
 	/* EMBEDDED CLASS */
+	@SuppressWarnings("serial")
 	public class ChartTreeNode extends DefaultMutableTreeNode
 	{
 		ChartElement element;
