@@ -5,9 +5,11 @@ import java.io.*;
 import com.extant.utilities.Strings;
 
 /**
+ * TODO    THIS CLASS MAY NOT BE USED IN VL2
  *
  * @author jms
  */
+@SuppressWarnings("serial")
 public class VLProps
     extends Properties
 {
