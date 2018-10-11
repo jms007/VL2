@@ -391,6 +391,7 @@ public class ChartTree implements MouseListener // ,TreeSelectionListener
 
 	/***** END OF TEST *****/
 
+	@SuppressWarnings("serial")
 	public class ChartTreeNode extends DefaultMutableTreeNode
 	{
 		ChartElement element;
