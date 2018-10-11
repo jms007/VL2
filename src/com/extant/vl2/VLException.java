@@ -10,6 +10,7 @@ package com.extant.vl2;
  *
  * @author jms
  */
+@SuppressWarnings("serial")
 public class VLException extends java.lang.Exception
 {
 	int code;
