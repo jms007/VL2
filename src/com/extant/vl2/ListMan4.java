@@ -35,6 +35,7 @@ import com.extant.utilities.UsefulFile;
  *
  * @author jms
  */
+@SuppressWarnings("serial")
 public class ListMan4 extends javax.swing.JFrame {
 	public ListMan4(VL2Config props, ListType listType)
 	{
@@ -82,7 +83,7 @@ public class ListMan4 extends javax.swing.JFrame {
 		northPanel = new javax.swing.JPanel();
 		centerPanel = new javax.swing.JPanel();
 		jPanel2 = new javax.swing.JPanel();
-		comboNames = new javax.swing.JComboBox();
+		comboNames = new javax.swing.JComboBox <String> ();
 		txtLine1 = new javax.swing.JTextField();
 		txtLine2 = new javax.swing.JTextField();
 		txtLine3 = new javax.swing.JTextField();
@@ -275,7 +276,7 @@ public class ListMan4 extends javax.swing.JFrame {
 		// evt.getStateChange() );
 		if (initializing)
 			return;
-		if (evt.getStateChange() == evt.SELECTED) {
+		if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED) {
 			fillLines();
 			currentIndex = comboNames.getSelectedIndex();
 			manageButtons();
@@ -292,7 +293,7 @@ public class ListMan4 extends javax.swing.JFrame {
 				comboBuffer = comboBuffer.substring(0, comboBuffer.length() - 1);
 			else
 				return;
-		} else if (c == evt.VK_ESCAPE)
+		} else if (c == java.awt.event.KeyEvent.VK_ESCAPE)
 			comboBuffer = "";
 		else
 			comboBuffer += c;
@@ -636,7 +637,7 @@ public class ListMan4 extends javax.swing.JFrame {
 	private javax.swing.JButton btnSave;
 	private javax.swing.JButton btnUpdate;
 	private javax.swing.JPanel centerPanel;
-	private javax.swing.JComboBox comboNames;
+	private javax.swing.JComboBox <String> comboNames;
 	private javax.swing.JPanel jPanel1;
 	private javax.swing.JPanel jPanel2;
 	private javax.swing.JPanel jPanel3;
