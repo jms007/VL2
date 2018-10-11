@@ -252,32 +252,13 @@ public class Analyze extends JDialog implements TreeSelectionListener
 		closeDialog(null);
 	}// GEN-LAST:event_btnAnalyzeCancelActionPerformed
 
-	private void comboAccountsKeyTyped(java.awt.event.KeyEvent evt)// GEN-FIRST:event_comboAccountsKeyTyped
-	{// GEN-HEADEREND:event_comboAccountsKeyTyped
-		if (evt.getKeyChar() == java.awt.event.KeyEvent.VK_ENTER)
-			btnAnalyzeActionPerformed(null);
-		accountFinder.processKeyEvent(evt);
-		// else if ( evt.getKeyChar() == '\b' )
-		// {
-		// if ( comboAcctBuffer.length() > 0 ) comboAcctBuffer.deleteCharAt(
-		// comboAcctBuffer.length()-1 );
-		// }
-		// else if ( evt.getKeyChar() == evt.VK_ESCAPE )
-		// comboAcctBuffer.setLength( 0 );
-		// else comboAcctBuffer.append( evt.getKeyChar() );
-		// if ( comboAcctBuffer.length() > 0 )
-		// {
-		// String trialAcctNo = chart.match( comboAcctBuffer.toString() );
-		// Account trialAcct = chart.findAcctByNo( trialAcctNo );
-		// comboAccounts.setSelectedItem( trialAcct );
-		// }
-		// else comboAccounts.setSelectedIndex( -1 );
-	}// GEN-LAST:event_comboAccountsKeyTyped
-
-	// public void TreeSelectionListener(TreeSelectionEvent e)
-	// {
-	// }
-
+//	private void comboAccountsKeyTyped(java.awt.event.KeyEvent evt)// GEN-FIRST:event_comboAccountsKeyTyped
+//	{// GEN-HEADEREND:event_comboAccountsKeyTyped
+//		if (evt.getKeyChar() == java.awt.event.KeyEvent.VK_ENTER)
+//			btnAnalyzeActionPerformed(null);
+//		accountFinder.processKeyEvent(evt);
+//	}// GEN-LAST:event_comboAccountsKeyTyped
+//
 	/** Closes the dialog */
 	private void closeDialog(java.awt.event.WindowEvent evt)
 	{// GEN-FIRST:event_closeDialog
