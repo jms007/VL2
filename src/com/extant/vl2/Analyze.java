@@ -28,6 +28,7 @@ import javax.swing.JTextField;
  *
  * @author jms
  */
+@SuppressWarnings("serial")
 public class Analyze extends JDialog implements TreeSelectionListener
 {
 	VL2Config vl2Config;
@@ -253,7 +254,7 @@ public class Analyze extends JDialog implements TreeSelectionListener
 
 	private void comboAccountsKeyTyped(java.awt.event.KeyEvent evt)// GEN-FIRST:event_comboAccountsKeyTyped
 	{// GEN-HEADEREND:event_comboAccountsKeyTyped
-		if (evt.getKeyChar() == evt.VK_ENTER)
+		if (evt.getKeyChar() == java.awt.event.KeyEvent.VK_ENTER)
 			btnAnalyzeActionPerformed(null);
 		accountFinder.processKeyEvent(evt);
 		// else if ( evt.getKeyChar() == '\b' )
@@ -310,18 +311,18 @@ public class Analyze extends JDialog implements TreeSelectionListener
 				if (image.length() < 3)
 					continue; // ignore blank lines
 				glEntry = new GLEntry(image);
-				if (chart.match(acctNo, glEntry, startDate, endDate))
+				if (Chart.match(acctNo, glEntry, startDate, endDate))
 					entries.addElement(glEntry);
 			}
 			glFile.close();
-			Vector sortFields = new Vector(entries.size());
+			Vector <GLEntry> sortFields = new Vector<GLEntry>(entries.size());
 			for (int i = 0; i < entries.size(); ++i)
 				if (rbSortByDescr.isSelected())
-					sortFields.addElement(((GLEntry) entries.elementAt(i)).getField("descr"));
+					sortFields.addElement(((GLEntry) entries.elementAt(i)));
 				else if (rbSortByDate.isSelected())
-					sortFields.addElement(((GLEntry) entries.elementAt(i)).getField("date"));
+					sortFields.addElement(((GLEntry) entries.elementAt(i)));
 				else if (rbSortByAmount.isSelected())
-					sortFields.addElement(((GLEntry) entries.elementAt(i)).getField("amount"));
+					sortFields.addElement(((GLEntry) entries.elementAt(i)));
 			int[] p = Sorts.sort(sortFields);
 
 			long total = 0L;
@@ -338,7 +339,7 @@ public class Analyze extends JDialog implements TreeSelectionListener
 				}
 			} else if (rbSortByDescr.isSelected())
 			{
-				int descrWidth = ((String) sortFields.elementAt(0)).length();
+				int descrWidth = (sortFields.elementAt(0).toString()).length();
 				String thisPayer = "";
 				String lastPayer = "";
 				String thisDescr = "";
