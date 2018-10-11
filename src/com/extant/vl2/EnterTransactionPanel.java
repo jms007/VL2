@@ -17,6 +17,7 @@ import java.io.IOException;
  *
  * @author jms
  */
+@SuppressWarnings("serial")
 public class EnterTransactionPanel extends javax.swing.JPanel
 {
 	/**
