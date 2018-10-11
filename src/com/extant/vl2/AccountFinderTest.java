@@ -8,6 +8,7 @@ import java.io.IOException;
  *
  * @author jms
  */
+@SuppressWarnings("serial")
 public class AccountFinderTest extends javax.swing.JFrame
 {
 	public AccountFinderTest(String dir, Chart chart, LogFile logger)
@@ -23,7 +24,6 @@ public class AccountFinderTest extends javax.swing.JFrame
 	// Code">//GEN-BEGIN:initComponents
 	private void initComponents()
 	{
-
 		comboBox = new javax.swing.JComboBox();
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);

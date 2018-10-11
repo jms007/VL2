@@ -103,7 +103,7 @@ public class ChartElement
 	{
 		String answer = name + ";" + Strings.format(level, "00") + ";" + Strings.format(index, "00") + ";" + "beginBal="
 				+ Strings.formatPennies(beginBal) + ";" + "deltaBal=" + Strings.formatPennies(deltaBal);
-		Enumeration en = props.propertyNames();
+		Enumeration<?> en = props.propertyNames();
 		boolean first = true;
 		while (en.hasMoreElements())
 		{
