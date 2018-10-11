@@ -22,8 +22,6 @@ public class EnterTrans
     static String entityDir;
     static String year;
     static String entityRemoteDir;
-    //static String entityPropsFilename;
-    //static XProperties props;
     static String chartFilename;
     static Chart chart;
     static ChartTree chartTree;
