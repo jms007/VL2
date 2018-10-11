@@ -9,6 +9,7 @@ import com.extant.utilities.LogFile;
 import java.awt.Color;
 
 /**
+ * TODO     THIS CLASS MAY BE OBSOLETE AND NOT USED IN VL2
  *
  * @author jms
  */
