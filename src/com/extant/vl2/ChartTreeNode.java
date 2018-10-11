@@ -3,6 +3,7 @@ package com.extant.vl2;
 import javax.swing.tree.DefaultMutableTreeNode;
 import com.extant.utilities.Strings;
 
+@SuppressWarnings("serial")
 public class ChartTreeNode extends DefaultMutableTreeNode
 {
 	ChartElement element;
