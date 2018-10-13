@@ -2,6 +2,7 @@ package com.extant.vl2;
 
 import com.extant.utilities.Console;
 import com.extant.utilities.LogFile;
+import javax.swing.JComboBox;
 import java.io.IOException;
 
 /**
@@ -24,7 +25,7 @@ public class AccountFinderTest extends javax.swing.JFrame
 	// Code">//GEN-BEGIN:initComponents
 	private void initComponents()
 	{
-		comboBox = new javax.swing.JComboBox();
+		JComboBox <Account> comboBox = new JComboBox <Account> ();
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		setTitle("Account Finder Test");
@@ -85,7 +86,7 @@ public class AccountFinderTest extends javax.swing.JFrame
 	AccountFinder accountFinder;
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
-	private javax.swing.JComboBox comboBox;
+	// private JComboBox comboBox;
 	// End of variables declaration//GEN-END:variables
 
 }
