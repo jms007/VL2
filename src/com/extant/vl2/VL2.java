@@ -49,6 +49,7 @@ public class VL2 extends JFrame implements ActionListener
 
 	// Global variables
 	static final String BRANCH = "Post_07-23-18";
+	static final String VERSION = "2.3 " + BRANCH;
 	static String ACCOUNTING_DIR;
 	static String entityName = null;
 	static String entityLongName = null;
@@ -273,6 +274,10 @@ public class VL2 extends JFrame implements ActionListener
 		muTest.addActionListener(this);
 		muFile.add(muTest);
 
+		JMenuItem muAbout = new JMenuItem("About");
+		muAbout.addActionListener(this);
+		muFile.add(muAbout);
+		
 		JMenuItem muExit = new JMenuItem("Exit");
 		muExit.addActionListener(this);
 		muFile.add(muExit);
@@ -405,6 +410,12 @@ public class VL2 extends JFrame implements ActionListener
 			logger.log("PLElement: " + chart.getPLElement().toString());
 			logger.log("TLNW: " + chart.findTagElement("TLNE"));
 			logger.setLogLevel(LogFile.NORMAL_LOG_LEVEL);
+		}
+
+		else if (command.equals("About"))
+		{
+			System.out.println("Visual Ledger");
+			System.out.println("Version " + VERSION);
 		}
 
 		else if (command.equals("Exit"))
@@ -621,20 +632,6 @@ public class VL2 extends JFrame implements ActionListener
 		}
 	}
 
-	// public void startPrintChart()
-	// {
-	// // This method will print the Chart in .txt format
-	// logger.logDebug("enter startPrintChart");
-	// try
-	// {
-	// PrintChartTxt printChartTxt = new PrintChartTxt();
-	// printChartTxt.initialize(workDir + "Chart.txt", chart, logger);
-	// } catch (IOException iox)
-	// {
-	// logger.logFatal("Unable to create Chart outFile");
-	// }
-	// }
-	//
 	public static void main(String[] args) throws IOException
 	{
 		VL2 vl2 = new VL2();
