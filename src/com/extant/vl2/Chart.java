@@ -232,8 +232,6 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 				{
 					plAccount = account;
 					plElement = chartElement;
-					logger.log("plAccount=" + plAccount.toString());
-					logger.log("plElement=" + plElement.toString());
 				}
 			}
 
