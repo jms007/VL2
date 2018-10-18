@@ -94,13 +94,13 @@ public class AccountFinder implements TreeSelectionListener
 		// while (accounts.hasMoreElements())
 		{
 			if (Strings.isDecimalDigit(clue.charAt(0)))
-			{ // Look for matching account number
+			{ // Look for matching account numbers
 				Account account = chart.accounts.elementAt(chart.acctsByNumberP[i]);
 				logger.logDebug("testing " + account.getAccountNo());
 				if (Strings.match(clue + "*", account.getAccountNo()))
 				{
 					answerV.addElement(account);
-					logger.logDebug("adding " + account.toString());
+					logger.logDebug("adding to answer: " + account.toString());
 				} else
 				// Accounts are in order by account number, so if we stop finding matches, we
 				// must be done
@@ -113,7 +113,7 @@ public class AccountFinder implements TreeSelectionListener
 				if (Strings.match(clue + "*", account.getTitle()))
 				{
 					answerV.addElement(account);
-					logger.logDebug("adding " + account.toString());
+					logger.logDebug("adding to answer: " + account.toString());
 				} else if (answerV.size() > 0)
 					// We didn't find any matches on descr
 					break;
@@ -137,7 +137,6 @@ public class AccountFinder implements TreeSelectionListener
 			answer[i] = (Account) answerV.elementAt(i);
 			logger.logDebug("AccountFinder.find returns " + answer[i].toString());
 		}
-
 		return answer;
 	}
 

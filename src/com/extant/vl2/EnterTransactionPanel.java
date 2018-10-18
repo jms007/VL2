@@ -9,7 +9,7 @@ import com.extant.utilities.ViewFile;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
+//import java.util.regex.Pattern;
 import javax.swing.*;
 import java.io.IOException;
 
@@ -35,26 +35,25 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 		this.transType = transType;
 		this.vl2Config = vl2Config;
 		this.chartTree = chartTree;
+		String GLFilename = vl2Config.getGLFile();
+		logger.logDebug("GLFilename=" + GLFilename);
+		GLFile = new UsefulFile(GLFilename, "rw+");
+		normalBG = txtAmount.getBackground();
+		logger.logDebug("normalBG="+normalBG);
+
 		String entityLongName = vl2Config.getEntityLongName();
 		lblCoName.setText(entityLongName);
 		cashAcctNo = vl2Config.getCashAcctNo();
 		lblCashAcctDescr.setText("Cash Account No: " + cashAcctNo);
 		lblTransType.setText("Cash " + transType);
-
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
-		logger.logDebug("EntityLongName=" + vl2Config.getEntityLongName());
-		logger.logDebug("CashAcctNo=" + vl2Config.getCashAcctNo());
-
-		this.setVisible(true);
-		txtDate.setInputVerifier(new DateVerifier());
-		txtAmount.setInputVerifier(new AmountVerifier());
-		accountFinder = new AccountFinder(chart, chartTree, comboAccount, logger);
 		imbalanceAmount = 0L;
-		clearForm();
-		String GLFilename = vl2Config.getGLFile();
-		logger.logDebug("GLFilename=" + GLFilename);
-		GLFile = new UsefulFile(GLFilename, "rw+");
-		txtDate.requestFocus();
+		//clearForm();
+		manageButtons();
+
+		accountFinder = new AccountFinder(chart, chartTree, comboAccount, logger);
+		this.requestFocus();
+		txtDate.requestFocusInWindow();
+		this.setVisible(true);
 	}
 
 	/**
@@ -225,18 +224,24 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 		else
 			drcr = "D";
 		amount = txtAmount.getText();
-		Account selectedAccount = (Account) accountFinder.comboBox.getSelectedItem();
+		// TODO Note the following statement clears everything in the comboBox except the selected item 
+		Account selectedAccount = (Account) comboAccount.getSelectedItem();
 		String accountNo = selectedAccount.getAccountNo();
 		logger.logDebug("enter trans: accountNo=" + accountNo);
+		// Rebuild comboBox
+		accountFinder.setup();
 		GLEntry glEntry = new GLEntry(jRef, GSNMan.getGSN(), "E", drcr, "100", accountNo, amount, descr,
 				transDate.toString("yymmdd"));
 		logger.logDebug(glEntry.toString());
 		imbalanceAmount += Strings.parsePennies(amount);
 		unpostedEntries.add(glEntry);
 		manageStatusBar();
-		clearForm();
+		txtAmount.setText("");
+		comboAccount.setSelectedIndex(-1); // TODO
+		txtDescr.setText("");
+		manageButtons();
 		txtDate.setEnabled(false);
-		txtAmount.requestFocus();
+		txtAmount.requestFocusInWindow();
 	}// GEN-LAST:event_EnterActionPerformed
 
 	private void CloseActionPerformed(java.awt.event.ActionEvent evt)
@@ -346,8 +351,12 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 		}
 	}// GEN-LAST:event_btnViewActionPerformed
 
-	private void txtDateFocusLost(java.awt.event.FocusEvent evt)
+	private void txtDateFocusLost(java.awt.event.FocusEvent evt) //TODO
 	{// GEN-FIRST:event_txtDateFocusLost
+		logger.logDebug("txtDateFocusLost - date="+txtDate.getText());
+		if (dateVerifier(txtDate.getText()))
+			txtDate.setBackground(normalBG);
+		else txtDate.setBackground(Color.yellow);
 		manageButtons();
 	}// GEN-LAST:event_txtDateFocusLost
 
@@ -371,68 +380,105 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 	private void clearForm()
 	{
 		logger.logDebug("Enter clearForm");
-		if (unpostedEntries.isEmpty())
-		{
-			txtDate.setText(new Julian().toString("mm-dd-yyyy"));
-			txtDate.setEnabled(true);
-		}
+//		Leave date unchanged		
+//		if (unpostedEntries.isEmpty())
+//		{
+//			txtDate.setText(new Julian().toString("mm-dd-yy"));
+//			txtDate.setEnabled(true);
+//		}
+		txtDate.setEnabled(true);
 		txtDescr.setText("");
 		txtAmount.setText("");
 		txtDate.requestFocusInWindow();
 		manageStatusBar();
-		manageButtons();
+		clearButtons();
 	}
 
-	class AmountVerifier extends InputVerifier
+//	class AmountVerifier extends InputVerifier
+//	{
+//		String amountPattern = "\\d*\\.\\d\\d";
+//
+//		public boolean verify(JComponent jc)
+//		{
+//			JTextField tf = (JTextField) jc;
+//			return Pattern.matches(amountPattern, tf.getText());
+//		}
+//	}
+//
+	// Use our own code to verify dates
+	private boolean dateVerifier(String text)
 	{
-		String amountPattern = "\\d*\\.\\d\\d";
-
-		public boolean verify(JComponent jc)
-		{
-			JTextField tf = (JTextField) jc;
-			return Pattern.matches(amountPattern, tf.getText());
-		}
+		boolean valid;
+		Julian date = new Julian(txtDate.getText());
+		valid = date.isValid() && date.toString("yy").equals(vl2Config.currentYear);
+		return valid;
 	}
 
-	class DateVerifier extends InputVerifier
-	{
-		public boolean verify(JComponent jc)
-		{
-			JTextField tf = (JTextField) jc;
-			// Use regex
-			// return Pattern.matches( datePattern, tf.getText());
-
-			// or use Julian
-			transDate = new Julian(tf.getText());
-			String yy = transDate.toString("yy");
-			String currentYear = vl2Config.getCurrentYear();
-			logger.log("yy=" + yy + " currentYear=" + currentYear);
-			return transDate.isValid() && yy.equals(vl2Config.getCurrentYear());
-		}
-
-		String datePattern = "\\d{1,2}[-/]\\d{1,2}[-/]\\d\\d";
-	}
-
+//	class DateVerifier extends InputVerifier
+//	{
+//		public boolean verify(JComponent jc)
+//		{
+//			JTextField tf = (JTextField) jc;
+//			// Use regex
+//			// return Pattern.matches( datePattern, tf.getText());
+//
+//			// or use Julian
+//			transDate = new Julian(tf.getText());
+//			String yy = transDate.toString("yy");
+//			String currentYear = vl2Config.getCurrentYear();
+//			logger.log("yy=" + yy + " currentYear=" + currentYear);
+//			boolean valid = transDate.isValid() && yy.equals(vl2Config.getCurrentYear());
+//			if (valid) txtDate.setBackground(normalBG);
+//			else txtDate.setBackground(Color.YELLOW);
+//			return valid;
+//		}
+//
+//		String datePattern = "\\d{1,2}[-/]\\d{1,2}[-/]\\d\\d";
+//	}
+//
 	public void appendToGL(GLEntry glEntry)
 	{
 		GLFile.println(glEntry.toString());
 	}
 
+	public void clearButtons()
+	{
+		//txtDate.setText("");
+		txtDate.setBackground(normalBG);
+		txtAmount.setText("");
+		txtAmount.setBackground(normalBG);
+		//comboAccount.setSelectedIndex(-1);
+		
+		comboAccount.setBackground(normalBG);
+		txtDescr.setText("");
+		txtDescr.setBackground(normalBG);
+		txtDate.requestFocusInWindow();
+	}
+	
 	public void manageButtons()
 	{
-		// boolean OKdate = new Julian(txtDate.getText()).isValid();
-		// boolean OKaccount = comboAccount.getSelectedIndex() >= 0;
-		// boolean OKamount = Strings.regexMatch("\\d+\\.\\d\\d", txtAmount.getText());
-		// boolean OKdescr = !txtDescr.getText().isEmpty();
-		// if (!OKdate) System.out.print("OKdate ");
-		// if (!OKaccount) System.out.print("OKaccount ");
-		// if (!OKamount) System.out.print("OKamount ");
-		// if (!OKdescr) System.out.print("OKdescr");
+		boolean dateIsValid;
+		Julian date = new Julian(txtDate.getText());
+		dateIsValid = date.isValid() && date.toString("yy").equals(VL2.vl2Config.currentYear);
+		if (!dateIsValid)
+			txtDate.setBackground(Color.yellow);
+		else txtDate.setBackground(normalBG);
 
-		if (comboAccount == null)
-			logger.log("EnterTransaction 434: comboAccount = null!");
-		boolean OKtoEnter = new Julian(txtDate.getText()).isValid() && comboAccount.getSelectedIndex() >= 0
-				&& Strings.regexMatch("\\d+\\.\\d\\d", txtAmount.getText()) && !txtDescr.getText().isEmpty();
+		boolean amountIsValid;
+		amountIsValid = Strings.regexMatch("\\d+\\.\\d\\d", txtAmount.getText());
+		if (amountIsValid) txtAmount.setBackground(normalBG);
+		else txtAmount.setBackground(Color.yellow);
+		
+		boolean accountIsValid;
+		accountIsValid = comboAccount.getSelectedIndex() >= 0;
+		if (!accountIsValid) comboAccount.setBackground(Color.yellow);
+		else comboAccount.setBackground(normalBG);
+		
+		boolean descrIsValid = !txtDescr.getText().isEmpty();
+		if (!descrIsValid) txtDescr.setBackground(Color.yellow);
+		else txtDescr.setBackground(normalBG);
+		
+		boolean OKtoEnter = dateIsValid && amountIsValid && accountIsValid && descrIsValid;
 		Enter.setEnabled(OKtoEnter);
 		txtDate.setEnabled(unpostedEntries.isEmpty());
 		btnView.setEnabled(!unpostedEntries.isEmpty());
@@ -461,7 +507,7 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 	String amount;
 	String descr;
 	String cashAcctNo;
-	Color defaultBackground;
+	Color normalBG;
 	AccountFinder accountFinder;
 	List<GLEntry> unpostedEntries = new ArrayList<GLEntry>();
 	long imbalanceAmount;
