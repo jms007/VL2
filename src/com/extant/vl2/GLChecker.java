@@ -33,7 +33,6 @@ public class GLChecker
 		this.logger = VL2.logger;
 
 		// For debugging:
-		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		// logger.setLogAll(true);
 
 		currentYear = Integer.parseInt(props.getCurrentYear());
@@ -168,8 +167,7 @@ public class GLChecker
 	{
 		try
 		{
-			// logger.log("WARNING GLChecker.checkTokenFile() HAS NOT BEEN TESTED!");
-			logger.logFatal("GLChecker.checkTokenFile() HAS NOT BEEN TESTED!");
+			logger.logFatal("GLChecker.checkFixedFile() HAS NOT BEEN TESTED!");
 
 			String image;
 			logger.logDebug("Processing Fixed File " + glFile + ": ");
@@ -259,11 +257,6 @@ public class GLChecker
 		return errorReport;
 	}
 
-	// public int getNLines()
-	// {
-	// return lineNo;
-	// }
-	//
 	public int getNJournals()
 	{
 		return nJournals;
@@ -329,13 +322,4 @@ public class GLChecker
 	long journalBals[] = new long[100];
 	int nJournals = 0;
 	LogFile logger;
-
-	/*****
-	 * FOR TESTING ***** public static void main(String[] args) { GLCheck
-	 * glCheckinstance = new GLCheck(); glCheckinstance.glCheck (
-	 * "G:\\ACCOUNTING\\JMS\\ARCHIVES\\GL06\\GL0010.DAT" ,
-	 * "G:\\ACCOUNTING\\JMS\\ARCHIVES\\GL06\\CHART.XML" , "token" , new LogFile() );
-	 * 
-	 * Console.print( glCheckinstance.getReport() ); } /***** END OF TESTING
-	 *****/
 }

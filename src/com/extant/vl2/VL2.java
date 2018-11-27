@@ -199,7 +199,7 @@ public class VL2 extends JFrame implements ActionListener
 		VLUtil.computeElementTotals(chart);
 
 		// Test for consistent GSN
-		if ((maxGSN + 1) != Strings.parseInt(GSNMan.getGSN()))
+		if (maxGSN != Strings.parseInt(GSNMan.getGSN()))
 			logger.logFatal("GSN mismatch: GSNMan=" + GSNMan.getGSN() + " maxGSN=" + maxGSN);
 		logger.logDebug("Next GSN=" + GSNMan.getGSN() + " verified");
 
