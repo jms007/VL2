@@ -48,7 +48,7 @@ public class VL2 extends JFrame implements ActionListener
 	public static VL2Config vl2Config;
 
 	// Global variables
-	static final String BRANCH = ".1climb";
+	static final String BRANCH = ".1";
 	static final String VERSION = "2.4" + BRANCH;
 	static String ACCOUNTING_DIR;
 	static String entityName = null;
