@@ -376,8 +376,6 @@ public class VL2 extends JFrame implements ActionListener
 	}
 
 	// Process main menu clicks
-	// JTree tree = null;
-	// DisplayTree displayTree = null;
 
 	@Override
 	public void actionPerformed(ActionEvent evt)
@@ -515,11 +513,6 @@ public class VL2 extends JFrame implements ActionListener
 		// Reports
 		else if (command.equals("Text Statement"))
 			startTextStmt();
-		// else if (command.equals("Print Chart"))
-		// startTextStmt(vl2Config.getWorkingDirectory() + "chart.txt",
-		// vl2Config.getPrintOrientation(), true, false);
-		// else if (command.equals("PDF Statement"))
-		// startPDFStmt();
 		else if (command.equals("Transaction Summary"))
 			startTranReport(TranReport.SUMMARY, vl2Config, logger);
 		else if (command.equals("Transaction Details"))
@@ -537,9 +530,9 @@ public class VL2 extends JFrame implements ActionListener
 	}
 
 	// showAccount (means show account numbers in output) is not set in chart XML
-	// it should always be true for chart listings and be optional for statements
+	// it should always be true for chart listings and is optional for statements
 	// showAmount (means show dollar amounts in output) is not set in chart XML
-	// it should be false for chart listings and always true for statements
+	// it should always be false for chart listings and always true for statements
 	private void startTextStmt()
 	{
 		// For debugging
@@ -562,16 +555,6 @@ public class VL2 extends JFrame implements ActionListener
 		{
 			logger.log("Unable to access " + outfileName + ": " + x.getMessage());
 		}
-
-		// logger.logDebug("Statement is in file " + outFilename);
-		// new ViewFile(outFilename, logger);
-		// } catch (VLException vlx)
-		// {
-		// logger.log("Failure in StatementPDF: " + vlx.getMessage());
-		// } catch (UtilitiesException ux)
-		// {
-		// logger.log("Cannot initialize ViewFile: " + ux.getMessage());
-		// }
 
 	}
 
