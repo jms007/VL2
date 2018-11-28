@@ -199,8 +199,12 @@ public class VL2 extends JFrame implements ActionListener
 		VLUtil.computeElementTotals(chart);
 
 		// Test for consistent GSN
-		if (maxGSN != Strings.parseInt(GSNMan.getGSN()))
+		// GSN should be equal to the next GSN to be used (one more than the last GSN used)
+		if ((maxGSN+1) != Strings.parseInt(GSNMan.getGSN()))
+		{
+			logger.log("GSN must be " + (maxGSN + 1));
 			logger.logFatal("GSN mismatch: GSNMan=" + GSNMan.getGSN() + " maxGSN=" + maxGSN);
+		}
 		logger.logDebug("Next GSN=" + GSNMan.getGSN() + " verified");
 
 		// Set retained earnings balances
@@ -214,12 +218,12 @@ public class VL2 extends JFrame implements ActionListener
 			logger.log("VL2 214:  plElement=" + chart.getPLElement().toString());
 		// The print above shows the correct balances for plElement
 
-		// Now update the Total Liabilities & Retained Earnings element
+		// Now update the Total Liabilities & Retained Earnings element (if it exists)
 		// necessary because the retained earnings element did not have
 		// the correct data at the time that the element totals were computed
 		ChartElement TLREElement = chart.findTagElement("TLRE");
-
-		TLREElement.deltaBal += chart.plElement.deltaBal;
+		if (TLREElement != null)
+			TLREElement.deltaBal += chart.plElement.deltaBal;
 
 		// Debugging tool to display the current element list
 		// String workDir = vl2Config.getWorkingDirectory();

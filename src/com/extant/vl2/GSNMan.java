@@ -12,6 +12,7 @@ import com.extant.utilities.UsefulFile;
  */
 public class GSNMan
 {
+	/* GSN is the next value to be used */
 
 	private static String GSN;
 	VL2Config vl2Config;

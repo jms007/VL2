@@ -65,6 +65,7 @@ public class GLChecker
 			if (emptyGL)
 			{
 				reportError("GL0010 is empty");
+				VL2.maxGSN = -1;
 				finish();
 			}
 			plElement = chart.plElement;
