@@ -48,7 +48,7 @@ public class VL2 extends JFrame implements ActionListener
 	public static VL2Config vl2Config;
 
 	// Global variables
-	static final String BRANCH = ".1";
+	static final String BRANCH = ".1climb";
 	static final String VERSION = "2.4" + BRANCH;
 	static String ACCOUNTING_DIR;
 	static String entityName = null;
@@ -134,6 +134,13 @@ public class VL2 extends JFrame implements ActionListener
 		if (msgBox.getCommand().equals("Cancel"))
 			logger.logFatal("User Cancel (Enter Entity Name)");
 		entityName = msgBox.getResponse().toUpperCase();
+		if (!VL2Config.isValidEntityName(entityName))
+		{
+			String errorMsg = entityName + " is not a valid entity.";
+			logger.log(entityName + " is not a valid entity.");
+			logger.logFatal(errorMsg);
+		}
+			
 		String entityPropFilename = VL2Config.getAccountingDataDirectory() + entityName + "\\" + entityName
 				+ ".properties";
 		XProperties entityProps = new XProperties(entityPropFilename);
@@ -467,6 +474,7 @@ public class VL2 extends JFrame implements ActionListener
 			} catch (UtilitiesException ux)
 			{
 				System.out.println("treeClimber failed: " + ux.getMessage());
+				System.out.println("    chartFilename="+chartFilename);
 			}
 		}
 

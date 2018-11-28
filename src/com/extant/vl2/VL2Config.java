@@ -1,9 +1,11 @@
 package com.extant.vl2;
 
 import java.io.IOException;
+import java.io.File;
 
 import com.extant.utilities.Strings;
 import com.extant.utilities.XProperties;
+//import com.sun.java.util.jar.pack.Package.File;
 
 public class VL2Config
 {
@@ -14,6 +16,7 @@ public class VL2Config
 		return String.format(pattern, userName);
 	}
 
+	private final String validEntities = "EXTANT, JMS, JMSCT, QUITO, XINV";
 	private final String accountingDataDir;
 	private final String entityName;
 	String currentYear; // Set after user enters yy or confirms default
@@ -31,6 +34,10 @@ public class VL2Config
 	{
 		this.accountingDataDir = getAccountingDataDirectory();
 		this.entityName = entityName;
+		if (!(new File(this.accountingDataDir + "\\"+ entityName).exists()))
+		{
+			VL2.logger.logFatal(entityName + " is not a valid entity name.");
+		}
 		VL2.logger.logDebug("Properties:46" + "Reading properties file: " + propFilename);
 		props = new XProperties(propFilename);
 	}
@@ -38,6 +45,8 @@ public class VL2Config
 	void setCurrentYear(String yy)
 	{
 		currentYear = yy;
+		if (!new File(this.accountingDataDir + "\\" + entityName + "\\GL" + yy).exists())
+			VL2.logger.logFatal(yy + " is not a valid year.");
 	}
 
 	public void listAllProperties()
