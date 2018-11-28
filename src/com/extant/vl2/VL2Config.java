@@ -16,7 +16,7 @@ public class VL2Config
 		return String.format(pattern, userName);
 	}
 
-	private final String validEntities = "EXTANT, JMS, JMSCT, QUITO, XINV";
+	//private final String validEntities = "EXTANT, JMS, JMSCT, QUITO, XINV";
 	private final String accountingDataDir;
 	private final String entityName;
 	String currentYear; // Set after user enters yy or confirms default

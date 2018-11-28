@@ -129,29 +129,26 @@ public class VL2 extends JFrame implements ActionListener
 		// For Debugging
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
+		// Get and verify the entity short name for this run
 		MsgBox msgBox = new MsgBox(VL2MenuFrame, "Entity Name", "Enter Entity Short Name", "",
 				new String[] { "OK", "Cancel" });
 		if (msgBox.getCommand().equals("Cancel"))
 			logger.logFatal("User Cancel (Enter Entity Name)");
 		entityName = msgBox.getResponse().toUpperCase();
-		if (!VL2Config.isValidEntityName(entityName))
-		{
-			String errorMsg = entityName + " is not a valid entity.";
-			logger.log(entityName + " is not a valid entity.");
-			logger.logFatal(errorMsg);
-		}
-			
+
+		// Get the name of the properties file for this entity
 		String entityPropFilename = VL2Config.getAccountingDataDirectory() + entityName + "\\" + entityName
 				+ ".properties";
 		XProperties entityProps = new XProperties(entityPropFilename);
 		vl2Config = new VL2Config(entityPropFilename, entityName);
 
+		// Set & verify the current year (yy) 
 		String defaultYear = entityProps.getProperty("CurrentYear");
 		msgBox = new MsgBox(VL2MenuFrame, "Year", "Enter the year (yy)", defaultYear, new String[] { "OK", "Cancel" });
 		if (msgBox.getCommand().equals("Cancel"))
 			logger.logFatal("User Cancel (Enter year)");
 		yy = msgBox.getResponse();
-		vl2Config.setCurrentYear(yy);
+		vl2Config.setCurrentYear(yy); // This aborts if yy is invalid
 
 		// Set printOrientation
 		vl2Config.setPrintOrientation("portrait");
@@ -192,7 +189,7 @@ public class VL2 extends JFrame implements ActionListener
 		// For Debugging:
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
-		// Check GL entries and post transactions to chart elements
+		// Check GL entries and record previously posted transactions in chart elements
 		String GLFilename = vl2Config.getGLFile();
 		logger.logDebug("Checking GLFile " + GLFilename);
 		if (!new File(GLFilename).exists())
@@ -225,8 +222,8 @@ public class VL2 extends JFrame implements ActionListener
 			logger.log("VL2 214:  plElement=" + chart.getPLElement().toString());
 		// The print above shows the correct balances for plElement
 
-		// Now update the Total Liabilities & Retained Earnings element (if it exists)
-		// necessary because the retained earnings element did not have
+		// Now update the Total Liabilities & Retained Earnings element (if it exists).
+		// This is necessary because the retained earnings element did not have
 		// the correct data at the time that the element totals were computed
 		ChartElement TLREElement = chart.findTagElement("TLRE");
 		if (TLREElement != null)
