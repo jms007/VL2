@@ -107,7 +107,7 @@ public class VL2 extends JFrame implements ActionListener
 			{
 				System.out.println("cannot display logo: " + x.getMessage());
 			}
-			// System.out.println("finished with logo");
+		// System.out.println("finished with logo");
 		}
 
 		Strings.printVersion();
@@ -124,7 +124,7 @@ public class VL2 extends JFrame implements ActionListener
 		String logFilename = VL2Config.getAccountingDataDirectory() + "VL2.log";
 		logger = new LogFile(logFilename, true);
 		logger.log("Log File " + logFilename + " opened");
-		logger.log("***** STARTING VL2 [branch " + BRANCH + "] " + new Julian().toString("") + " *****");
+		logger.log("***** STARTING VL2 Version " + VERSION + " "+new Julian().toString("") + " *****");
 
 		// For Debugging
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
@@ -182,7 +182,7 @@ public class VL2 extends JFrame implements ActionListener
 			logger.logFatal("IO error checking chart: " + iox.getMessage());
 		} catch (VLException vlx)
 		{
-			logger.logFatal("VL Error checking chart: " + vlx.getMessage());
+			logger.log("IGNORING VL Error checking chart: " + vlx.getMessage());
 		}
 		logger.logInfo("Chart initialized without error");
 
