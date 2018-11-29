@@ -54,7 +54,7 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		try
 		{
 			// For Debugging
-			// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+			logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
 			logger.logDebug("Chart.init: chartFilename=" + chartFilename);
 			nErrors = 0;
@@ -114,12 +114,16 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 			// acctNumbers = null; // basura
 			// descrs = null; // basura
 			return;
-		} catch (ParserConfigurationException | SAXException xl)
-		{
+		} catch (ParserConfigurationException pcx)
+			{
+			reportError(pcx.getMessage());
+			}
+			catch (SAXException xl)
+			{
 			reportError(xl.getMessage());
 			logger.logFatal(xl.getMessage());
 			throw new IOException(xl.getMessage());
-		}
+			}
 	}
 
 	public void startElement(String namespaceURI, String sName, // simple name (localName)
