@@ -54,7 +54,7 @@ public class Chart extends DefaultHandler // implements Enumeration<String>
 		try
 		{
 			// For Debugging
-			logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+			// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 
 			logger.logDebug("Chart.init: chartFilename=" + chartFilename);
 			nErrors = 0;
