@@ -541,7 +541,7 @@ public class VL2 extends JFrame implements ActionListener
 	private void startTextStmt()
 	{
 		// For debugging
-		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		logger.logDebug("starting new StatementTXT");
 		StatementTXT statementTXT = new StatementTXT();
 		logger.logDebug("starting statementTXT.setup");
