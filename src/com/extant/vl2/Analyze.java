@@ -52,7 +52,9 @@ public class Analyze extends JDialog implements TreeSelectionListener
 	// Code">//GEN-BEGIN:initComponents
 	private void initComponents()
 	{
-
+		// For debugging:
+		logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
+		
 		comboAccounts = new JTextField();
 		jLabel1 = new javax.swing.JLabel();
 		btnAnalyze = new javax.swing.JButton();
@@ -240,11 +242,12 @@ public class Analyze extends JDialog implements TreeSelectionListener
 
 	private void btnAnalyzeActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_btnAnalyzeActionPerformed
 	{// GEN-HEADEREND:event_btnAnalyzeActionPerformed
+		logger.logDebug("selected account: " + comboAccounts.getSelectedText());
 		if (rbDates.isSelected())
-			analyze((Account) chart.findAcctByNo(comboAccounts.getText()), new Julian(txtStartDate.getText()),
+			analyze((Account)chart.findAcctByNo(comboAccounts.getSelectedText()), new Julian(txtStartDate.getText()),
 					new Julian(txtEndDate.getText()));
 		else
-			analyze((Account) chart.findAcctByNo(comboAccounts.getText()), null, null);
+			analyze((Account) chart.findAcctByNo(comboAccounts.getSelectedText()), null, null);
 	}// GEN-LAST:event_btnAnalyzeActionPerformed
 
 	private void btnAnalyzeCancelActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_btnAnalyzeCancelActionPerformed
@@ -276,6 +279,8 @@ public class Analyze extends JDialog implements TreeSelectionListener
 
 	private void analyze(Account acctEntry, Julian startDate, Julian endDate)
 	{
+		if (acctEntry == null) logger.logDebug("acctEntry = null!");
+		logger.logDebug("analyze acctEntry =" + acctEntry.toString());
 		String acctNo = acctEntry.getAccountNo();
 		StringBuffer results = new StringBuffer();
 		GLEntry glEntry;
