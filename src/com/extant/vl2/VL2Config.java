@@ -16,10 +16,9 @@ public class VL2Config
 		return String.format(pattern, userName);
 	}
 
-	//private final String validEntities = "EXTANT, JMS, JMSCT, QUITO, XINV";
 	private final String accountingDataDir;
 	private final String entityName;
-	String currentYear; // Set after user enters yy or confirms default
+	String currentYY; // Set after user enters last 2 digits of current year or confirms default
 	private XProperties props;
 	private String earliestDate;
 	private String latestDate;
@@ -44,9 +43,9 @@ public class VL2Config
 
 	void setCurrentYear(String yy)
 	{
-		currentYear = yy;
+		currentYY = yy;
 		if (!new File(this.accountingDataDir + "\\" + entityName + "\\GL" + yy).exists())
-			VL2.logger.logFatal(yy + " is not a valid year.");
+			VL2.logger.logFatal("no data found for entityName" + "\\"+ yy + ".");
 	}
 
 	public void listAllProperties()
@@ -54,7 +53,7 @@ public class VL2Config
 		System.out.println("AccountingDataDirectory=" + getAccountingDataDirectory());
 		System.out.println("EntityName=" + getEntityName());
 		System.out.println("EntityLongName=" + getEntityLongName());
-		System.out.println("currentYear=" + getCurrentYear());
+		System.out.println("currentYear=" + getCurrentYY());
 		System.out.println("ChartFile=" + getChartFile());
 		System.out.println("CustomerList=" + getCustomerList());
 		System.out.println("VendorList=" + getVendorList());
@@ -81,9 +80,9 @@ public class VL2Config
 		return props.getString("EntityLongName");
 	}
 
-	public String getCurrentYear()
+	public String getCurrentYY()
 	{
-		return currentYear;
+		return currentYY;
 	}
 
 	public String getChartFile()
@@ -128,7 +127,7 @@ public class VL2Config
 
 	public String getWorkingDirectory()
 	{
-		return accountingDataDir + entityName + "\\GL" + currentYear + "\\";
+		return accountingDataDir + entityName + "\\GL" + currentYY + "\\";
 	}
 
 	public String getEarliestDate()

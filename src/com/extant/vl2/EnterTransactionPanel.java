@@ -410,7 +410,7 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 	{
 		boolean valid;
 		Julian date = new Julian(txtDate.getText());
-		valid = date.isValid() && date.toString("yy").equals(vl2Config.currentYear);
+		valid = date.isValid() && date.toString("yy").equals(vl2Config.getCurrentYY());
 		return valid;
 	}
 
@@ -459,7 +459,7 @@ public class EnterTransactionPanel extends javax.swing.JPanel
 	{
 		boolean dateIsValid;
 		Julian date = new Julian(txtDate.getText());
-		dateIsValid = date.isValid() && date.toString("yy").equals(VL2.vl2Config.currentYear);
+		dateIsValid = date.isValid() && date.toString("yy").equals(vl2Config.getCurrentYY());
 		if (!dateIsValid)
 			txtDate.setBackground(Color.yellow);
 		else txtDate.setBackground(normalBG);
