@@ -54,7 +54,7 @@ public class VL2 extends JFrame implements ActionListener
 	static String entityName = null;
 	static String entityLongName = null;
 	static String entityPropsFilename = null;
-	static String yy = null;
+	static String CurrentYY = null;
 	static String workDir;
 	static String chartFilename = null;
 	static Chart chart = null;
@@ -147,9 +147,9 @@ public class VL2 extends JFrame implements ActionListener
 		msgBox = new MsgBox(VL2MenuFrame, "Year", "Enter the year (yy)", defaultYear, new String[] { "OK", "Cancel" });
 		if (msgBox.getCommand().equals("Cancel"))
 			logger.logFatal("User Cancel (Enter year)");
-		yy = msgBox.getResponse();
-		vl2Config.setCurrentYear(yy); // This aborts if yy is invalid
-
+		CurrentYY = msgBox.getResponse();
+		vl2Config.setCurrentYY(CurrentYY); // This aborts if CurrentYY is invalid (no workdir for that year)
+		
 		// Set printOrientation
 		vl2Config.setPrintOrientation("portrait");
 
@@ -160,7 +160,7 @@ public class VL2 extends JFrame implements ActionListener
 		// Debug Report
 		// logger.setLogLevel(LogFile.DEBUG_LOG_LEVEL);
 		logger.logDebug("entityName=" + entityName);
-		logger.logDebug("year=" + yy);
+		logger.logDebug("year=" + CurrentYY);
 		logger.logDebug("workDir=" + workDir);
 		logger.logDebug("entityPropsFilename=" + entityPropsFilename);
 		logger.logDebug("printOrientation=" + vl2Config.getPrintOrientation());
@@ -278,6 +278,10 @@ public class VL2 extends JFrame implements ActionListener
 		muPrintCheck.addActionListener(this);
 		muFile.add(muPrintCheck);
 
+		JMenuItem muClose = new JMenuItem("Close");
+		muClose.addActionListener(this);
+		muFile.add(muClose);
+		
 		JMenuItem muTest = new JMenuItem("Test");
 		muTest.addActionListener(this);
 		muFile.add(muTest);
@@ -418,6 +422,12 @@ public class VL2 extends JFrame implements ActionListener
 			logger.setLogLevel(LogFile.NORMAL_LOG_LEVEL);
 		}
 
+//		else if (command.equals("Close"))
+//		{
+//			CloseFiscalPeriod closeFiscalPeriod = new CloseFiscalPeriod();
+//			closeFiscalPeriod();
+//		}
+//
 		else if (command.equals("About"))
 		{
 			System.out.println("Visual Ledger");

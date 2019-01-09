@@ -35,7 +35,7 @@ public class GLChecker
 		// For debugging:
 		// logger.setLogAll(true);
 
-		currentYear = Integer.parseInt(props.getCurrentYear());
+		currentYear = Integer.parseInt(vl2Config.getCurrentYY());
 		infoReport = "";
 		nErrors = 0;
 		lineNo = 0;

@@ -19,6 +19,9 @@ public class VL2Config
 	private final String accountingDataDir;
 	private final String entityName;
 	String currentYY; // Set after user enters last 2 digits of current year or confirms default
+	//String currentYYYY;
+	int yy;
+	int yyyy;
 	private XProperties props;
 	private String earliestDate;
 	private String latestDate;
@@ -41,11 +44,16 @@ public class VL2Config
 		props = new XProperties(propFilename);
 	}
 
-	void setCurrentYear(String yy)
+	void setCurrentYY(String YY)
 	{
-		currentYY = yy;
-		if (!new File(this.accountingDataDir + "\\" + entityName + "\\GL" + yy).exists())
-			VL2.logger.logFatal("no data found for entityName" + "\\"+ yy + ".");
+		this.currentYY = YY;
+		yy = new Integer(currentYY);
+		if (!new File(this.accountingDataDir + "\\" + entityName + "\\GL" + YY).exists())
+			VL2.logger.logFatal("no data found for " + entityName + "\\GL"+ YY + ".");
+		// Compute full year int (yyyy)
+		if (yy < 50)
+			yyyy = 1900 + yy;
+		else yyyy = 2000 + yy;
 	}
 
 	public void listAllProperties()
@@ -53,7 +61,9 @@ public class VL2Config
 		System.out.println("AccountingDataDirectory=" + getAccountingDataDirectory());
 		System.out.println("EntityName=" + getEntityName());
 		System.out.println("EntityLongName=" + getEntityLongName());
-		System.out.println("currentYear=" + getCurrentYY());
+		System.out.println("currentYY=" + getCurrentYY());
+		System.out.println("yy=" + getyy());
+		System.out.println("yyyy=" + getyyyy());
 		System.out.println("ChartFile=" + getChartFile());
 		System.out.println("CustomerList=" + getCustomerList());
 		System.out.println("VendorList=" + getVendorList());
@@ -83,6 +93,16 @@ public class VL2Config
 	public String getCurrentYY()
 	{
 		return currentYY;
+	}
+
+	public int getyy()
+	{
+		return yy;
+	}
+
+	public int getyyyy()
+	{
+		return yyyy;
 	}
 
 	public String getChartFile()
