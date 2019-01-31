@@ -418,7 +418,7 @@ public class EnterJournalTransaction extends javax.swing.JPanel
 
 			// or use Julian
 			transDate = new Julian(tf.getText());
-			logger.log("DateVerifier: transDate=" + transDate);
+			//logger.log("DateVerifier: transDate=" + transDate);
 			if (transDate.toString("yy").equals(vl2Config.currentYY))
 				return true;
 			return false;
