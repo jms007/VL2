@@ -49,7 +49,7 @@ public class VL2 extends JFrame implements ActionListener
 
 	// Global variables
 	static final String BRANCH = ".1";
-	static final String VERSION = "2.4" + BRANCH;
+	static final String VERSION = "2.5" + BRANCH;
 	static String ACCOUNTING_DIR;
 	static String entityName = null;
 	static String entityLongName = null;
