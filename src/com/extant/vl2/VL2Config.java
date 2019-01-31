@@ -51,11 +51,11 @@ public class VL2Config
 		if (!new File(this.accountingDataDir + "\\" + entityName + "\\GL" + YY).exists())
 			VL2.logger.logFatal("no data found for " + entityName + "\\GL"+ YY + ".");
 		// Compute full year int (yyyy)
-		if (yy < 50)
+		if (yy > 50)
 			yyyy = 1900 + yy;
 		else yyyy = 2000 + yy;
 	}
-
+	
 	public void listAllProperties()
 	{
 		System.out.println("AccountingDataDirectory=" + getAccountingDataDirectory());
